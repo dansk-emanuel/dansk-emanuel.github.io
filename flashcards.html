@@ -3,24 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Materiale</title>
+    <title>Vælg Flashcards - Emanuel</title>
     <style>
-        body { font-family: 'Arial', sans-serif; padding: 40px; background: #fff; }
-        .project-link { background: #f0f0f0; border-left: 5px solid #2ecc71; padding: 15px; margin: 10px 0; }
-        h1 { color: #27ae60; }
+        body { font-family: 'Arial', sans-serif; background: #f4f4f4; margin: 0; padding: 20px; text-align: center; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; }
+        .menu-item { 
+            display: block; 
+            background: #3498db; 
+            color: white; 
+            padding: 15px; 
+            margin: 10px 0; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            font-size: 1.2rem; 
+            transition: 0.3s; 
+        }
+        .menu-item:hover { background: #2980b9; transform: scale(1.02); }
+        .back-link { display: inline-block; margin-top: 20px; color: #7f8c8d; text-decoration: none; }
     </style>
 </head>
 <body>
 
-    <h1>[HER SKRIVER DU OVERSKRIFTEN]</h1>
-    <p>Her er mine programmer og noter:</p>
+<div class="container">
+    <h1>Vælg et emne</h1>
+    <p>Hvilke ord vil du øve i dag?</p>
 
-    <div class="project-link">
-        <strong>Nyt projekt:</strong> <a href="#">Link til koden kommer her</a>
-    </div>
-
-    <br>
-    <a href="du2-modul.html">← Tilbage til modulsiden</a>
+    <a href="fc-adjektiver.html" class="menu-item">De 20 vigtigste Adjektiver</a>
+    
+    <hr>
+    <a href="du2-modul.html" class="back-link">← Tilbage til Modul 3-4</a>
+</div>
 
 </body>
 </html>
