@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards: 20 Adjektiver</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #27ae60;
+            --bg: #f4f7f6;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: var(--primary); }
+
+        .controls { margin-bottom: 20px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        select { padding: 8px; font-size: 1rem; border-radius: 5px; border: 1px solid #ccc; cursor: pointer; }
+
+        /* Flashcard Styling */
+        .card-container { perspective: 1000px; width: 300px; height: 200px; cursor: pointer; }
+        .card {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+        .card.is-flipped { transform: rotateY(180deg); }
+        
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            border-radius: 15px; font-size: 1.8rem; font-weight: bold; padding: 20px; box-sizing: border-box; text-align: center;
+        }
+        .card-front { background: white; color: var(--primary); border: 3px solid var(--primary); }
+        .card-back { background: var(--accent); color: white; transform: rotateY(180deg); font-size: 1.5rem; }
+
+        .nav-buttons { margin-top: 30px; display: flex; gap: 20px; }
+        button { padding: 10px 20px; font-size: 1rem; cursor: pointer; border: none; border-radius: 5px; background: var(--primary); color: white; transition: 0.3s; }
+        button:hover { opacity: 0.8; }
+        
+        .back-link { margin-top: 40px; text-decoration: none; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Dansk Adjektiver</h1>
+    <p>Tryk på kortet for at se oversættelsen</p>
+</header>
+
+<div class="controls">
+    <label>Vælg sprog: </label>
+    <select id="langSelect" onchange="updateCard()">
+        <option value="en">Engelsk (English)</option>
+        <option value="ru">Russisk (Русский)</option>
+        <option value="fa">Persisk (فارسی)</option>
+        <option value="ur">Urdu (اردو)</option>
+    </select>
+</div>
+
+<div class="card-container" onclick="flipCard()">
+    <div class="card" id="card">
+        <div class="card-face card-front" id="dansk-word">Indlæser...</div>
+        <div class="card-face card-back" id="translated-word">Loading...</div>
+    </div>
+</div>
+
+<div class="nav-buttons">
+    <button onclick="prevCard()">Forrige</button>
+    <button onclick="nextCard()">Næste</button>
+</div>
+
+<p style="margin-top: 20px;"><span id="currentNum">1</span> / 20</p>
+
+<a href="du2-modul.html" class="back-link">← Tilbage til modulsiden</a>
+
+<script>
+    const adjectives = [
+        { da: "Stor", en: "Big", ru: "Большой", fa: "بزرگ", ur: "بڑا" },
+        { da: "Lille", en: "Small", ru: "Маленький", fa: "کوچک", ur: "چھوٹا" },
+        { da: "God", en: "Good", ru: "Хороший", fa: "خوب", ur: "اچھا" },
+        { da: "Dårlig", en: "Bad", ru: "Bad", fa: "بد", ur: "برا" },
+        { da: "Glad", en: "Happy", ru: "Счастливый", fa: "خوشحال", ur: "خوش" },
+        { da: "Træt", en: "Tired", ru: "Уставший", fa: "خسته", ur: "تھکا ہوا" },
+        { da: "Varm", en: "Warm/Hot", ru: "Теплый", fa: "گرم", ur: "گرم" },
+        { da: "Kold", en: "Cold", ru: "Холодный", fa: "سرد", ur: "تھنڈا" },
+        { da: "Ny", en: "New", ru: "Новый", fa: "جدید", ur: "نیا" },
+        { da: "Gammel", en: "Old", ru: "Старый", fa: "قدیمی", ur: "پرانا" },
+        { da: "Hurtig", en: "Fast", ru: "Быстрый", fa: "سریع", ur: "تیز" },
+        { da: "Langsom", en: "Slow", ru: "Медленный", fa: "آهسته", ur: "آہستہ" },
+        { da: "Smuk", en: "Beautiful", ru: "Красивый", fa: "زیبا", ur: "خوبصورت" },
+        { da: "Svær", en: "Difficult", ru: "Трудный", fa: "سخت", ur: "مشکل" },
+        { da: "Let", en: "Easy", ru: "Легкий", fa: "آسان", ur: "آسان" },
+        { da: "Billig", en: "Cheap", ru: "Дешевый", fa: "ارزان", ur: "سستا" },
+        { da: "Dyr", en: "Expensive", ru: "Дорогой", fa: "گران", ur: "مہنگا" },
+        { da: "Vigtig", en: "Important", ru: "Важный", fa: "مهم", ur: "اہم" },
+        { da: "Syg", en: "Sick", ru: "Больной", fa: "بیمار", ur: "بیمار" },
+        { da: "Frisk", en: "Fresh/Healthy", ru: "Свежий", fa: "سالم", ur: "تازہ" }
+    ];
+
+    let currentIndex = 0;
+
+    function updateCard() {
+        const lang = document.getElementById('langSelect').value;
+        const card = adjectives[currentIndex];
+        document.getElementById('dansk-word').textContent = card.da;
+        document.getElementById('translated-word').textContent = card[lang];
+        document.getElementById('currentNum').textContent = currentIndex + 1;
+        document.getElementById('card').classList.remove('is-flipped');
+    }
+
+    function flipCard() {
+        document.getElementById('card').classList.toggle('is-flipped');
+    }
+
+    function nextCard() {
+        currentIndex = (currentIndex + 1) % adjectives.length;
+        updateCard();
+    }
+
+    function prevCard() {
+        currentIndex = (currentIndex - 1 + adjectives.length) % adjectives.length;
+        updateCard();
+    }
+
+    // Start
+    updateCard();
+</script>
+
+</body>
+</html>
