@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flipped {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col items-center p-4 font-sans">
+
+    <div id="app" class="w-full max-w-2xl">
+        <!-- Header & Sprogvælger -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-slate-800 mb-4">Emanuels Flashcards</h1>
+            <div class="flex flex-wrap justify-center gap-2 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+                <label class="w-full text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Vælg målsprog:</label>
+                <select id="languageSelect" class="bg-slate-100 border-none text-slate-700 py-2 px-4 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+                    <!-- Sprog bliver indsat via JS -->
+                </select>
+            </div>
+        </header>
+
+        <!-- Status -->
+        <div class="flex justify-between items-center mb-4 px-2">
+            <span class="text-slate-600 font-medium" id="cardCountDisplay">Kort tilbage: 10</span>
+            <div class="h-2 w-32 bg-slate-200 rounded-full overflow-hidden">
+                <div id="progressBar" class="h-full bg-blue-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Flashcard Container -->
+        <div class="relative h-80 w-full perspective-1000 group cursor-pointer" id="cardContainer">
+            <div id="cardInner" class="flip-card-inner relative w-full h-full shadow-xl rounded-2xl">
+                
+                <!-- Forside (Dansk) -->
+                <div class="flip-card-front absolute inset-0 bg-white rounded-2xl flex flex-col items-center justify-center p-8 border border-slate-100">
+                    <span class="text-xs font-bold text-blue-500 uppercase tracking-widest mb-2">Dansk</span>
+                    <p id="danishText" class="text-2xl md:text-3xl font-semibold text-center text-slate-800">Indlæser...</p>
+                    <p class="text-slate-400 text-sm mt-8 italic">Klik for at se oversættelse</p>
+                </div>
+
+                <!-- Bagside (Målsprog) -->
+                <div class="flip-card-back absolute inset-0 bg-blue-600 rounded-2xl flex flex-col items-center justify-center p-8 text-white">
+                    <span id="targetLangLabel" class="text-xs font-bold text-blue-200 uppercase tracking-widest mb-2">Oversættelse</span>
+                    <p id="translatedText" class="text-2xl md:text-3xl font-semibold text-center">Translation</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Knapper (Vises kun når kortet er vendt) -->
+        <div id="controls" class="mt-8 flex gap-4 justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+            <button onclick="handleAnswer(false)" class="bg-rose-100 text-rose-600 hover:bg-rose-200 font-bold py-3 px-8 rounded-xl transition-colors border-2 border-rose-200 shadow-sm">
+                Forkert
+            </button>
+            <button onclick="handleAnswer(true)" class="bg-emerald-500 text-white hover:bg-emerald-600 font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-emerald-200 active:scale-95">
+                Rigtigt
+            </button>
+        </div>
+
+        <!-- Færdig Skærm -->
+        <div id="finishScreen" class="hidden fixed inset-0 bg-white/95 flex flex-col items-center justify-center p-6 text-center z-50">
+            <div class="bg-white p-10 rounded-3xl shadow-2xl border border-slate-100">
+                <div class="text-6xl mb-4">🎉</div>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Godt gået!</h2>
+                <p class="text-slate-600 mb-8">Du har lært alle ordene i denne omgang.</p>
+                <button onclick="resetApp()" class="bg-blue-600 text-white font-bold py-4 px-10 rounded-2xl hover:bg-blue-700 transition-all shadow-xl">
+                    Start forfra
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const wordList = [
+            { id: 1, da: "Kære Emanuel" },
+            { id: 2, da: "Hej Emanuel" },
+            { id: 3, da: "Tak for din mail" },
+            { id: 4, da: "Hvordan går det?" },
+            { id: 5, da: "Hvordan har du det?" },
+            { id: 6, da: "Jeg håber det går godt" },
+            { id: 7, da: "Jeg har det fint" },
+            { id: 8, da: "Jeg vil gerne fortælle om _______" },
+            { id: 9, da: "Jeg håber vi ses snart" },
+            { id: 10, da: "Med venlig hilsen" }
+        ];
+
+        const translations = {
+            "Engelsk": ["Dear Emanuel", "Hello Emanuel", "Thank you for your email", "How is it going?", "How are you?", "I hope it is going well", "I am fine", "I would like to tell you about _______", "I hope to see you soon", "Best regards / Sincerely"],
+            "Bengali": ["প্রিয় ইمانুয়েল", "হ্যালো ইمانুয়েল", "আপনার ইমেলের জন্য ধন্যবাদ", "কেমন চলছে?", "আপনি কেমন আছেন?", "আমি আশা করি সব ভালো চলছে", "আমি ভালো আছি", "আমি _______ সম্পর্কে বলতে চাই", "আশা করি শীঘ্রই দেখা হবে", "শুভেচ্ছান্তে"],
+            "Hindi": ["प्रिय इमानुएल", "नमस्ते इमानुएल", "आपके ईमेल के लिए धन्यवाद", "क्या हाल है?", "आप कैसे हैं?", "मुझे उम्मीद है कि सब ठीक चल रहा होगा", "मैं ठीक हूँ", "मैं _______ के बारे में बताना चाहता हूँ", "आशा है कि हम जल्द ही मिलेंगे", "सादर"],
+            "Urdu": ["پیارے ایمانوئل", "ہیلو ایمانوئل", "آپ کی ای میل کا شکریہ", "کیا حال ہے؟", "آپ کیسے ہیں؟", "مجھے امید ہے کہ سب ٹھیک ہو گا", "میں ٹھیک ہوں", "میں _______ کے بارے میں بتانا چاہتا ہوں", "امید ہے کہ جلد ملاقات ہوگی", "نیک تمنائیں"],
+            "Ukrainsk": ["Дорогий Емануелю", "Привіт, Емануелю", "Дякую за ваш лист", "Як справи?", "Як ви почуваєтесь?", "Сподіваюся, у вас все добре", "У мене все добре", "Я хотів би розповісти про _______", "Сподіваюся, скоро побачимось", "З найкращими побажаннями"],
+            "Russisk": ["Дорогой Эмануэль", "Привет, Эмануэль", "Спасибо за ваше письмо", "Как дела?", "Как вы поживаете?", "Надеюсь, всё хорошо", "У меня всё в порядке", "Я хотел бы рассказать о _______", "Надеюсь, до скорой встречи", "С уважением"],
+            "Persisk": ["امانوئل عزیز", "سلام امانوئل", "ممنون از ایمیل شما", "چطور پیش می‌رود؟", "حالت چطور است؟", "امیدوارم همه چیز خوب باشد", "من خوب هستم", "من می‌خواهم در مورد _______ بگویم", "امیدوارم به زودی ببینمت", "با احترام"],
+            "Tyrkisk": ["Sevgili Emanuel", "Merhaba Emanuel", "E-postanız için teşekkürler", "Nasıl gidiyor?", "Nasılsınız?", "Umarım her şey yolundadır", "İyiyim", "Size _______ hakkında anlatmak istiyorum", "Umarım yakında görüşürüz", "Saygılarımla"],
+            "Kurdisk Kurmanji": ["Emanuelê hêja", "Silav Emanuel", "Spas ji bo e-peyama te", "Çawa diçe?", "Tu çawa yî?", "Hêvî dikim ku her tişt baş diçe", "Ez baş im", "Ez dixwazim li ser _______ biaxivim", "Bi hêviya dîtina nêzîk", "Bi silavên germ"],
+            "Kurdisk Sorani": ["ئیمانوێلی ئازیز", "سڵاو ئیمانوێل", "سوپাস بۆ ئیمەیڵەکەت", "چۆن دەچێت؟", "چۆنیت؟", "هیوادارم هەموو شتێک باش بێت", "من باشم", "دەمەوێت باسی _______ بکەم", "بە هیوای دیدار", "لەگەڵ ڕێزدا"],
+            "Nepalesisk": ["प्रिय इमानुएल", "नमस्ते इमानुएल", "तपाईंको इमेलको लागि धन्यवाद", "के छ खबर?", "तपाईंलाई कस्तो छ?", "मलाई आशा छ कि सबै ठीक भइरहेको छ", "मलाई ठीक छ", "म _______ को बारेमा भन्न चाहन्छु", "आशा छ हामी छिट्टै भेट्नेछौं", "शुभकामना सहित"],
+            "Kiswahili": ["Mpendwa Emanuel", "Habari Emanuel", "Asante kwa barua pepe yako", "Mambo vipi?", "U hali gani?", "Natumai kila kitu ni sawa", "Niko salama", "Ningependa kuelezea kuhusu _______", "Natumai tutaonana hivi karibuni", "Wako wa dhati"],
+            "Fransk": ["Cher Emanuel", "Salut Emanuel", "Merci pour votre e-mail", "Comment ça va ?", "Comment allez-vous ?", "J'espère que tout va bien", "Je vais bien", "Je voudrais vous parler de _______", "J'espère vous revoir bientôt", "Cordialement"],
+            "Twi": ["Emanuel dɔfo", "Maakye/Maaha Emanuel", "Meda wo ase wo krataa no ho", "Ɛte sɛn?", "Wo ho te sɛn?", "Mepɛ sɛ meka _______ ho asɛm", "Mewɔ anidaso sɛ yɛbehyia nnansa yi", "Yɛ bɛ hyia bio", "Mema wo akye"],
+            "Bosnisk": ["Dragi Emanuele", "Zdravo Emanuele", "Hvala na tvom mejlu", "Kako ide?", "Kako si?", "Nadam se da je sve u redu", "Dobro sam", "Želio bih ti ispričati o _______", "Nadam se da se vidimo uskoro", "Srdačan pozdrav"],
+            "Somali": ["Gacalle Emanuel", "Inaadeer Emanuel / Haye Emanuel", "Waad ku mahadsantahay iimaylkaaga", "Sidee bay wax u socdaan?", "Sidee tahay?", "Waxaan rajeynayaa inay wax walba si fiican u socdaan", "Waan ladnahay / Waan fiicanahay", "Waxaan rabaa inaan kaaga sheego _______", "Waxaan rajeynayaa inaan dhowaan is aragno", "Wabillaahi tawfiiq / Mahadsanid"],
+            "Tigrinya": ["ቁንጅና ኢማኑኤል", "ሰላም ኢማኑኤል", "ሳላ ኢመይልካ", "ከመይ ይኸይድ ኣሎ?", "ከመይ ኣለኻ?", "ሰላም ክትኸውን ተስፋ እገብር", "ኣነ ደሓን እየ", "ብዛዕባ _______ ክነግረካ እደሊ", "ቀልጢፍና ክንራኸብ ተስፋ እገብር", "ሰላምታ"],
+            "Mandarin Kinesisk": ["亲爱的伊曼纽尔", "你好, 伊曼纽尔", "感谢您的来信", "最近怎么样？", "你好吗？", "我希望一切都好", "我很好", "我想告诉你关于 _______", "希望很快能见到你", "此致敬礼"]
+        };
+
+        let currentDeck = [...wordList];
+        let currentCardIndex = 0;
+        let isFlipped = false;
+        let isTransitioning = false;
+        let selectedLanguage = "Engelsk";
+
+        const cardContainer = document.getElementById('cardContainer');
+        const cardInner = document.getElementById('cardInner');
+        const controls = document.getElementById('controls');
+        const danishText = document.getElementById('danishText');
+        const translatedText = document.getElementById('translatedText');
+        const languageSelect = document.getElementById('languageSelect');
+        const targetLangLabel = document.getElementById('targetLangLabel');
+        const cardCountDisplay = document.getElementById('cardCountDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const finishScreen = document.getElementById('finishScreen');
+
+        function init() {
+            Object.keys(translations).forEach(lang => {
+                const option = document.createElement('option');
+                option.value = lang;
+                option.textContent = lang;
+                languageSelect.appendChild(option);
+            });
+
+            languageSelect.addEventListener('change', (e) => {
+                selectedLanguage = e.target.value;
+                resetApp();
+            });
+
+            cardContainer.addEventListener('click', flipCard);
+            shuffleDeck();
+            updateUI();
+        }
+
+        function shuffleDeck() {
+            currentDeck.sort(() => Math.random() - 0.5);
+        }
+
+        function flipCard() {
+            if (isTransitioning || isFlipped) return;
+            isFlipped = true;
+            cardInner.classList.add('flipped');
+            controls.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function handleAnswer(isCorrect) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            cardInner.classList.remove('flipped');
+            controls.classList.add('opacity-0', 'pointer-events-none');
+
+            setTimeout(() => {
+                if (isCorrect) {
+                    currentDeck.splice(currentCardIndex, 1);
+                } else {
+                    const card = currentDeck.splice(currentCardIndex, 1)[0];
+                    currentDeck.push(card);
+                }
+
+                if (currentDeck.length === 0) {
+                    showFinish();
+                } else {
+                    if (currentCardIndex >= currentDeck.length) {
+                        currentCardIndex = 0;
+                    }
+                    isFlipped = false;
+                    updateUI();
+                }
+                isTransitioning = false;
+            }, 400);
+        }
+
+        function updateUI() {
+            const currentCard = currentDeck[currentCardIndex];
+            if (!currentCard) return;
+
+            danishText.textContent = currentCard.da;
+            const langIndex = wordList.findIndex(w => w.id === currentCard.id);
+            const translationArr = translations[selectedLanguage];
+            translatedText.textContent = translationArr[langIndex];
+            
+            targetLangLabel.textContent = selectedLanguage;
+            cardCountDisplay.textContent = `Kort tilbage: ${currentDeck.length}`;
+            
+            const progress = ((wordList.length - currentDeck.length) / wordList.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function showFinish() {
+            finishScreen.classList.remove('hidden');
+        }
+
+        function resetApp() {
+            currentDeck = [...wordList];
+            currentCardIndex = 0;
+            isFlipped = false;
+            isTransitioning = false;
+            shuffleDeck();
+            cardInner.classList.remove('flipped');
+            controls.classList.add('opacity-0', 'pointer-events-none');
+            finishScreen.classList.add('hidden');
+            updateUI();
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
