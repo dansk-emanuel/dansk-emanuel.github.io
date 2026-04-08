@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dansk Flashcards - Lær Dansk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card-inner.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans">
+
+    <!-- Header & Sprogvalg -->
+    <header class="bg-white shadow-sm p-4 sticky top-0 z-10">
+        <div class="max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <h1 class="text-xl font-bold text-gray-800">Dansk Flashcards</h1>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <label for="langSelect" class="text-sm font-medium text-gray-600">Målsprog:</label>
+                <select id="langSelect" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    <option value="english">Engelsk</option>
+                    <option value="bengali">Bengali</option>
+                    <option value="hindi">Hindi</option>
+                    <option value="urdu">Urdu</option>
+                    <option value="ukrainian">Ukrainsk</option>
+                    <option value="russian">Russisk</option>
+                    <option value="persian">Persisk</option>
+                    <option value="turkish">Tyrkisk</option>
+                    <option value="kurmanji">Kurdisk Kurmanji</option>
+                    <option value="sorani">Kurdisk Sorani</option>
+                    <option value="nepali">Nepalesisk</option>
+                    <option value="swahili">Kiswahili</option>
+                    <option value="french">Fransk</option>
+                    <option value="twi">Twi</option>
+                    <option value="bosnian">Bosnisk</option>
+                    <option value="somali">Somali</option>
+                    <option value="serbian">Serbisk</option>
+                    <option value="tigrinya">Tigrinya</option>
+                    <option value="mandarin">Mandarin Kinesisk</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center p-6" id="app">
+        <!-- Status -->
+        <div id="gameUI" class="w-full max-w-md flex flex-col items-center gap-6">
+            <div class="w-full flex justify-between items-center text-gray-600 font-semibold px-2">
+                <span id="cardCount">Kort tilbage: 0</span>
+                <span id="statusLabel" class="text-xs uppercase tracking-wider bg-gray-200 px-2 py-1 rounded">Klik på kortet for at se svar</span>
+            </div>
+
+            <!-- Flashcard Container -->
+            <div id="cardTrigger" class="w-full h-80 perspective-1000 cursor-pointer">
+                <div id="cardInner" class="flip-card-inner relative w-full h-full">
+                    <!-- Forside (Dansk) -->
+                    <div class="flip-card-front bg-white text-black border-2 border-gray-200 text-center">
+                        <p id="danishText" class="text-2xl font-medium"></p>
+                    </div>
+                    <!-- Bagside (Målsprog) -->
+                    <div class="flip-card-back bg-[#F5F5DC] text-black text-center">
+                        <p id="translatedText" class="text-2xl font-medium"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Knapper (Vises kun når kortet er vendt) -->
+            <div id="controls" class="flex gap-4 w-full opacity-0 transition-opacity duration-300 pointer-events-none">
+                <button id="btnWrong" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl shadow-lg transition-transform active:scale-95">
+                    Forkert
+                </button>
+                <button id="btnRight" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg transition-transform active:scale-95">
+                    Rigtigt
+                </button>
+            </div>
+        </div>
+
+        <!-- Færdig Skærm -->
+        <div id="finishUI" class="hidden flex flex-col items-center justify-center text-center gap-6">
+            <div class="text-6xl">🎉</div>
+            <h2 class="text-3xl font-bold text-gray-800">Du er færdig!</h2>
+            <p class="text-gray-600">Du har lært alle sætningerne i denne runde.</p>
+            <button id="btnRestart" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform active:scale-95">
+                Start forfra
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // Data struktur med oversættelser
+        const flashcardsData = [
+            {
+                da: "Man kan lære dansk på arbejdet/sprogskolen/online/i fritiden",
+                english: "You can learn Danish at work / at language school / online / in your free time",
+                bengali: "আপনি কর্মক্ষেত্রে / ভাষা স্কুলে / অনলাইনে / আপনার অবসর সময়ে ডেনিশ শিখতে পারেন",
+                hindi: "आप काम पर / भाषा स्कूल में / ऑनलाइन / अपने खाली समय में डेनिश सीख सकते हैं",
+                urdu: "آپ کام پر / لینگویج اسکول میں / آن لائن / اپنے فارغ وقت میں ڈینش سیکھ سکتے ہیں۔",
+                ukrainian: "Ви можете вивчати данську на роботі / в мовній школі / онлайн / у вільний час",
+                russian: "Вы можете учить датский на работе / в языковой школе / онлайн / в свободное время",
+                persian: "شما می توانید دانمارکی را در محل کار / در مدرسه زبان / آنلاین / در اوقات فراغت خود یاد بگیرید",
+                turkish: "İş yerinde / dil okulunda / çevrimiçi / boş zamanlarınızda Danca öğrenebilirsiniz",
+                kurmanji: "Hûn dikarin danîmarkî li ser kar / li dibistana ziman / serhêl / di dema xwe ya vala de fêr bibin",
+                sorani: "دەتوانیت زمانی دانیمارکی لە سەر کار / لە قوتابخانەی زمان / بە ئۆنلاین / لە کاتە بەتاڵەکانتدا فێر بیت",
+                nepali: "तपाईं काममा / भाषा विद्यालयमा / अनलाइन / आफ्नो खाली समयमा डेनिस सिक्न सक्नुहुन्छ",
+                swahili: "Unaweza kujifunza Kidenmaki kazini / katika shule ya lugha / mtandaoni / wakati wako wa mapumziko",
+                french: "Vous pouvez apprendre le danois au travail / à l'école de langues / en ligne / pendant votre temps libre",
+                twi: "Wubetumi asua Denmark kasa wɔ adwumam / kasa sukuu mu / intanɛt so / bere a woanya adagye mu",
+                bosnian: "Danski možete učiti na poslu / u školi jezika / online / u slobodno vrijeme",
+                somali: "Waxaad ku baran kartaa deenishka shaqada / dugsiga luqadda / onlayn / wakhtiga firaaqadaada",
+                serbian: "Danski možete učiti na poslu / u školi jezika / onlajn / u slobodno vreme",
+                tigrinya: "ትምህርቲ ዴንማርክ ኣብ ስራሕ / ኣብ ቤት ትምህርቲ ቋንቋ / ብኢንተርነት / ኣብ ናይ ዕረፍቲ ግዜኻ ክትመሃር ትኽእል ኢኻ",
+                mandarin: "你可以在工作场所、语言学校、网上或在业余时间学习丹麦语。"
+            },
+            {
+                da: "Kan du lide at gå på sprogskole?",
+                english: "Do you like going to language school?",
+                bengali: "আপনি কি ভাষা স্কুলে যেতে পছন্দ করেন?",
+                hindi: "क्या आपको भाषा स्कूल जाना पसंद है?",
+                urdu: "کیا آپ کو لینگویج اسکول جانا پسند ہے؟",
+                ukrainian: "Тобі подобається ходити в мовну школу?",
+                russian: "Тебе нравится ходить в языковую школу?",
+                persian: "آیا دوست داری به مدرسه زبان بروی؟",
+                turkish: "Dil okuluna gitmeyi seviyor musun?",
+                kurmanji: "Ma tu hez dikî biçî dibistana ziman?",
+                sorani: "ئایا حەزت لێیە بچیتە قوتابخانەی زمان؟",
+                nepali: "के तपाईलाई भाषा विद्यालय जान मन पर्छ?",
+                swahili: "Je, unapenda kwenda shule ya lugha?",
+                french: "Aimes-tu aller à l'école de langues ?",
+                twi: "Wopɛ sɛ wokɔ kasa sukuu?",
+                bosnian: "Da li volite ići u školu jezika?",
+                somali: "Ma jeceshahay inaad aado dugsiga luqadda?",
+                serbian: "Da li volite da idete u školu jezika?",
+                tigrinya: "ናብ ቤት ትምህርቲ ቋንቋ ክትከይድ ትፈቱ ዲኻ?",
+                mandarin: "你喜欢上语言学校吗？"
+            },
+            {
+                da: "Kan du lide at lære dansk online?",
+                english: "Do you like learning Danish online?",
+                bengali: "আপনি কি অনলাইনে ডেনিশ শিখতে পছন্দ করেন?",
+                hindi: "क्या आपको ऑनलाइन डेनिश सीखना पसंद है?",
+                urdu: "کیا آپ کو آن لائن ڈینش سیکھنا پسند ہے؟",
+                ukrainian: "Тобі подобається вивчати данську онлайн?",
+                russian: "Тебе нравится учить датский онлайн?",
+                persian: "آیا یادگیری آنلاین دانمارکی را دوست داری؟",
+                turkish: "Çevrimiçi Danca öğrenmeyi seviyor musun?",
+                kurmanji: "Ma tu hez dikî danîmarkî bi serhêl fêr bibî?",
+                sorani: "ئایا حەزت لێیە بە ئۆنلاین زمانی دانیمارکی فێر بیت؟",
+                nepali: "के तपाईलाई अनलाइन डेनिस सिक्न मन पर्छ?",
+                swahili: "Je, unapenda kujifunza Kidenmaki mtandaoni?",
+                french: "Aimes-tu apprendre le danois en ligne ?",
+                twi: "Wopɛ sɛ wosua Denmark kasa wɔ intanɛt so?",
+                bosnian: "Da li volite učiti danski online?",
+                somali: "Ma jeceshahay inaad deenishka ku barato onlayn?",
+                serbian: "Da li volite da učite danski onlajn?",
+                tigrinya: "ብኢንተርነት ዴንማርክ ክትመሃር ትፈቱ ዲኻ?",
+                mandarin: "你喜欢在网上学习丹麦语吗？"
+            },
+            {
+                da: "Kan du lide at lære dansk på arbejde?",
+                english: "Do you like learning Danish at work?",
+                bengali: "আপনি কি কর্মক্ষেত্রে ডেনিশ শিখতে পছন্দ করেন?",
+                hindi: "क्या आपको काम पर डेनिश सीखना पसंद है?",
+                urdu: "کیا آپ کو کام پر ڈینش سیکھنا پسند ہے؟",
+                ukrainian: "Тобі подобається вивчати данську на роботі?",
+                russian: "Тебе нравится учить датский на работе?",
+                persian: "آیا یادگیری دانمارکی در محل کار را دوست داری؟",
+                turkish: "İş yerinde Danca öğrenmeyi seviyor musun?",
+                kurmanji: "Ma tu hez dikî li ser kar danîmarkî fêr bibî?",
+                sorani: "ئایا حەزت لێیە لە سەر کار زمانی دانیمارکی فێر بیت؟",
+                nepali: "के तपाईलाई काममा डेनिस सिक्न मन पर्छ?",
+                swahili: "Je, unapenda kujifunza Kidenmaki kazini?",
+                french: "Aimes-tu apprendre le danois au travail ?",
+                twi: "Wopɛ sɛ wosua Denmark kasa wɔ adwumam?",
+                bosnian: "Da li volite učiti danski na poslu?",
+                somali: "Ma jeceshahay inaad deenishka ku barato shaqada?",
+                serbian: "Da li volite da učite danski na poslu?",
+                tigrinya: "ኣብ ስራሕ ዴንማርክ ክትመሃር ትፈቱ ዲኻ?",
+                mandarin: "你喜欢在工作中学习丹麦语吗？"
+            },
+            {
+                da: "Kan du lide at lære dansk i fritiden?",
+                english: "Do you like learning Danish in your free time?",
+                bengali: "আপনি কি আপনার অবসর সময়ে ডেনিশ শিখতে পছন্দ করেন?",
+                hindi: "क्या आपको अपने खाली समय में डेनिश सीखना पसंद है?",
+                urdu: "کیا آپ کو فارغ وقت میں ڈینش سیکھنا پسند ہے؟",
+                ukrainian: "Тобі подобається вивчати данську у вільний час?",
+                russian: "Тебе нравится учить датский в свободное время?",
+                persian: "آیا یادگیری دانمارکی را در اوقات فراغت دوست داری؟",
+                turkish: "Boş zamanlarınızda Danca öğrenmeyi seviyor musun?",
+                kurmanji: "Ma tu hez dikî di dema xwe ya vala de danîmarkî fêr bibî?",
+                sorani: "ئایا حەزت لێیە لە کاتە بەتاڵەکانتدا زمانی دانیمارکی فێر بیت؟",
+                nepali: "के तपाईलाई खाली समयमा डेनिस सिक्न मन पर्छ?",
+                swahili: "Je, unapenda kujifunza Kidenmaki wakati wako wa mapumziko?",
+                french: "Aimes-tu apprendre le danois pendant ton temps libre ?",
+                twi: "Wopɛ sɛ wosua Denmark kasa wɔ w’adagye mu?",
+                bosnian: "Da li volite učiti danski u slobodno vrijeme?",
+                somali: "Ma jeceshahay inaad deenishka barato waqtigaaga firaaqada ah?",
+                serbian: "Da li volite da učite danski u slobodno vreme?",
+                tigrinya: "ኣብ ናይ ዕረፍቲ ግዜኻ ዴንማርክ ክትመሃር ትፈቱ ዲኻ?",
+                mandarin: "你喜欢在业余时间学习丹麦语吗？"
+            },
+            {
+                da: "Hvordan kan du bedst lide at lære dansk?",
+                english: "How do you best like to learn Danish?",
+                bengali: "আপনি কিভাবে সবচেয়ে ভাল ডেনিশ শিখতে পছন্দ করেন?",
+                hindi: "आपको डेनिश सीखना सबसे अच्छा कैसे लगता है?",
+                urdu: "آپ ڈینش سیکھنا کس طرح سب سے زیادہ پسند کرتے ہیں؟",
+                ukrainian: "Як тобі найбільше подобається вивчати данську?",
+                russian: "Как тебе больше всего нравится учить датский?",
+                persian: "چگونه ترجیح می دهی دانمارکی را یاد بگیری؟",
+                turkish: "Dancayı en iyi nasıl öğrenmeyi seversiniz?",
+                kurmanji: "Tu herî zêde bi çi awayî hez dikî danîmarkî fêr bibî?",
+                sorani: "باشترین ڕێگە لات بۆ فێربوونی زمانی دانیمارکی چییە؟",
+                nepali: "तपाईलाई डेनिस सिक्न सबैभन्दा बढी कसरी मन पर्छ?",
+                swahili: "Je, ni njia gani unayopenda zaidi ya kujifunza Kidenmaki?",
+                french: "Comment préfères-tu apprendre le danois ?",
+                twi: "Ɔkwan bɛn so na wopɛ paa sɛ wofa so sua Denmark kasa?",
+                bosnian: "Kako najbolje volite učiti danski?",
+                somali: "Sidee ayaad u jeceshahay inaad u barato deenishka sida ugu fiican?",
+                serbian: "Kako najviše volite da učite danski?",
+                tigrinya: "ብኸመይ ዴንማርክ ክትመሃር ትፈቱ?",
+                mandarin: "你最喜欢以什么方式学习丹麦语？"
+            },
+            {
+                da: "Hvornår taler du dansk?",
+                english: "When do you speak Danish?",
+                bengali: "আপনি কখন ডেনিশ বলেন?",
+                hindi: "आप डेनिश कब बोलते हैं?",
+                urdu: "آپ ڈینش کب بولتے ہیں؟",
+                ukrainian: "Коли ти говориш данською?",
+                russian: "Когда ты говоришь по-датски?",
+                persian: "چه زمانی دانمارکی صحبت می کنی؟",
+                turkish: "Ne zaman Danca konuşuyorsun?",
+                kurmanji: "Tu kengî bi danîmarkî diaxivî?",
+                sorani: "کەی بە دانیمارکی قسە دەکەیت؟",
+                nepali: "तपाईं कहिले डेनिस बोल्नुहुन्छ?",
+                swahili: "Unazungumza Kidenmaki lini?",
+                french: "Quand parles-tu danois ?",
+                twi: "Bere bɛn na wokasa Denmark kasa?",
+                bosnian: "Kada pričate danski?",
+                somali: "Goormaad ku hadashaa deenish?",
+                serbian: "Kada govorite danski?",
+                tigrinya: "መዓስ ዴንማርክ ትዛረብ?",
+                mandarin: "你什么时候说丹麦语？"
+            },
+            {
+                da: "Kan du fortælle lidt om, hvordan du har lært dansk?",
+                english: "Can you tell a little about how you learned Danish?",
+                bengali: "আপনি কিভাবে ডেনিশ শিখেছেন সে সম্পর্কে কি একটু বলতে পারেন?",
+                hindi: "क्या आप थोड़ा बता सकते हैं कि आपने डेनिश कैसे सीखी?",
+                urdu: "کیا آپ تھوڑا بتا سکتے ہیں کہ آپ نے ڈینش کیسے سیکھی؟",
+                ukrainian: "Можеш трохи розповісти про те, як ти вивчив данську?",
+                russian: "Можешь немного рассказать о том, как ты выучил датский?",
+                persian: "آیا می توانی کمی در مورد چگونگی یادگیری دانمارکی توضیح دهی؟",
+                turkish: "Dancayı nasıl öğrendiğinizden biraz bahseder misiniz?",
+                kurmanji: "Ma tu dikarî hinekî bêjî ka te çawa danîmarkî fêr bûye?",
+                sorani: "دەتوانیت کەمێک باسی ئەوە بکەیت کە چۆن زمانی دانیمارکی فێربوویت؟",
+                nepali: "के तपाईले डेनिस कसरी सिक्नुभयो भन्ने बारे थोरै बताउन सक्नुहुन्छ?",
+                swahili: "Je, unaweza kueleza kidogo kuhusu jinsi ulivyojifunza Kidenmaki?",
+                french: "Peux-tu nous dire un peu comment tu as appris le danois ?",
+                twi: "Wubetumi aka biribi fa sɛnea wosuaa Denmark kasa ho?",
+                bosnian: "Možete li reći nešto o tome kako ste naučili danski?",
+                somali: "Ma ka sheekayn kartaa in yar oo ku saabsan sida aad u baratay deenishka?",
+                serbian: "Možete li reći nešto o tome kako ste naučili danski?",
+                tigrinya: "ብኸመይ ዴንማርክ ከም ዝተመሃርካ ቁሩብ ክትነግረና ትኽእል ዲኻ?",
+                mandarin: "你能说说你是怎么学习丹麦语的吗？"
+            }
+        ];
+
+        // State management
+        let deck = [...flashcardsData];
+        let currentCardIndex = 0;
+        let isFlipped = false;
+        let isTransitioning = false;
+        let currentLanguage = "english";
+
+        // DOM Elements
+        const langSelect = document.getElementById('langSelect');
+        const cardInner = document.getElementById('cardInner');
+        const cardTrigger = document.getElementById('cardTrigger');
+        const danishText = document.getElementById('danishText');
+        const translatedText = document.getElementById('translatedText');
+        const controls = document.getElementById('controls');
+        const cardCountDisplay = document.getElementById('cardCount');
+        const statusLabel = document.getElementById('statusLabel');
+        const gameUI = document.getElementById('gameUI');
+        const finishUI = document.getElementById('finishUI');
+        const btnRight = document.getElementById('btnRight');
+        const btnWrong = document.getElementById('btnWrong');
+        const btnRestart = document.getElementById('btnRestart');
+
+        // Init App
+        function init() {
+            shuffle(deck);
+            currentCardIndex = 0;
+            isFlipped = false;
+            isTransitioning = false;
+            showCard();
+            updateUI();
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function showCard() {
+            const card = deck[currentCardIndex];
+            danishText.innerText = card.da;
+            translatedText.innerText = card[currentLanguage];
+        }
+
+        function updateUI() {
+            cardCountDisplay.innerText = `Kort tilbage: ${deck.length}`;
+            if (deck.length === 0) {
+                gameUI.classList.add('hidden');
+                finishUI.classList.remove('hidden');
+            } else {
+                gameUI.classList.remove('hidden');
+                finishUI.classList.add('hidden');
+            }
+        }
+
+        // Card Flip Event
+        cardTrigger.addEventListener('click', () => {
+            if (isTransitioning || isFlipped) return;
+            
+            isFlipped = true;
+            cardInner.classList.add('is-flipped');
+            controls.classList.remove('opacity-0', 'pointer-events-none');
+            statusLabel.innerText = "Hvad synes du?";
+        });
+
+        // Handlers for Right/Wrong
+        function handleAnswer(isCorrect) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            // 1. Skjul knapper
+            controls.classList.add('opacity-0', 'pointer-events-none');
+
+            // 2. Vend kortet tilbage til forsiden
+            cardInner.classList.remove('is-flipped');
+            isFlipped = false;
+            statusLabel.innerText = "Opdaterer...";
+
+            // 3. Vent 400ms før teksten skiftes
+            setTimeout(() => {
+                if (isCorrect) {
+                    deck.splice(currentCardIndex, 1);
+                } else {
+                    // Flyt til bunden af bunken eller bare næste index
+                    currentCardIndex = (currentCardIndex + 1) % deck.length;
+                }
+
+                if (deck.length > 0) {
+                    // Sørg for at index ikke er out of bounds hvis vi fjernede det sidste element
+                    if (currentCardIndex >= deck.length) currentCardIndex = 0;
+                    showCard();
+                    statusLabel.innerText = "Klik på kortet for at se svar";
+                }
+
+                updateUI();
+                isTransitioning = false;
+            }, 400);
+        }
+
+        btnRight.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleAnswer(true);
+        });
+
+        btnWrong.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleAnswer(false);
+        });
+
+        btnRestart.addEventListener('click', () => {
+            deck = [...flashcardsData];
+            init();
+        });
+
+        langSelect.addEventListener('change', (e) => {
+            currentLanguage = e.target.value;
+            if (deck.length > 0) showCard();
+        });
+
+        // Start app
+        window.onload = init;
+    </script>
+</body>
+</html>
