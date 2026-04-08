@@ -3,88 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Læsning - Oversigt</title>
+    <title>Læsning - Sunset Warmth</title>
     <style>
-        /* Grundlæggende layout */
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #fdfaf6; 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #fff9f5; 
             margin: 0; 
             padding: 20px; 
             display: flex; 
             justify-content: center;
         }
-
         .container { 
             width: 100%;
             max-width: 500px; 
             background: white; 
             padding: 30px; 
             border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+            box-shadow: 0 10px 30px rgba(93, 64, 55, 0.1); 
             text-align: center;
-            border: 1px solid #f3e5d8;
+            border: 1px solid #edbb99;
         }
-
         h1 { color: #d35400; margin-bottom: 5px; }
-        p { color: #7f8c8d; margin-bottom: 30px; font-size: 0.95rem; }
+        p { color: #a04000; margin-bottom: 30px; }
 
-        /* Knapperne til dine læse-programmer */
-        .menu-item { 
+        .menu-btn { 
             display: block; 
-            background: #e67e22; /* Flot orange */
+            background: #f39c12; /* En lidt mere gylden orange */
             color: white; 
-            padding: 16px; 
-            margin: 12px 0; 
+            padding: 18px; 
+            margin: 15px 0; 
             text-decoration: none; 
-            border-radius: 12px; 
-            font-size: 1.1rem; 
+            border-radius: 15px; 
+            font-size: 1.2rem; 
             font-weight: bold;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 0 #cf6a17;
+            box-shadow: 0 5px 0 #e67e22;
         }
-
-        .menu-item:hover { 
-            background: #d35400; 
+        .menu-btn:hover { 
+            background: #e67e22; 
             transform: translateY(-2px);
-            box-shadow: 0 6px 0 #a04000;
+            box-shadow: 0 7px 0 #d35400;
         }
-
-        .menu-item:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #a04000;
+        .menu-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #d35400;
         }
-
-        /* Adskillelse og tilbage-knap */
         hr {
             margin: 30px 0;
             border: 0;
-            border-top: 2px dashed #f3e5d8;
+            border-top: 2px dashed #edbb99;
         }
-
         .back-link { 
             display: inline-block; 
-            color: #bdc3c7; 
+            color: #8d6e63; 
             text-decoration: none; 
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-weight: bold;
         }
-
-        .back-link:hover { color: #7f8c8d; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Læseøvelser</h1>
+        <p>Træn din læseforståelse</p>
 
-<div class="container">
-    <h1>Læseøvelser</h1>
-    <p>Find tekster og opgaver herunder</p>
+        <a href="vi-taler-dansk-tekst.html" class="menu-btn">Vi taler dansk - Side 59</a>
 
-    <a href="Cloze-test.html" class="menu-item">Cloze-test</a>
-    
-    <hr>
-    
-    <a href="du2-modul.html" class="back-link">← Tilbage til Modul 3-4</a>
-</div>
-
+        <hr>
+        <a href="du2-modul.html" class="back-link">← Tilbage til Modul 3-4</a>
+    </div>
 </body>
 </html>
