@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprog Flashcards - Arbejde & Fritid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 3D Flip Animation Styles */
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 320px;
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flip-card.is-flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .flip-card-front {
+            background-color: white;
+            color: #1e293b;
+            border: 2px solid #f1f5f9;
+        }
+
+        .flip-card-back {
+            background-color: #f8fafc;
+            color: #2563eb;
+            transform: rotateY(180deg);
+            border: 2px solid #dbeafe;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col items-center p-4 font-sans text-slate-900">
+
+    <div id="app" class="w-full max-w-md">
+        <!-- Header -->
+        <header class="mb-8 text-center mt-6">
+            <h1 class="text-4xl font-black text-blue-600 mb-2 tracking-tight">Flashcards</h1>
+            <p class="text-slate-500 font-medium italic text-sm">Lær sætninger om arbejde og fritid</p>
+        </header>
+
+        <!-- Sprogvælger -->
+        <div class="mb-6">
+            <label for="languageSelect" class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Vælg målsprog</label>
+            <div class="relative">
+                <select id="languageSelect" class="w-full p-4 bg-white border-2 border-slate-200 rounded-2xl shadow-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer font-bold text-slate-700">
+                    <!-- Options populated via JS -->
+                </select>
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statuslinje -->
+        <div id="statusArea" class="mb-4 flex justify-between items-end px-1">
+            <div class="flex flex-col">
+                <span class="text-slate-700 font-bold">Kort tilbage: <span id="remainingCount" class="text-blue-600 text-xl">0</span></span>
+            </div>
+            <span id="currentLangLabel" class="bg-blue-600 text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-blue-200"></span>
+        </div>
+
+        <!-- Kort-visning -->
+        <div id="cardContainer" class="relative">
+            <div id="card" class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <p id="frontText" class="text-2xl font-bold leading-tight"></p>
+                    </div>
+                    <div class="flip-card-back">
+                        <p id="backText" class="text-2xl font-extrabold leading-tight"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Handlingsknapper (skjult indtil kortet er vendt) -->
+            <div id="controls" class="mt-8 flex gap-4 opacity-0 pointer-events-none transition-all duration-300 transform translate-y-4">
+                <button id="btnWrong" class="flex-1 bg-white border-2 border-rose-100 hover:border-rose-500 text-rose-500 font-black py-4 rounded-2xl shadow-xl hover:shadow-rose-100 active:scale-95 transition-all">
+                    FORKERT
+                </button>
+                <button id="btnRight" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-200 active:scale-95 transition-all">
+                    RIGTIGT
+                </button>
+            </div>
+        </div>
+
+        <!-- Færdig-skærm -->
+        <div id="finishScreen" class="hidden text-center py-12 bg-white rounded-3xl shadow-2xl p-10 border-2 border-emerald-50">
+            <div class="text-7xl mb-6">🏁</div>
+            <h2 class="text-3xl font-black text-slate-800 mb-3">Flot klaret!</h2>
+            <p class="text-slate-500 mb-8 font-medium">Du har lært alle sætningerne i denne runde.</p>
+            <button id="btnRestart" class="w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-2xl shadow-xl transition-all active:scale-[0.98]">
+                START FORFRA
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Oversættelsesdata
+        const translations = {
+            "Engelsk": ["Where does she/he work?", "Which city does she/he work in?", "What are her/his tasks?", "What does she/he do at her/his work?", "How does she/he get to work?", "What is her/his leisure activity?", "What does she/he do in her/his free time?", "What time does she/he run?", "Does she/he run alone or with someone?", "Who does she/he run with?"],
+            "Bengali": ["সে কোথায় কাজ করে?", "সে কোন শহরে কাজ করে?", "তার কাজের দায়িত্ব কী কী?", "সে তার কাজে কী করে?", "সে কীভাবে কাজে যায়?", "তার অবসর সময়ের কাজ কী?", "সে তার অবসর সময়ে কী করে?", "সে কখন দৌড়ায়?", "সে কি একা না কি কারো সাথে দৌড়ায়?", "সে কার সাথে দৌড়ায়?"],
+            "Hindi": ["वह कहाँ काम करता/करती है?", "वह किस शहर में काम करता/करती है?", "उसके काम के कर्तव्य क्या हैं?", "वह अपने काम पर क्या करता/करती है?", "वह काम पर कैसे जाता/जाती है?", "उसकी अवकाश गतिविधि क्या है?", "वह अपने खाली समय में क्या करता/करती है?", "वह किस समय दौड़ता/दौड़ती है?", "वह अकेला/अकेली दौड़ता/दौड़ती है या किसी के साथ?", "वह किसके साथ दौड़ता/दौड़ती है?"],
+            "Urdu": ["وہ کہاں کام کرتا/کرتی ہے؟", "وہ کس شہر میں کام کرتا/کرتی ہے؟", "اس کے کام کے فرائض کیا ہیں؟", "وہ اپنے کام پر کیا کرتا/کرتی ہے؟", "وہ کام پر کیسے جاتا/جاتی ہے؟", "اس کی تفریحی سرگرمی کیا ہے؟", "وہ اپنے فارغ وقت میں کیا کرتا/کرتی ہے؟", "وہ کس وقت دوڑتا/دوڑتی ہے؟", "کیا وہ اکیلا/اکیلی دوڑتا/دوڑتی ہے یا کسی کے ساتھ؟", "وہ کس کے ساتھ دوڑتا/دوڑتی ہے؟"],
+            "Ukrainsk": ["Де вона/він працює?", "В якому місті вона/він працює?", "Які її/його робочі обов'язки?", "Що вона/він робить на своїй роботі?", "Як вона/він дістається до роботи?", "Яке її/його дозвілля?", "Що вона/він робить у вільний час?", "О котрій годині вона/він бігає?", "Вона/він бігає сама/сам чи з кимось?", "З ким вона/він бігає?"],
+            "Russisk": ["Где она/он работает?", "В каком городе она/он работает?", "Какие ее/его рабочие обязанности?", "Что она/он делает на своей работе?", "Как она/он добирается до работы?", "Какой ее/его досуг?", "Чем она/он занимается в свободное время?", "В какое время она/он бегает?", "Она/он бегает одна/один или с кем-то?", "С кем она/он бегает?"],
+            "Persisk": ["او کجا کار می‌کند؟", "او در کدام شهر کار می‌کند؟", "وظایف کاری او چیست؟", "او در محل کارش چه کار می‌کند؟", "او چطور به سر کار می‌رود؟", "فعالیت اوقات فراغت او چیست؟", "او در زمان بیکاری خود چه کار می‌کند؟", "او چه ساعتی می‌دود؟", "او تنها می‌دود یا با کسی؟", "او با چه کسی می‌دود؟"],
+            "Tyrkisk": ["O nerede çalışıyor?", "O hangi şehirde çalışıyor?", "Onun görevleri nelerdir?", "O işinde ne yapıyor?", "O işe nasıl gidiyor?", "Onun boş zaman aktivitesi nedir?", "O boş zamanlarında ne yapıyor?", "O saat kaçta koşuyor?", "O yalnız mı yoksa birisiyle mi koşuyor?", "O kiminle koşuyor?"],
+            "Kurdisk Kurmanji": ["Ew li ku derê dixebite?", "Ew li kîjan bajarî dixebite?", "Erkên wî/wê yên kar çi ne?", "Ew li ser karê xwe çi dike?", "Ew çawa diçe ser kar?", "Çalakiya wî/wê ya dema vala çi ye?", "Ew di dema xwe ya vala de çi dike?", "Ew di kîjan saetê de direve?", "Ew bi tenê direve yan bi kesekî re?", "Ew bi kê re direve?"],
+            "Kurdisk Sorani": ["ئەو لە کوێ کار دەکات؟", "ئەو لە چ شارێک کار دەکات؟", "ئەرکەکانی کاری ئەو چییە؟", "ئەو لە سەر کارەکەی چی دەکات؟", "ئەو چۆن دەچێت بۆ سەر کار؟", "چالاکی کاتی بێکاری ئەو چییە؟", "ئەو لە کاتی بێکاری خۆیدا چی دەکات؟", "ئەو چ کاتێک ڕادەکات؟", "ئەو بە تەنها ڕادەکات یان لەگەڵ کەسێک؟", "ئەو لەگەڵ کێ ڕادەکات؟"],
+            "Nepalesisk": ["उनी/उनी कहाँ काम गर्छन्?", "उनी/उनी कुन शहरमा काम गर्छन्?", "उनका/उनका कामको कर्तव्य के हुन्?", "उनी/उनी आफ्नो काममा के गर्छन्?", "उनी/उनी कसरी काममा जान्छन्?", "उनको/उनको फुर्सदको गतिविधि के हो?", "उनी/उनी आफ्नो खाली समयमा के गर्छन्?", "उनी/उनी कति बजे दौडिन्छन्?", "उनी/उनी एक्लै दौडिन्छन् कि कसैसँग?", "उनी/उनी कसको साथमा दौडिन्छन्?"],
+            "Kiswahili": ["Yeye anafanya kazi wapi?", "Anafanya kazi katika mji gani?", "Majukumu yake ya kazi ni nini?", "Anafanya nini kazini kwake?", "Anafikaje kazini?", "Shughuli yake ya wakati wa ziada ni nini?", "Anafanya nini wakati wake wa bure?", "Anakimbia saa ngapi?", "Je, yeye anakimbia peke yake au na mtu?", "Anakimbia na nani?"],
+            "Fransk": ["Où travaille-t-elle/il ?", "Dans quelle ville travaille-t-elle/il ?", "Quelles sont ses tâches de travail ?", "Que fait-elle/il à son travail ?", "Comment va-t-elle/il au travail ?", "Quelle est son activité de loisir ?", "Que fait-elle/il pendant son temps libre ?", "À quelle heure court-elle/il ?", "Court-elle/il seul(e) ou avec quelqu'un ?", "Avec qui court-elle/il ?"],
+            "Twi": ["Ɔyɛ adwuma wɔ he?", "Kuro bɛn mu na ɔyɛ adwuma?", "N'adwuma mu nnwuma ne dɛn?", "Dɛn na ɔyɛ wɔ n'adwuma mu?", "Ɔyɛ dɛn kɔ adwuma?", "Dɛn na ɔyɛ wɔ ne bere a ɔda ne ho adi mu?", "Dɛn na ɔyɛ wɔ ne bere a ɔda ne ho adi mu?", "Mbere bɛn na ɔtu mmirika?", "Ɔtu mmirika nkoaa anaa ɔne obi na ɛtu?", "Obi bɛn na ɔne no tu mmirika?"],
+            "Bosnisk": ["Gdje ona/on radi?", "U kojem gradu ona/on radi?", "Koji su njeni/njegovi radni zadaci?", "Šta ona/on radi na svom poslu?", "Kako ona/on dolazi na posao?", "Koja je njena/njegova slobodna aktivnost?", "Šta ona/on radi u svoje slobodno vrijeme?", "U koliko sati ona/on trči?", "Da li trči sama/sam ili s nekim?", "S kim ona/on trči?"],
+            "Somali": ["Halkee bay/buu ka shaqeeyaa?", "Magaaladee bay/buu ka shaqeeyaa?", "Waa maxay waajibaadkiisa/keeda shaqo?", "Muxuu/Maxay ka qabataa shaqada?", "Sidee bay/buu u tagaa shaqada?", "Waa maxay hawsha uu/ay qabato xilliga firaaqada?", "Muxuu/Maxay qabataa waqtiga firaaqada?", "Waa imisa saacu markuu/markay ordayo/ordayso?", "Ma keligiis/keed baa ordaya mise qof baa la socda?", "Yuu/Yay la ordayaa/ordaysaa?"],
+            "Tigrinya": ["ኣበይ ይሰርሕ/ትሰርሕ፧", "ኣብ ኣየናይ ከተማ ይሰርሕ/ትሰርሕ፧", "ናይ ስራሕ ሓላፍነቱ/ታ እንታይ እዩ፧", "ኣብ ስርሑ/ሓ እንታይ ይገብር/ትገብር፧", "ከመይ ገይሩ/ራ ናብ ስራሕ ይኸይд/ትኸይድ፧", "ናይ ዕረፍቲ ግዜ ንጥፈቱ/ታ እንታይ እዩ፧", "ኣብ ናይ ዕረፍቲ ግዜኡ/ኣ እንታይ ይገብር/ትገብር፧", "ሰዓት ክንደይ ይጎይይ/ትጎይይ፧", "በይኑ/በይና ድዩ/ዲያ ዝጎይይ ወይስ ምስ ሰብ፧", "ምስ መን ይጎይይ/ትጎይይ፧"]
+        };
+
+        const danishWords = [
+            "Hvor arbejder hun/han?",
+            "Hvilken by arbejder hun/han i?",
+            "Hvad er hendes/hans arbejdsopgaver?",
+            "Hvad laver hun/han på sit arbejde?",
+            "Hvordan kommer hun/han på arbejde?",
+            "Hvad er hendes/hans fritidsaktivitet?",
+            "Hvad laver hun/han i sin fritid?",
+            "Hvad tid løber hun/han?",
+            "Løber hun/han alene eller sammen med nogen?",
+            "Hvem løber hun/han med?"
+        ];
+
+        // Tilstand
+        let currentDeck = [];
+        let currentCardIndex = 0;
+        let selectedLanguage = "Engelsk";
+        let isFlipped = false;
+        let isTransitioning = false;
+
+        // DOM Elementer
+        const langSelect = document.getElementById('languageSelect');
+        const card = document.getElementById('card');
+        const frontText = document.getElementById('frontText');
+        const backText = document.getElementById('backText');
+        const controls = document.getElementById('controls');
+        const remainingCount = document.getElementById('remainingCount');
+        const currentLangLabel = document.getElementById('currentLangLabel');
+        const cardContainer = document.getElementById('cardContainer');
+        const finishScreen = document.getElementById('finishScreen');
+        const btnRight = document.getElementById('btnRight');
+        const btnWrong = document.getElementById('btnWrong');
+        const btnRestart = document.getElementById('btnRestart');
+
+        // Funktioner
+        function init() {
+            // Fyld sprogmenuen
+            Object.keys(translations).sort().forEach(lang => {
+                const opt = document.createElement('option');
+                opt.value = lang;
+                opt.innerText = lang;
+                langSelect.appendChild(opt);
+            });
+
+            langSelect.value = selectedLanguage;
+            setupDeck();
+            updateUI();
+        }
+
+        function setupDeck() {
+            // Lav kortobjekter
+            currentDeck = danishWords.map((word, index) => ({
+                danish: word,
+                translation: translations[selectedLanguage][index],
+                id: index
+            }));
+            
+            // Bland bunken (Shuffle)
+            currentDeck.sort(() => Math.random() - 0.5);
+            
+            currentCardIndex = 0;
+            finishScreen.classList.add('hidden');
+            cardContainer.classList.remove('hidden');
+            statusArea.classList.remove('hidden');
+        }
+
+        function updateUI() {
+            if (currentDeck.length === 0) {
+                cardContainer.classList.add('hidden');
+                statusArea.classList.add('hidden');
+                finishScreen.classList.remove('hidden');
+                return;
+            }
+
+            const current = currentDeck[currentCardIndex];
+            frontText.innerText = current.danish;
+            backText.innerText = current.translation;
+            remainingCount.innerText = currentDeck.length;
+            currentLangLabel.innerText = selectedLanguage;
+        }
+
+        function toggleFlip() {
+            if (isTransitioning) return;
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                card.classList.add('is-flipped');
+                controls.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+            } else {
+                card.classList.remove('is-flipped');
+                controls.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+            }
+        }
+
+        function handleResponse(isCorrect) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            // Step 1: Vend kortet tilbage til forsiden (Dansk)
+            card.classList.remove('is-flipped');
+            controls.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+            isFlipped = false;
+
+            // Step 2: Vent på animationen før vi skifter ordet (Timing)
+            setTimeout(() => {
+                if (isCorrect) {
+                    // Fjern kortet fra bunken
+                    currentDeck.splice(currentCardIndex, 1);
+                } else {
+                    // Behold kortet, flyt til næste (bliver i bunken)
+                    currentCardIndex++;
+                }
+
+                // Sikr at index ikke er uden for rammen
+                if (currentCardIndex >= currentDeck.length && currentDeck.length > 0) {
+                    currentCardIndex = 0;
+                }
+
+                updateUI();
+                isTransitioning = false;
+            }, 400); // Specifikation: ca. 400ms
+        }
+
+        // Event Listeners
+        langSelect.addEventListener('change', (e) => {
+            selectedLanguage = e.target.value;
+            setupDeck();
+            updateUI();
+        });
+
+        card.addEventListener('click', toggleFlip);
+
+        btnRight.addEventListener('click', (e) => {
+            e.stopPropagation(); // Undgå at klikke på selve kortet
+            handleResponse(true);
+        });
+
+        btnWrong.addEventListener('click', (e) => {
+            e.stopPropagation(); // Undgå at klikke på selve kortet
+            handleResponse(false);
+        });
+
+        btnRestart.addEventListener('click', () => {
+            setupDeck();
+            updateUI();
+        });
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
