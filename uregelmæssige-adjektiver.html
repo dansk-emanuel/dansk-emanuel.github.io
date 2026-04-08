@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uregelmæssige Adjektiver</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .perspective-1000 { perspective: 1000px; }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flipped { transform: rotateY(180deg); }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center py-10 px-4 font-sans">
+
+    <div id="app" class="max-w-md w-full">
+        <h1 class="text-3xl font-bold text-center text-indigo-700 mb-6 uppercase tracking-wide">Uregelmæssige Adjektiver</h1>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2 text-center">Vælg målsprog:</label>
+            <select id="languageSelect" class="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </select>
+        </div>
+
+        <div id="game-container">
+            <div class="flex justify-between items-center mb-4 text-gray-600 font-semibold">
+                <span>Kort tilbage: <span id="cardsLeft" class="text-indigo-600 text-xl">0</span></span>
+            </div>
+
+            <div class="perspective-1000 w-full h-64 cursor-pointer" id="cardContainer">
+                <div id="cardInner" class="flip-card-inner relative w-full h-full shadow-xl rounded-2xl">
+                    <div class="backface-hidden absolute inset-0 bg-white flex items-center justify-center rounded-2xl border-4 border-indigo-200">
+                        <p id="danishText" class="text-3xl font-bold text-gray-800 text-center px-4"></p>
+                    </div>
+                    <div class="backface-hidden rotate-y-180 absolute inset-0 bg-indigo-600 flex items-center justify-center rounded-2xl text-white">
+                        <p id="targetText" class="text-2xl font-medium text-center px-6"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="actionButtons" class="invisible mt-8 flex justify-center gap-4">
+                <button onclick="handleResult(false)" class="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-full font-bold shadow-lg transition-transform active:scale-95">Forkert</button>
+                <button onclick="handleResult(true)" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow-lg transition-transform active:scale-95">Rigtigt</button>
+            </div>
+            <p class="text-center text-gray-400 mt-4 text-sm" id="hintText">Klik på kortet for at se svaret</p>
+        </div>
+
+        <div id="finishedScreen" class="hidden text-center py-10">
+            <div class="text-6xl mb-4">🎉</div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Godt gået!</h2>
+            <p class="text-gray-600 mb-8">Du har lært alle de uregelmæssige adjektiver i denne runde.</p>
+            <button onclick="resetGame()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3 rounded-lg font-bold shadow-md transition-all">Start forfra</button>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            "engels": ["good/better/best", "bad/worse/worst", "young/younger/youngest", "old/older/oldest", "many/more/most", "few/fewer/fewest", "small/smaller/smallest", "big/bigger/biggest", "long/longer/longest"],
+            "bengali": ["ভালো/আরও ভালো/সেরা", "খারাপ/আরও খারাপ/সবচেয়ে খারাপ", "তরুণ/কনিষ্ঠ/কনিষ্ঠতম", "পুরানো/বয়স্ক/সবচেয়ে পুরানো", "অনেক/আরও/সবচেয়ে বেশি", "অল্প/কম/সবচেয়ে কম", "ছোট/ছোটতর/ক্ষুদ্রতম", "বড়/বৃহত্তর/বৃহত্তম", "দীর্ঘ/দীর্ঘতর/দীর্ঘতম"],
+            "hindi": ["अच्छा/बेहतर/सबसे अच्छा", "बुरा/बदतर/सबसे बुरा", "युवा/छोटा/सबसे छोटा", "पुराना/बड़ा/सबसे पुराना", "बहुत/अधिक/सबसे अधिक", "कम/कमतर/सबसे कम", "छोटा/लघुतर/लघुतम", "बड़ा/विशाल/सबसे बड़ा", "लंबा/अधिक लंबा/सबसे लंबा"],
+            "urdu": ["اچھا/بہتر/بہترین", "برا/بدتر/سب سے برا", "جوان/چھوٹا/سب سے چھوٹا", "پرانا/بڑا/سب سے پرانا", "بہت/زیادہ/سب سے زیادہ", "کم/کمتر/سب سے کم", "چھوٹا/مزید چھوٹا/سب سے چھوٹا", "بڑا/بڑا/سب سے بڑا", "لمبا/طویل/سب سے طویل"],
+            "ukrainsk": ["добрий/кращий/найкращий", "поганий/гірший/найгірший", "молодий/молодший/наймолодший", "старий/старший/найстаріший", "багато/більше/найбільше", "мало/менше/найменше", "малий/менший/найменший", "великий/більший/найбільший", "довгий/довший/найдовший"],
+            "russisk": ["хороший/лучше/лучший", "плохой/хуже/худший", "молодой/моложе/самый молодой", "старый/старше/самый старый", "много/больше/больше всего", "мало/меньше/меньше всего", "маленький/меньше/самый маленький", "большой/больше/самый большой", "длинный/длиннее/самый длинный"],
+            "persisk": ["خوب/بهتر/بهترین", "بد/بدتر/بدترین", "جوان/جوان‌تر/جوان‌ترین", "پیر/پیرتر/پیرترین", "زیاد/بیشتر/بیشترین", "کم/کمتر/کمترین", "کوچک/کوچک‌تر/کوچک‌ترین", "بزرگ/بزرگ‌تر/بزرگ‌ترین", "بلند/بلندتر/بلندترین"],
+            "tyrkisk": ["iyi/daha iyi/en iyi", "kötü/daha kötü/en kötü", "genç/daha genç/en genç", "eski/daha eski/en eski", "çok/daha çok/en çok", "az/daha az/en az", "küçük/daha küçük/en küçük", "büyük/daha büyük/en büyük", "uzun/daha uzun/en uzun"],
+            "kurdisk kurmanji": ["baş/çêtir/başترین", "xirab/xirabtir/xirabtirîn", "ciwan/ciwantir/ciwantirîn", "kal/kaltir/kaltirîn", "pir/pirtir/pirtirîn", "hindik/kêmtir/kêmtirîn", "biçûk/biçûktir/biçûktirîn", "mezin/mezintir/mezintirîn", "dirêj/dirêjtir/dirêjtirîn"],
+            "kurdisk sorani": ["باش/باشتر/باشترین", "خراپ/خراپتر/خراپترین", "گنج/گنجتر/گنجترین", "کۆن/کۆنتر/کۆنترین", "زۆر/زۆرتر/زۆرترین", "کەم/کەمتر/کەمترین", "بچووک/بچووکتر/بچووکترین", "گەورە/گەورەتر/گەورەترین", "درێژ/درێژتر/درێژترین"],
+            "nepalesisk": ["राम्रो/राम्रो/सबैभन्दा राम्रो", "खराब/खराब/सबैभन्दा खराब", "युवा/कान्छो/सबैभन्दा कान्छो", "पुरानो/जेठो/सबैभन्दा पुरानो", "धेरै/धेरै/सबैभन्दा धेरै", "थोरै/कम/सबैभन्दा कम", "सानो/सानो/सबैभन्दा सानो", "ठूलो/ठूलो/सबैभन्दा ठूलो", "लामो/लामो/सबैभन्दा लामो"],
+            "kiswahili": ["nzuri/bora/bora zaidi", "mbaya/mbaya zaidi/mbaya kabisa", "kijana/mdogo zaidi/mdogo kabisa", "zee/zamani zaidi/kabisa", "nyingi/zaidi/nyingi sana", "chache/pungufu/chache kabisa", "ndogo/ndogo zaidi/ndogo kabisa", "kubwa/kubwa zaidi/kubwa kabisa", "refu/refu zaidi/refu kabisa"],
+            "fransk": ["bon/meilleur/le meilleur", "mauvais/pire/le pire", "jeune/plus jeune/le plus jeune", "vieux/plus vieux/le plus vieux", "beaucoup/plus/le plus", "peu/moins/le moins", "petit/plus petit/le plus petit", "grand/plus grand/le plus grand", "long/plus long/le plus long"],
+            "twi": ["pa/papa/papa pa", "bɔne/bɔne koraa/bɔne koraa", "abaayewa/abaayewa paa/abaayewa paa", "akwakora/akwakora paa/akwakora paa", "pii/pii paa/pii pii", "kakrt/kakrt paa/kakrt bi", "ketewa/ketewa paa/ketewa koraa", "kɛseɛ/kɛseɛ paa/kɛseɛ koraa", "tenten/tenten paa/tenten koraa"]
+        };
+
+        const danishWords = [
+            "god / bedre / bedst",
+            "slem / værre / værst",
+            "ung / yngre / yngst",
+            "gammel / ældre / ældst",
+            "mange / flere / flest",
+            "få / færre / færrest",
+            "lille / mindre / mindst",
+            "stor / større / størst",
+            "lang / længere / længst"
+        ];
+
+        let currentDeck = [];
+        let currentIndex = 0;
+        let isFlipped = false;
+        let isTransitioning = false;
+
+        const langSelect = document.getElementById('languageSelect');
+        const cardInner = document.getElementById('cardInner');
+        const cardContainer = document.getElementById('cardContainer');
+        const danishText = document.getElementById('danishText');
+        const targetText = document.getElementById('targetText');
+        const actionButtons = document.getElementById('actionButtons');
+        const cardsLeft = document.getElementById('cardsLeft');
+        const gameContainer = document.getElementById('game-container');
+        const finishedScreen = document.getElementById('finishedScreen');
+        const hintText = document.getElementById('hintText');
+
+        // Initialiser sprogvalg
+        Object.keys(translations).forEach(lang => {
+            const option = document.createElement('option');
+            option.value = lang;
+            option.textContent = lang.charAt(0).toUpperCase() + lang.slice(1);
+            langSelect.appendChild(option);
+        });
+
+        function initDeck() {
+            currentDeck = danishWords.map((word, index) => ({
+                da: word,
+                index: index
+            }));
+            shuffle(currentDeck);
+            updateUI();
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function updateUI() {
+            if (currentDeck.length === 0) {
+                gameContainer.classList.add('hidden');
+                finishedScreen.classList.remove('hidden');
+                return;
+            }
+
+            const lang = langSelect.value;
+            const currentItem = currentDeck[0];
+            danishText.textContent = currentItem.da;
+            targetText.textContent = translations[lang][currentItem.index];
+            cardsLeft.textContent = currentDeck.length;
+            
+            // Nulstil kort visuelt
+            isFlipped = false;
+            cardInner.classList.remove('flipped');
+            actionButtons.classList.add('invisible');
+            hintText.classList.remove('invisible');
+            isTransitioning = false;
+        }
+
+        cardContainer.addEventListener('click', () => {
+            if (isTransitioning || isFlipped) return;
+            isFlipped = true;
+            cardInner.classList.add('flipped');
+            actionButtons.classList.remove('invisible');
+            hintText.classList.add('invisible');
+        });
+
+        function handleResult(correct) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            const completedCard = currentDeck.shift();
+            if (!correct) {
+                currentDeck.push(completedCard);
+            }
+
+            // Vend kortet tilbage til forsiden først
+            cardInner.classList.remove('flipped');
+            
+            // Vent på animation (400ms) før teksten opdateres
+            setTimeout(() => {
+                updateUI();
+            }, 400);
+        }
+
+        function resetGame() {
+            gameContainer.classList.remove('hidden');
+            finishedScreen.classList.add('hidden');
+            initDeck();
+        }
+
+        langSelect.addEventListener('change', () => {
+            // Hvis man skifter sprog midt i det hele, opdaterer vi bare teksten på bagsiden
+            const lang = langSelect.value;
+            if (currentDeck.length > 0) {
+                targetText.textContent = translations[lang][currentDeck[0].index];
+            }
+        });
+
+        // Start spillet
+        initDeck();
+    </script>
+</body>
+</html>
