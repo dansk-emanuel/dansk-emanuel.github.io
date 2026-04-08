@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emanuels Danskportal</title>
+    <title>Velkommen</title>
     <style>
-        /* Sunset Warmth - Hovedside Design */
+        /* DETTE ER CSS-SEKTIONEN */
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #fff9f5; /* Den lyse sandfarve */
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #fff9f5; 
             margin: 0; 
             padding: 0; 
             display: flex; 
@@ -28,28 +28,12 @@
             border: 1px solid #edbb99;
         }
 
-        .logo-area {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
+        h1 { color: #5d4037; font-size: 1.8rem; }
+        p { color: #8d6e63; margin-bottom: 30px; }
 
-        h1 { 
-            color: #5d4037; 
-            margin-bottom: 10px; 
-            font-size: 1.8rem;
-            letter-spacing: -0.5px;
-        }
-
-        p { 
-            color: #8d6e63; 
-            margin-bottom: 35px; 
-            font-size: 1.1rem;
-        }
-
-        /* Sunset Knapper */
         .start-btn { 
             display: block; 
-            background: #e67e22; /* Varm orange */
+            background: #e67e22; 
             color: white; 
             padding: 20px; 
             margin: 10px 0; 
@@ -57,43 +41,35 @@
             border-radius: 18px; 
             font-size: 1.3rem; 
             font-weight: bold;
-            transition: all 0.2s ease;
             box-shadow: 0 6px 0 #d35400;
+            transition: all 0.2s ease;
         }
 
-        .start-btn:hover { 
-            background: #d35400; 
-            transform: translateY(-2px);
-            box-shadow: 0 8px 0 #a04000;
-        }
-
-        .start-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #a04000;
-        }
-
-        .sub-text {
+        /* Den nye stil til din tekst under knappen */
+        .info-text {
             margin-top: 25px;
-            font-size: 0.8rem;
-            color: #bdc3c7;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 0.95rem;
+            color: #8d6e63;
+            line-height: 1.5;
+            padding: 0 10px;
+            font-style: italic;
         }
+
+        .logo-area { font-size: 3rem; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div class="main-card">
-    <div class="logo-area">🌅</div>
-    <h1>Velkommen</h1>
-    <p>Hvad vil du øve i dag?</p>
+        <div class="logo-area">🌅</div>
+        <h1>Velkommen</h1>
+        <p>Hvad vil du øve i dag?</p>
 
-    <a href="du2-modul.html" class="start-btn">Dansk Modul 3-4</a>
-    
-    <div class="info-text">
-        Denne side er skabt af Emanuel. Jeg lægger løbende ressourcer op på denne side, som skal hjælpe kursister på danskuddannelserne med deres dansklæring.
-    </div>
-
+        <a href="du2-modul.html" class="start-btn">Dansk Modul 3-4</a>
+        
+        <div class="info-text">
+            Denne side er skabt af mig, Emanuel. Jeg lægger løbende ressourcer op, som skal hjælpe kursister på danskuddannelserne med deres dansklæring.
+        </div>
     </div>
 
 </body>
