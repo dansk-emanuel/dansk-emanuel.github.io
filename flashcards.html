@@ -3,38 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vælg Flashcards - Emanuel</title>
+    <title>Flashcards - Sunset Warmth</title>
     <style>
-        body { font-family: 'Arial', sans-serif; background: #f4f4f4; margin: 0; padding: 20px; text-align: center; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; }
-        .menu-item { 
-            display: block; 
-            background: #3498db; 
-            color: white; 
-            padding: 15px; 
-            margin: 10px 0; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            font-size: 1.2rem; 
-            transition: 0.3s; 
+        /* Sunset Warmth Farvetema */
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #fff9f5; /* Lys sandfarve */
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center;
         }
-        .menu-item:hover { background: #2980b9; transform: scale(1.02); }
-        .back-link { display: inline-block; margin-top: 20px; color: #7f8c8d; text-decoration: none; }
+
+        .container { 
+            width: 100%;
+            max-width: 500px; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(93, 64, 55, 0.1); 
+            text-align: center;
+            border: 1px solid #edbb99;
+        }
+
+        h1 { color: #5d4037; margin-bottom: 5px; } /* Mørkebrun */
+        p { color: #a04000; margin-bottom: 30px; }
+
+        /* De nye Sunset knapper */
+        .menu-btn { 
+            display: block; 
+            background: #e67e22; /* Varm orange */
+            color: white; 
+            padding: 18px; 
+            margin: 15px 0; 
+            text-decoration: none; 
+            border-radius: 15px; 
+            font-size: 1.2rem; 
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 0 #d35400; /* Mørk orange bund */
+        }
+
+        .menu-btn:hover { 
+            background: #d35400; 
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #a04000;
+        }
+
+        .menu-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #a04000;
+        }
+
+        hr {
+            margin: 30px 0;
+            border: 0;
+            border-top: 2px dashed #edbb99;
+        }
+
+        .back-link { 
+            display: inline-block; 
+            color: #8d6e63; 
+            text-decoration: none; 
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Vælg et emne</h1>
-    <p>Hvilke ord vil du øve i dag?</p>
+    <h1>Flashcards</h1>
+    <p>Vælg et sæt og start din træning</p>
 
-    <a href="Vi-taler-dansk-3-side-59.html" class="menu-item">Vi taler dansk 3 side 59</a>
-    <a href="mundtlig-test-modul-3.html" class="menu-item">Mundtlig test modul 3</a>
-    <a href="mundtlig-test-modul-4.html" class="menu-item">Mundtlig test modul 4</a>
-    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+    <a href="fc-adjektiver.html" class="menu-btn">De 20 vigtigste Adjektiver</a>
+    <a href="vi-taler-dansk.html" class="menu-btn">Vi taler dansk - Side 59</a>
+
+    <hr>
     
-    <a href="du2-modul.html" class="back-link">← Tilbage til Modul 3-4</a>   
+    <a href="du2-modul.html" class="back-link">← Tilbage til Modul 3-4</a>
 </div>
 
 </body>
