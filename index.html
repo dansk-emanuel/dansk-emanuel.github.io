@@ -3,29 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lær dansk med Emanuel</title>
+    <title>Emanuels Danskportal</title>
     <style>
-        body { font-family: 'Arial', sans-serif; line-height: 1.6; margin: 0; padding: 0; background: #f9f9f9; text-align: center; }
-        header { background: #2c3e50; color: white; padding: 2rem 0; }
-        nav { background: #ecf0f1; padding: 1rem; border-bottom: 1px solid #bdc3c7; }
-        nav a { text-decoration: none; color: #2980b9; font-weight: bold; font-size: 1.2rem; }
-        nav a:hover { color: #c0392b; }
-        .content { padding: 2rem; }
+        /* Sunset Warmth - Hovedside Design */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #fff9f5; /* Den lyse sandfarve */
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh;
+        }
+
+        .main-card { 
+            width: 90%;
+            max-width: 450px; 
+            background: white; 
+            padding: 40px 20px; 
+            border-radius: 30px; 
+            box-shadow: 0 15px 35px rgba(93, 64, 55, 0.1); 
+            text-align: center;
+            border: 1px solid #edbb99;
+        }
+
+        .logo-area {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        h1 { 
+            color: #5d4037; 
+            margin-bottom: 10px; 
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+        }
+
+        p { 
+            color: #8d6e63; 
+            margin-bottom: 35px; 
+            font-size: 1.1rem;
+        }
+
+        /* Sunset Knapper */
+        .start-btn { 
+            display: block; 
+            background: #e67e22; /* Varm orange */
+            color: white; 
+            padding: 20px; 
+            margin: 10px 0; 
+            text-decoration: none; 
+            border-radius: 18px; 
+            font-size: 1.3rem; 
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 0 #d35400;
+        }
+
+        .start-btn:hover { 
+            background: #d35400; 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #a04000;
+        }
+
+        .start-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #a04000;
+        }
+
+        .sub-text {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            color: #bdc3c7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Lær dansk med Emanuel</h1>
-</header>
+    <div class="main-card">
+        <div class="logo-area">🌅</div>
+        <h1>Velkommen</h1>
+        <p>Hvad vil du øve i dag?</p>
 
-<nav>
-    <a href="du2-modul.html">DU2 modul 3-4</a>
-</nav>
-
-<div class="content">
-    <p>Velkommen! Her samler jeg alt mit materiale og de programmer, jeg udvikler.</p>
-</div>
+        <a href="du2-modul.html" class="start-btn">Dansk Modul 3-4</a>
+        
+        <div class="sub-text">Emanuels Læringsportal</div>
+    </div>
 
 </body>
 </html>
