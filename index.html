@@ -8,13 +8,13 @@
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background-color: #fff9f5; 
-            margin: 0; padding: 0; 
+            margin: 0; padding: 20px; 
             display: flex; align-items: center; justify-content: center; 
             min-height: 100vh;
         }
 
         .main-card { 
-            width: 90%;
+            width: 100%;
             max-width: 450px; 
             background: white; 
             padding: 40px 20px; 
@@ -41,19 +41,31 @@
         .word-header { display: flex; align-items: baseline; gap: 10px; }
         .the-word { font-size: 1.6rem; color: #5d4037; font-weight: bold; margin: 0; }
         .word-class { font-size: 0.8rem; background: #edbb99; color: #5d4037; padding: 2px 8px; border-radius: 8px; font-weight: bold; }
-        .phonetic { color: #8d6e63; font-size: 0.95rem; margin: 5px 0 12px 0; display: block; }
+        
+        /* Forbedret IPA Lydskrift */
+        .phonetic { 
+            color: #d35400; 
+            font-family: "Times New Roman", Times, serif; 
+            font-size: 1.1rem; 
+            margin: 5px 0 12px 0; 
+            display: block;
+            letter-spacing: 0.5px;
+        }
+        
         .info-content { font-size: 0.95rem; color: #5d4037; line-height: 1.4; margin-bottom: 8px; }
-        .example-text { font-style: italic; color: #6d4c41; font-size: 0.9rem; }
+        .example-text { font-style: italic; color: #6d4c41; font-size: 0.9rem; border-left: 2px solid #edbb99; padding-left: 10px; }
         .ordnet-link { display: inline-block; margin-top: 10px; font-size: 0.85rem; color: #e67e22; text-decoration: none; font-weight: bold; }
 
-        /* Knapper og bundtekst */
+        /* Knapper */
         .start-btn { 
             display: block; background: #e67e22; color: white; 
-            padding: 20px; margin: 20px 0; text-decoration: none; 
-            border-radius: 18px; font-size: 1.3rem; font-weight: bold;
-            box-shadow: 0 6px 0 #d35400; transition: all 0.2s ease;
+            padding: 18px; margin: 12px 0; text-decoration: none; 
+            border-radius: 18px; font-size: 1.2rem; font-weight: bold;
+            box-shadow: 0 5px 0 #d35400; transition: all 0.2s ease;
         }
-        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #a04000; }
+        .start-btn.alt { background: #8d6e63; box-shadow: 0 5px 0 #5d4037; }
+        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #a04000; }
+        .start-btn.alt:hover { box-shadow: 0 7px 0 #3e2723; }
         
         .info-text { 
             margin-top: 25px; font-size: 0.95rem; color: #8d6e63; 
@@ -81,6 +93,7 @@
         </div>
 
         <a href="du2-modul.html" class="start-btn">Dansk Modul 3-4</a>
+        <a href="anbefalinger.html" class="start-btn alt">Anbefalinger</a>
         
         <div class="info-text">
             Denne side er skabt til at hjælpe med dansksproget læring, 
@@ -90,13 +103,13 @@
 
     <script>
         const ugedagensOrd = [
-            { word: "Viden", class: "sub", phonetic: "[ˈviːðn̩]", def: "Information man har om et emne.", example: "Hun har en stor viden om dansk historie.", link: "viden" },
-            { word: "Ihærdig", class: "adj", phonetic: "[iˈhaɐ̯di]", def: "At blive ved med at prøve, selvom det er svært.", example: "Han var meget ihærdig i sin søgen efter job.", link: "ihærdig" },
-            { word: "Beslutte", class: "verb", phonetic: "[beˈslodə]", def: "At vælge at gøre noget bestemt.", example: "De besluttede at flytte til en ny by.", link: "beslutte" },
-            { word: "Yderligere", class: "adv", phonetic: "[ˈyðʌliʌ]", def: "Noget der kommer oveni det eksisterende.", example: "Vi har brug for yderligere oplysninger.", link: "yderligere" },
-            { word: "Udfordring", class: "sub", phonetic: "[ˈuðˌfʌdneŋ]", def: "En svær opgave der kræver en indsats.", example: "Det er en udfordring at lære udtale.", link: "udfordring" },
-            { word: "Samarbejde", class: "verb", phonetic: "[ˈsamɒˌbajdə]", def: "At arbejde sammen om en opgave.", example: "Vi skal samarbejde om dette projekt.", link: "samarbejde" },
-            { word: "Ansvarlig", class: "adj", phonetic: "[anˈsvaɐ̯li]", def: "At have pligt til at sørge for noget.", example: "Du er ansvarlig for din egen læring.", link: "ansvarlig" }
+            { word: "Viden", class: "subst.", phonetic: "[ˈviːðn̩]", def: "Information man har om et emne.", example: "Hun har en stor viden om dansk historie.", link: "viden" },
+            { word: "Ihærdig", class: "adj.", phonetic: "[iˈhaɐ̯di]", def: "At man bliver ved, selvom det er svært.", example: "Han var meget ihærdig i sin søgen efter job.", link: "ihærdig" },
+            { word: "Beslutte", class: "verb.", phonetic: "[beˈslodə]", def: "At vælge at gøre noget bestemt.", example: "De besluttede at flytte til en ny by.", link: "beslutte" },
+            { word: "Yderligere", class: "adv.", phonetic: "[ˈyðʌliʌ]", def: "Noget der kommer oveni det eksisterende.", example: "Vi har brug for yderligere oplysninger.", link: "yderligere" },
+            { word: "Udfordring", class: "subst.", phonetic: "[ˈuðˌfʌdneŋ]", def: "En svær opgave der kræver en indsats.", example: "Det er en udfordring at lære udtale.", link: "udfordring" },
+            { word: "Samarbejde", class: "verb.", phonetic: "[ˈsamɒˌbajdə]", def: "At arbejde sammen om en opgave.", example: "Vi skal samarbejde om dette projekt.", link: "samarbejde" },
+            { word: "Ansvarlig", class: "adj.", phonetic: "[anˈsvaɐ̯li]", def: "At have pligt til at sørge for noget.", example: "Du er ansvarlig for din egen læring.", link: "ansvarlig" }
         ];
 
         const d = new Date();
