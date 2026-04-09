@@ -18,10 +18,6 @@
             transition: transform 0.6s;
             transform-style: preserve-3d;
         }
-        .flip-card.flipped .flip-card-inner {
-            transform: rotateY(180xl);
-        }
-        /* Vi bruger en klasse til at styre flip via JS */
         .is-flipped {
             transform: rotateY(180deg);
         }
@@ -51,7 +47,7 @@
             <h1 class="text-2xl font-bold mb-4 text-gray-800">Flashcards: Konjunktioner</h1>
             <label for="langSelect" class="block text-sm font-medium text-gray-600 mb-1">Vælg målsprog:</label>
             <select id="langSelect" class="w-full p-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                </select>
+            </select>
         </div>
 
         <div class="mb-4 flex justify-between items-center text-sm font-semibold text-gray-500">
@@ -90,28 +86,27 @@
     </div>
 
     <script>
-        // Data struktur
         const dictionary = {
-            "Og": { en: "And", bn: "এবং (Ebong)", hi: "और (Aur)", ur: "اور (Aur)", uk: "І (I)", ru: "И (I)", fa: "و (Va)", tr: "Ve", kmr: "Û", sd: "و (Û)", ne: "र (Ra)", sw: "Na", fr: "Et", twi: "Na", bs: "I", so: "Iyo", sr: "И (I)", ti: "ከምኡውን (Kemiu-wen)", zh: "和 (Hé)" },
-            "Men": { en: "But", bn: "কিন্তু (Kintu)", hi: "लेकिन (Lekin)", ur: "لیکن (Lekin)", uk: "Але (Ale)", ru: "Но (No)", fa: "اما (Amma)", tr: "Ama / Fakat", kmr: "Lê", sd: "بەڵام (Belam)", ne: "तर (Tara)", sw: "Lakini", fr: "Mais", twi: "Nanso", bs: "Ali", so: "Laakiin", sr: "Али (Ali)", ti: "ግን (Gin)", zh: "但是 (Dànshì)" },
-            "Eller": { en: "Or", bn: "অথবা (Othoba)", hi: "या (Ya)", ur: "یا (Ya)", uk: "Або (Abo)", ru: "Или (Ili)", fa: "یا (Ya)", tr: "Veya", kmr: "An", sd: "یان (Yan)", ne: "वा (Wa)", sw: "Au", fr: "Ou", twi: "Anaasɛ", bs: "Ili", so: "Ama", sr: "Или (Ili)", ti: "ወይስ (Weyisi)", zh: "或者 (Huòzhě)" },
-            "Så": { en: "So", bn: "তাই (Tai)", hi: "तो (To)", ur: "تو (To)", uk: "Тому / Отже", ru: "Так что / Поэтому", fa: "پس (Pas)", tr: "Bu yüzden / Öyleyse", kmr: "Ji ber vê", sd: "کەواتە (Kewate)", ne: "त्यसैले (Tyasaile)", sw: "Hivyo", fr: "Alors / Donc", twi: "Enti", bs: "Tako da", so: "Sidaas darteed", sr: "Тако да (Tako da)", ti: "ስለዚ (Silezi)", zh: "所以 (Suǒyǐ)" },
-            "At (Fx. Hun tror, at...)": { en: "That", bn: "যে (Je)", hi: "कि (Ki)", ur: "کہ (Ke)", uk: "Що (Shcho)", ru: "Что (Chto)", fa: "که (Ke)", tr: "Ki", kmr: "Ku", sd: "کە (Ke)", ne: "कि (Ki)", sw: "Kwamba", fr: "Que", twi: "Sɛ", bs: "Da", so: "In", sr: "Да (Da)", ti: "ከም (Kem)", zh: "觉得 / 认为 (juéde / rènwéi)" },
-            "Før": { en: "Before", bn: "আগে (Age)", hi: "पहले (Pahle)", ur: "پہلے (Pehle)", uk: "До / Перед", ru: "До / Прежде", fa: "قبل (Ghabl)", tr: "Önce", kmr: "Berî", sd: "پێش (Pêş)", ne: "अघि (Aghi)", sw: "Kabla", fr: "Avant", twi: "Ansa", bs: "Prije", so: "Ka hor", sr: "Пре (Pre)", ti: "ቅድሚ (Qidmi)", zh: "之前 (zhīqián)" },
-            "Mens (Fx. Jeg gør det mens...)": { en: "While", bn: "যখন (Jokhon)", hi: "जबकि (Jabki)", ur: "جبکہ (Jabke)", uk: "Поки", ru: "Пока / В то время как", fa: "در حالی که", tr: "İken / Esnasında", kmr: "Dema ku", sd: "کاتێک (Katêk)", ne: "जब (Jaba)", sw: "Wakati", fr: "Pendant que / Tandis que", twi: "Berɛ a", bs: "Dok", so: "Halka", sr: "Док (Dok)", ti: "ከሎ (Kelo)", zh: "当...的时候 (dāng... de shíhòu)" },
-            "Som/der (Fx. Det er ham, der...)": { en: "Who / Which / That", bn: "যে (Je)", hi: "जो (Jo)", ur: "جو (Jo)", uk: "Який / Хто", ru: "Который / Кто", fa: "که (Ke)", tr: "Ki / Olan", kmr: "Ku", sd: "کە (Ke)", ne: "जो (Jo)", sw: "Ambaye / Ambalo", fr: "Qui", twi: "A", bs: "Koji", so: "Ee", sr: "Који (Koji)", ti: "ዝ (Zi)", zh: "的人 / 的那个 (de rén / de nàgè)" },
-            "Da (Fx. Da jeg var syg...)": { en: "Since / As / Because", bn: "যেহেতু (Jehetu)", hi: "चूँकि (Chunki)", ur: "چونکہ (Chunke)", uk: "Оскільки / Так як", ru: "Так как / Поскольку", fa: "چون (Chon)", tr: "Çünkü / -den dolayı", kmr: "Ji ber ku", sd: "لەبەرئەوەی (Leber ewey)", ne: "किनभने (Kinabhane)", sw: "Kwa kuwa", fr: "Comme / Puisque", twi: "Ɛfiri sɛ", bs: "Pošto / Budući da", so: "Maadaama", sr: "Пошто (Pošto)", ti: "ስለዝኾነ (Silezihone)", zh: "因为 (yīnwèi)" },
-            "Hvis": { en: "If", bn: "যদি (Jodi)", hi: "यदि / अगर (Yadi / Agar)", ur: "اگر (Agar)", uk: "Якщо", ru: "Если", fa: "اگر (Agar)", tr: "Eğer", kmr: "Heke", sd: "ئەگەر (Eger)", ne: "यदि (Yadi)", sw: "Kama", fr: "Si", twi: "Sɛ", bs: "Ako", so: "Haddii", sr: "Ако (Ako)", ti: "እንተድኣ (Inteda)", zh: "如果 (rúguǒ)" },
-            "Når": { en: "When (future/recurring)", bn: "যখন (Jokhon)", hi: "जब (Jab)", ur: "جب (Jab)", uk: "Коли", ru: "Когда", fa: "وقتی (Vaghti)", tr: "Zaman / -diğinde", kmr: "Dema ku", sd: "کاتێک (Katêk)", ne: "जब (Jaba)", sw: "Lini / Wakati", fr: "Quand", twi: "Sɛ... a", bs: "Kada", so: "Marka", sr: "Када (Kada)", ti: "መዓስ (Me'as)", zh: "当...时 (dāng... shí)" },
-            "Dengang": { en: "Back then / When (past)", bn: "সেই সময় (Shei somoy)", hi: "उस समय (Us samay)", ur: "اس وقت (Us waqt)", uk: "Тоді / Коли (в минулому)", ru: "Тогда / Когда (в прошлом)", fa: "آن زمان", tr: "O zaman", kmr: "Wê çaxê", sd: "ئەو کاتە (Ew kate)", ne: "त्यतिबेला (Tyatibela)", sw: "Wakati huo", fr: "À l'époque", twi: "Saa mberɛ no", bs: "Tada", so: "Xilligaas", sr: "Тада (Tada)", ti: "ሽዑ (Shi'u)", zh: "那时 (nàshí)" },
-            "Idet (Fx. Idet jeg ikke var der...)": { en: "As / In that / Since", bn: "যেহেতু (Jehetu)", hi: "क्योंकि (Kyonki)", ur: "کیونکہ (Kyunke)", uk: "Тому що / Оскільки", ru: "Так как / Поскольку", fa: "زیرا (Zira)", tr: "Çünkü / -dığı için", kmr: "Ji ber ku", sd: "چونکە (Çunke)", ne: "किनभने (Kinabhane)", sw: "Kwa sababu", fr: "Car / Parce que", twi: "Ɛnam sɛ", bs: "Budući da", so: "Maadaama", sr: "Будући да (Budući da)", ti: "ብምኽንያት (Bimikhniyat)", zh: "由于 (yóuyú)" },
-            "Om": { en: "Whether / If / About", bn: "কিনা (Kina)", hi: "कि क्या (Ki kya)", ur: "آیا (Aya)", uk: "Чи", ru: "Ли / О", fa: "آیا (Aya)", tr: "Olup olmadığını / Hakkında", kmr: "Gelo", sd: "ئاخۆ (Axo)", ne: "कि (Ki)", sw: "Kama", fr: "Si", twi: "Sɛ", bs: "Da li", so: "Haddii", sr: "Да ли (Da li)", ti: "ወይ (Wey)", zh: "是否 (shìfǒu)" },
-            "End (Fx. Bedre end din)": { en: "Than", bn: "চেয়ে (Cheye)", hi: "से (Se)", ur: "سے (Se)", uk: "Ніж", ru: "Чем", fa: "از (Az)", tr: "-den / -dan daha", kmr: "Ji", sd: "لە (Le)", ne: "भन्दा (Bhanda)", sw: "Kuliko", fr: "Que", twi: "Sen", bs: "Nego", so: "In ka", sr: "Него (Nego)", ti: "ካብ (Kab)", zh: "比 (bǐ)" },
-            "Inden (Fx. Inden du kom)": { en: "Before", bn: "আগে (Age)", hi: "से पहले (Se pahle)", ur: "سے پہلے (Se pehle)", uk: "До того як", ru: "Перед тем как", fa: "قبل از (Ghabl az)", tr: "Önce / -den önce", kmr: "Beriya ku", sd: "پێش ئەوەی (Pêş ewey)", ne: "अघि (Aghi)", sw: "Kabla ya", fr: "Avant que", twi: "Ansa na", bs: "Prije nego", so: "Ka hor", sr: "Пре него што (Pre nego što)", ti: "ቅድሚ (Qidmi)", zh: "在...之前 (zài... zhīqián)" },
-            "Selvom": { en: "Even though", bn: "যদিও (Jodio)", hi: "भले ही (Bhale hi)", ur: "اگرچہ (Agarchy)", uk: "Хоча", ru: "Хотя", fa: "اگرچه (Agarché)", tr: "Rağmen / -sa bile", kmr: "Tevî ku", sd: "سەرەڕای ئەوەی (Sereray ewey)", ne: "भले नै (Bhale nai)", sw: "Hata kama", fr: "Même si / Bien que", twi: "Sɛ mpo a", bs: "Iako", so: "In kastoo", sr: "Иако (Iako)", ti: "ኳ እንተኾነ (Kwa intehone)", zh: "虽然 (suīrán)" },
-            "Fordi": { en: "Because", bn: "কারণ (Karon)", hi: "क्योंकि (Kyonki)", ur: "کیونکہ (Kyunke)", uk: "Бо / Тому що", ru: "Потому что", fa: "چون / زیرا", tr: "Çünkü", kmr: "Ji ber ku", sd: "لەبەرئەوەی (Leber ewey)", ne: "किनभने (Kinabhane)", sw: "Kwa sababu", fr: "Parce que", twi: "Ɛfiri sɛ", bs: "Jer / Zato što", so: "Sababtoo ah", sr: "Јер (Jer)", ti: "ምክንያቱ (Mikiniyatu)", zh: "因为 (yīnwèi)" },
-            "Indtil": { en: "Until", bn: "পর্যন্ত (Porjonto)", hi: "जब तक (Jab tak)", ur: "جب تک (Jab tak)", uk: "Доки / Аж до", ru: "Пока не / До", fa: "تا (Ta)", tr: "Kadar / -e kadar", kmr: "Heta ku", sd: "هەتا (Heta)", ne: "नभएसम्म (Nabhaesamma)", sw: "Mpaka", fr: "Jusqu'à ce que", twi: "Kosi sɛ", bs: "Dok ne", so: "Ilaa", sr: "Док не (Dok ne)", ti: "ክሳብ (Kisab)", zh: "直到 (zhídào)" },
-            "Siden (Fx. Siden jeg ikke...)": { en: "Since / As", bn: "থেকে (Theke) / যেহেতু (Jehetu)", hi: "चूँकि (Chunki)", ur: "چونکہ (Chunke)", uk: "Оскільки / З того часу", ru: "Так как / С тех пор как", fa: "از آنجایی که", tr: "Beri / -den beri / -dığı için", kmr: "Ji ber ku", sd: "لەو کاتەوەی (Lew katewey)", ne: "भएकाले (Bhaekale)", sw: "Tangu", fr: "Puisque / Depuis que", twi: "Ɛfiri sɛ", bs: "Pošto", so: "Maadaama", sr: "Пошто (Pošto)", ti: "ካብ (Kab)", zh: "既然 (jìrán)" }
+            "Og": { en: "And", bn: "এবং", hi: "और", ur: "اور", uk: "І", ru: "И", fa: "و", tr: "Ve", kmr: "Û", sd: "و", ne: "र", sw: "Na", fr: "Et", twi: "Na", bs: "I", so: "Iyo", sr: "И", ti: "ከምኡውን", zh: "和" },
+            "Men": { en: "But", bn: "কিন্তু", hi: "लेकिन", ur: "لیکن", uk: "Але", ru: "Но", fa: "اما", tr: "Ama / Fakat", kmr: "Lê", sd: "بەڵام", ne: "तर", sw: "Lakini", fr: "Mais", twi: "Nanso", bs: "Ali", so: "Laakiin", sr: "Али", ti: "ግን", zh: "但是" },
+            "Eller": { en: "Or", bn: "অথবা", hi: "या", ur: "یا", uk: "Або", ru: "Или", fa: "یا", tr: "Veya", kmr: "An", sd: "یان", ne: "वा", sw: "Au", fr: "Ou", twi: "Anaasɛ", bs: "Ili", so: "Ama", sr: "Или", ti: "ወይስ", zh: "或者" },
+            "Så": { en: "So", bn: "তাই", hi: "तो", ur: "تو", uk: "Тому / Отже", ru: "Так что / Поэтому", fa: "پس", tr: "Bu yüzden / Öyleyse", kmr: "Ji ber vê", sd: "کەواتە", ne: "त्यसैले", sw: "Hivyo", fr: "Alors / Donc", twi: "Enti", bs: "Tako da", so: "Sidaas darteed", sr: "Тако да", ti: "ስለዚ", zh: "所以" },
+            "At (Fx. Hun tror, at...)": { en: "That", bn: "যে", hi: "कि", ur: "کہ", uk: "Що", ru: "Что", fa: "که", tr: "Ki", kmr: "Ku", sd: "کە", ne: "कि", sw: "Kwamba", fr: "Que", twi: "Sɛ", bs: "Da", so: "In", sr: "Да", ti: "ከም", zh: "觉得 / 认为" },
+            "Før": { en: "Before", bn: "আগে", hi: "पहले", ur: "پہلے", uk: "До / Перед", ru: "До / Прежде", fa: "قبل", tr: "Önce", kmr: "Berî", sd: "پێش", ne: "अघि", sw: "Kabla", fr: "Avant", twi: "Ansa", bs: "Prije", so: "Ka hor", sr: "Пре", ti: "ቅድሚ", zh: "之前" },
+            "Mens (Fx. Jeg gør det mens...)": { en: "While", bn: "যখন", hi: "जबकि", ur: "جبکہ", uk: "Поки", ru: "Пока / В то время как", fa: "در حالی که", tr: "İken / Esnasında", kmr: "Dema ku", sd: "کاتێک", ne: "जब", sw: "Wakati", fr: "Pendant que / Tandis que", twi: "Berɛ a", bs: "Dok", so: "Halka", sr: "Док", ti: "ከሎ", zh: "当...的时候" },
+            "Som/der (Fx. Det er ham, der...)": { en: "Who / Which / That", bn: "যে", hi: "जो", ur: "جو", uk: "Який / Хто", ru: "Который / Кто", fa: "که", tr: "Ki / Olan", kmr: "Ku", sd: "کە", ne: "जो", sw: "Ambaye / Ambalo", fr: "Qui", twi: "A", bs: "Koji", so: "Ee", sr: "Који", ti: "ዝ", zh: "的人 / 的那个" },
+            "Da (Fx. Da jeg var syg...)": { en: "Since / As / Because", bn: "যেহেতু", hi: "चूँकि", ur: "چونکہ", uk: "Оскільки / Так як", ru: "Так как / Поскольку", fa: "چون", tr: "Çünkü / -den dolayı", kmr: "Ji ber ku", sd: "لەبەرئەوەی", ne: "किनभने", sw: "Kwa kuwa", fr: "Comme / Puisque", twi: "Ɛfiri sɛ", bs: "Pošto / Budući da", so: "Maadaama", sr: "Пошто", ti: "ስለዝኾነ", zh: "因为" },
+            "Hvis": { en: "If", bn: "যদি", hi: "यदि / अगर", ur: "اگر", uk: "Якщо", ru: "Если", fa: "اگر", tr: "Eğer", kmr: "Heke", sd: "ئەگەر", ne: "यदि", sw: "Kama", fr: "Si", twi: "Sɛ", bs: "Ako", so: "Haddii", sr: "Ако", ti: "እንተድኣ", zh: "如果" },
+            "Når": { en: "When (future/recurring)", bn: "যখন", hi: "जब", ur: "جب", uk: "Коли", ru: "Когда", fa: "وقتی", tr: "Zaman / -diğinde", kmr: "Dema ku", sd: "کاتێک", ne: "जब", sw: "Lini / Wakati", fr: "Quand", twi: "Sɛ... a", bs: "Kada", so: "Marka", sr: "Када", ti: "መዓስ", zh: "当...时" },
+            "Dengang": { en: "Back then / When (past)", bn: "সেই সময়", hi: "उस समय", ur: "اس وقت", uk: "Тоді / Коли", ru: "Тогда / Когда", fa: "آن زمان", tr: "O zaman", kmr: "Wê çaxê", sd: "ئەو کاتە", ne: "त्यतिबेला", sw: "Wakati huo", fr: "À l'époque", twi: "Saa mberɛ no", bs: "Tada", so: "Xilligaas", sr: "Тада", ti: "ሽዑ", zh: "那时" },
+            "Idet (Fx. Idet jeg ikke var der...)": { en: "As / In that / Since", bn: "যেহেতু", hi: "क्योंकि", ur: "کیونکہ", uk: "Тому що / Оскільки", ru: "Так как / Поскольку", fa: "زیرا", tr: "Çünkü / -dığı için", kmr: "Ji ber ku", sd: "چونکە", ne: "किनभने", sw: "Kwa sababu", fr: "Car / Parce que", twi: "Ɛnam sɛ", bs: "Budući da", so: "Maadaama", sr: "Будући да", ti: "ብምኽንያት", zh: "由于" },
+            "Om": { en: "Whether / If / About", bn: "কিনা", hi: "कि क्या", ur: "آیا", uk: "Чи", ru: "Ли / О", fa: "آیا", tr: "Olup olmadığını / Hakkında", kmr: "Gelo", sd: "ئاخۆ", ne: "कि", sw: "Kama", fr: "Si", twi: "Sɛ", bs: "Da li", so: "Haddii", sr: "Да ли", ti: "ወይ", zh: "是否" },
+            "End (Fx. Bedre end din)": { en: "Than", bn: "চেয়ে", hi: "से", ur: "سے", uk: "Ніж", ru: "Чем", fa: "از", tr: "-den / -dan daha", kmr: "Ji", sd: "لە", ne: "भन्दा", sw: "Kuliko", fr: "Que", twi: "Sen", bs: "Nego", so: "In ka", sr: "Него", ti: "ካብ", zh: "比" },
+            "Inden (Fx. Inden du kom)": { en: "Before", bn: "আগে", hi: "से पहले", ur: "سے پہلے", uk: "До того як", ru: "Перед тем как", fa: "قبل از", tr: "Önce / -den önce", kmr: "Beriya ku", sd: "پێش ئەوەی", ne: "अघि", sw: "Kabla ya", fr: "Avant que", twi: "Ansa na", bs: "Prije nego", so: "Ka hor", sr: "Пре него што", ti: "ቅድሚ", zh: "在...之前" },
+            "Selvom": { en: "Even though", bn: "যদিও", hi: "भله ہی", ur: "اگرچہ", uk: "Хоча", ru: "Хотя", fa: "اگرچه", tr: "Rağmen / -sa bile", kmr: "Tevî ku", sd: "سەرەڕای ئەوەی", ne: "भले नै", sw: "Hata kama", fr: "Même si / Bien que", twi: "Sɛ mpo a", bs: "Iako", so: "In kastoo", sr: "Иако", ti: "ኳ እንተኾነ", zh: "虽然" },
+            "Fordi": { en: "Because", bn: "कारण", hi: "क्योंकि", ur: "کیونکہ", uk: "Бо / Тому що", ru: "Потому что", fa: "چون / زیرا", tr: "Çünkü", kmr: "Ji ber ku", sd: "لەبەرئەوەی", ne: "किनभने", sw: "Kwa sababu", fr: "Parce que", twi: "Ɛfiri sɛ", bs: "Jer / Zato što", so: "Sababtoo ah", sr: "Јер", ti: "ምክንያቱ", zh: "因为" },
+            "Indtil": { en: "Until", bn: "পর্যন্ত", hi: "जब तक", ur: "جب تک", uk: "Доки / Аж до", ru: "Пока не / До", fa: "تا", tr: "Kadar / -e kadar", kmr: "Heta ku", sd: "هەتا", ne: "नभएसम्म", sw: "Mpaka", fr: "Jusqu'à ce que", twi: "Kosi sɛ", bs: "Dok ne", so: "Ilaa", sr: "Док не", ti: "ክሳብ", zh: "直到" },
+            "Siden (Fx. Siden jeg ikke...)": { en: "Since / As", bn: "থেকে / যেহেতু", hi: "चूँकि", ur: "چونکہ", uk: "Оскільки / З того часу", ru: "Так как / С тех пор как", fa: "از آنجایی که", tr: "Beri / -den beri / -dığı için", kmr: "Ji ber ku", sd: "لەو کاتەوەی", ne: "भएकाले", sw: "Tangu", fr: "Puisque / Depuis que", twi: "Ɛfiri sɛ", bs: "Pošto", so: "Maadaama", sr: "Пошто", ti: "ካብ", zh: "既然" }
         };
 
         const languages = [
@@ -124,7 +119,6 @@
             { id: "zh", name: "Mandarin Kinesisk" }
         ];
 
-        // Spillets tilstand
         let currentLanguage = "en";
         let deck = [];
         let currentIndex = 0;
@@ -141,7 +135,6 @@
         const actionButtons = document.getElementById('actionButtons');
         const finishScreen = document.getElementById('finishScreen');
 
-        // Initialisering
         function init() {
             languages.forEach(lang => {
                 const opt = document.createElement('option');
@@ -157,12 +150,10 @@
             currentIndex = 0;
             isFlipped = false;
             isTransitioning = false;
-            
             finishScreen.classList.add('hidden');
             cardContainer.classList.remove('hidden');
             actionButtons.classList.remove('hidden');
             counterEl.parentElement.classList.remove('hidden');
-            
             updateCard();
         }
 
@@ -172,14 +163,12 @@
             translatedWordEl.textContent = dictionary[word][currentLanguage];
             langLabel.textContent = languages.find(l => l.id === currentLanguage).name;
             counterEl.textContent = `Kort tilbage: ${deck.length}`;
-            
             cardInner.classList.remove('is-flipped');
             isFlipped = false;
             actionButtons.style.opacity = "0";
             actionButtons.style.pointerEvents = "none";
         }
 
-        // Event Listeners
         langSelect.addEventListener('change', (e) => {
             currentLanguage = e.target.value;
             updateCard();
@@ -187,11 +176,8 @@
 
         cardContainer.addEventListener('click', () => {
             if (isTransitioning || isFlipped) return;
-            
             isFlipped = true;
             cardInner.classList.add('is-flipped');
-            
-            // Vis knapper efter animationen er næsten færdig
             setTimeout(() => {
                 actionButtons.style.opacity = "1";
                 actionButtons.style.pointerEvents = "auto";
@@ -201,22 +187,15 @@
         function handleAnswer(isCorrect) {
             if (isTransitioning) return;
             isTransitioning = true;
-
-            // 1. Vend kortet tilbage til forsiden (Dansk)
             cardInner.classList.remove('is-flipped');
             actionButtons.style.opacity = "0";
             actionButtons.style.pointerEvents = "none";
 
-            // Logik til at fjerne eller beholde kort
-            const currentWord = deck[currentIndex];
-
             setTimeout(() => {
                 if (isCorrect) {
                     deck.splice(currentIndex, 1);
-                    // Hvis vi slettede det sidste kort i arrayet, gå til 0
                     if (currentIndex >= deck.length) currentIndex = 0;
                 } else {
-                    // Flyt til næste kort i runden (eller start forfra i bunken)
                     currentIndex = (currentIndex + 1) % deck.length;
                 }
 
@@ -226,7 +205,7 @@
                     updateCard();
                     isTransitioning = false;
                 }
-            }, 400); // 400ms delay som ønsket
+            }, 400);
         }
 
         function showFinishScreen() {
