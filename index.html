@@ -3,146 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velkommen - Kursistportal</title>
+    <title>Velkommen - Dansk Modul 3-4</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #fff9f5; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
-        .main-card { width: 100%; max-width: 480px; background: white; padding: 35px; border-radius: 30px; box-shadow: 0 15px 35px rgba(93, 64, 55, 0.1); text-align: center; border: 1px solid #edbb99; }
-        
-        h1 { color: #5d4037; margin-bottom: 5px; font-size: 1.8rem; }
-        .subtitle { color: #8d6e63; margin-bottom: 25px; font-size: 0.95rem; }
-        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #fff9f5; 
+            margin: 0; padding: 0; 
+            display: flex; align-items: center; justify-content: center; 
+            min-height: 100vh;
+        }
+
+        .main-card { 
+            width: 90%;
+            max-width: 450px; 
+            background: white; 
+            padding: 40px 20px; 
+            border-radius: 30px; 
+            box-shadow: 0 15px 35px rgba(93, 64, 55, 0.1); 
+            text-align: center;
+            border: 1px solid #edbb99;
+        }
+
+        .logo-area { font-size: 3rem; margin-bottom: 10px; }
+        h1 { color: #5d4037; font-size: 1.8rem; margin: 5px 0; }
+        .welcome-p { color: #8d6e63; margin-bottom: 20px; }
+
         /* Dagens Ord Boks */
-        .word-box { margin: 25px 0; padding: 25px; background-color: #fffaf0; border: 2px solid #edbb99; border-radius: 20px; text-align: left; position: relative; }
-        .word-label { font-size: 0.75rem; text-transform: uppercase; color: #e67e22; font-weight: bold; letter-spacing: 1px; display: block; margin-bottom: 10px; }
-        
-        .word-header { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-        .the-word { font-size: 1.8rem; color: #5d4037; margin: 0; font-weight: bold; }
-        .word-class { font-size: 0.8rem; background: #edbb99; color: #5d4037; padding: 2px 8px; border-radius: 8px; font-weight: bold; vertical-align: middle; }
-        
-        .phonetic { font-family: 'Segoe UI', sans-serif; color: #8d6e63; font-size: 1rem; margin: 5px 0 15px 0; display: block; }
-        
-        .info-section { margin-bottom: 12px; }
-        .info-label { font-weight: bold; color: #5d4037; font-size: 0.9rem; display: block; margin-bottom: 2px; }
-        .info-content { font-size: 0.95rem; color: #5d4037; line-height: 1.4; }
-        .example-text { font-style: italic; color: #6d4c41; }
-
+        .word-box { 
+            margin: 20px 0; 
+            padding: 20px; 
+            background-color: #fffaf0; 
+            border: 2px solid #edbb99; 
+            border-radius: 20px; 
+            text-align: left; 
+        }
+        .word-label { font-size: 0.75rem; text-transform: uppercase; color: #e67e22; font-weight: bold; display: block; margin-bottom: 8px; }
+        .word-header { display: flex; align-items: baseline; gap: 10px; }
+        .the-word { font-size: 1.6rem; color: #5d4037; font-weight: bold; margin: 0; }
+        .word-class { font-size: 0.8rem; background: #edbb99; color: #5d4037; padding: 2px 8px; border-radius: 8px; font-weight: bold; }
+        .phonetic { color: #8d6e63; font-size: 0.95rem; margin: 5px 0 12px 0; display: block; }
+        .info-content { font-size: 0.95rem; color: #5d4037; line-height: 1.4; margin-bottom: 8px; }
+        .example-text { font-style: italic; color: #6d4c41; font-size: 0.9rem; }
         .ordnet-link { display: inline-block; margin-top: 10px; font-size: 0.85rem; color: #e67e22; text-decoration: none; font-weight: bold; }
-        .ordnet-link:hover { text-decoration: underline; }
 
-        .start-btn { display: block; background: #e67e22; color: white; padding: 18px; margin-top: 25px; text-decoration: none; border-radius: 15px; font-size: 1.2rem; font-weight: bold; box-shadow: 0 5px 0 #d35400; transition: 0.2s; }
-        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #a04000; }
+        /* Knapper og bundtekst */
+        .start-btn { 
+            display: block; background: #e67e22; color: white; 
+            padding: 20px; margin: 20px 0; text-decoration: none; 
+            border-radius: 18px; font-size: 1.3rem; font-weight: bold;
+            box-shadow: 0 6px 0 #d35400; transition: all 0.2s ease;
+        }
+        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #a04000; }
         
-        .footer-text { margin-top: 30px; font-size: 0.85rem; color: #8d6e63; font-style: italic; }
+        .info-text { 
+            margin-top: 25px; font-size: 0.95rem; color: #8d6e63; 
+            line-height: 1.5; padding: 0 10px; font-style: italic; 
+        }
     </style>
 </head>
 <body>
 
-<div class="main-card">
-    <h1>Velkommen</h1>
-    <p class="subtitle">Danskundervisning Modul 3-4</p>
+    <div class="main-card">
+        <div class="logo-area">🌅</div>
+        <h1>Velkommen</h1>
+        <p class="welcome-p">Hvad vil du øve i dag?</p>
 
-    <div class="word-box">
-        <span class="word-label">Dagens ord 📖</span>
-        
-        <div class="word-header">
-            <span class="the-word" id="wordTitle">Indlæser...</span>
-            <span class="word-class" id="wordClass">...</span>
-        </div>
-        
-        <span class="phonetic" id="wordPhonetic"></span>
-        
-        <div class="info-section">
-            <span class="info-label">Betydning:</span>
+        <div class="word-box">
+            <span class="word-label">Dagens ord 📖</span>
+            <div class="word-header">
+                <span class="the-word" id="wordTitle">Indlæser...</span>
+                <span class="word-class" id="wordClass"></span>
+            </div>
+            <span class="phonetic" id="wordPhonetic"></span>
             <div class="info-content" id="wordDef"></div>
-        </div>
-
-        <div class="info-section">
-            <span class="info-label">Eksempel:</span>
             <div class="info-content example-text" id="wordExample"></div>
+            <a href="#" id="wordLink" target="_blank" class="ordnet-link">Se mere på Ordnet.dk →</a>
         </div>
 
-        <a href="#" id="wordLink" target="_blank" class="ordnet-link">Læs mere på Ordnet.dk →</a>
+        <a href="du2-modul.html" class="start-btn">Dansk Modul 3-4</a>
+        
+        <div class="info-text">
+            Denne side er skabt til at hjælpe med dansksproget læring, 
+            hvor du kan finde ressourcer til både læsning, skrivning og ordtræning.
+        </div>
     </div>
 
-    <a href="du2-modul.html" class="start-btn">Gå til materialer</a>
-    
-    <div class="footer-text">
-        Brug portalen hver dag for at støtte din læring.
-    </div>
-</div>
+    <script>
+        const ugedagensOrd = [
+            { word: "Viden", class: "sub", phonetic: "[ˈviːðn̩]", def: "Information man har om et emne.", example: "Hun har en stor viden om dansk historie.", link: "viden" },
+            { word: "Ihærdig", class: "adj", phonetic: "[iˈhaɐ̯di]", def: "At blive ved med at prøve, selvom det er svært.", example: "Han var meget ihærdig i sin søgen efter job.", link: "ihærdig" },
+            { word: "Beslutte", class: "verb", phonetic: "[beˈslodə]", def: "At vælge at gøre noget bestemt.", example: "De besluttede at flytte til en ny by.", link: "beslutte" },
+            { word: "Yderligere", class: "adv", phonetic: "[ˈyðʌliʌ]", def: "Noget der kommer oveni det eksisterende.", example: "Vi har brug for yderligere oplysninger.", link: "yderligere" },
+            { word: "Udfordring", class: "sub", phonetic: "[ˈuðˌfʌdneŋ]", def: "En svær opgave der kræver en indsats.", example: "Det er en udfordring at lære udtale.", link: "udfordring" },
+            { word: "Samarbejde", class: "verb", phonetic: "[ˈsamɒˌbajdə]", def: "At arbejde sammen om en opgave.", example: "Vi skal samarbejde om dette projekt.", link: "samarbejde" },
+            { word: "Ansvarlig", class: "adj", phonetic: "[anˈsvaɐ̯li]", def: "At have pligt til at sørge for noget.", example: "Du er ansvarlig for din egen læring.", link: "ansvarlig" }
+        ];
 
-<script>
-    // Liste med ord - du kan tilføje/rette dem herunder
-    const ugedagensOrd = [
-        { 
-            word: "Viden", 
-            class: "substantiv", 
-            phonetic: "[ˈviːðn̩]", 
-            def: "Information eller kendskab man har om et emne.", 
-            example: "Hun har en stor viden om dansk historie.",
-            link: "viden" 
-        },
-        { 
-            word: "Ihærdig", 
-            class: "adjektiv", 
-            phonetic: "[iˈhaɐ̯di]", 
-            def: "At man bliver ved med at gøre en indsats, selvom det er svært.", 
-            example: "Han var meget ihærdig i sin søgen efter et job.",
-            link: "ihærdig" 
-        },
-        { 
-            word: "Beslutte", 
-            class: "verbum", 
-            phonetic: "[beˈslodə]", 
-            def: "At vælge at gøre noget bestemt efter at have tænkt over det.", 
-            example: "De besluttede at flytte til en større lejlighed.",
-            link: "beslutte" 
-        },
-        { 
-            word: "Yderligere", 
-            class: "adverbium", 
-            phonetic: "[ˈyðʌliʌ]", 
-            def: "Noget der kommer oveni det, der allerede er.", 
-            example: "Vi har brug for yderligere oplysninger i sagen.",
-            link: "yderligere" 
-        },
-        { 
-            word: "Udfordring", 
-            class: "substantiv", 
-            phonetic: "[ˈuðˌfʌdneŋ]", 
-            def: "En svær opgave som kræver at man gør sit bedste.", 
-            example: "Det er en stor udfordring at lære et nyt sprog.",
-            link: "udfordring" 
-        },
-        { 
-            word: "Samarbejde", 
-            class: "verbum", 
-            phonetic: "[ˈsamɒˌbajdə]", 
-            def: "At arbejde sammen med andre om en fælles opgave.", 
-            example: "Kursisterne er gode til at samarbejde i grupper.",
-            link: "samarbejde" 
-        },
-        { 
-            word: "Ansvarlig", 
-            class: "adjektiv", 
-            phonetic: "[anˈsvaɐ̯li]", 
-            def: "At man har pligt til at sørge for noget eller passe på noget.", 
-            example: "Hvem er ansvarlig for at lukke vinduerne?",
-            link: "ansvarlig" 
-        }
-    ];
+        const d = new Date();
+        const current = ugedagensOrd[d.getDay()];
 
-    const d = new Date();
-    const today = d.getDay(); // 0 = søndag, 1 = mandag...
-    const current = ugedagensOrd[today];
-
-    document.getElementById("wordTitle").innerText = current.word;
-    document.getElementById("wordClass").innerText = current.class;
-    document.getElementById("wordPhonetic").innerText = current.phonetic;
-    document.getElementById("wordDef").innerText = current.def;
-    document.getElementById("wordExample").innerText = "\"" + current.example + "\"";
-    document.getElementById("wordLink").href = "https://ordnet.dk/ddo/ordbog?query=" + current.link;
-</script>
-
+        document.getElementById("wordTitle").innerText = current.word;
+        document.getElementById("wordClass").innerText = current.class;
+        document.getElementById("wordPhonetic").innerText = current.phonetic;
+        document.getElementById("wordDef").innerText = current.def;
+        document.getElementById("wordExample").innerText = "\"" + current.example + "\"";
+        document.getElementById("wordLink").href = "https://ordnet.dk/ddo/ordbog?query=" + current.link;
+    </script>
 </body>
 </html>
