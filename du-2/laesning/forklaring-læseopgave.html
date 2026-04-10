@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dansktest DU2 Modul 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .option-btn:hover:not(:disabled) { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col items-center p-4">
+
+    <div id="app" class="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 mt-8">
+        <!-- Header -->
+        <div class="mb-8 border-b pb-4">
+            <h1 class="text-2xl font-bold text-slate-800">Dansktest: Vælg det rigtige ord</h1>
+            <p class="text-slate-600">Niveau: DU2 Modul 3</p>
+            <div class="mt-4 bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div id="progress-bar" class="bg-blue-500 h-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Question Section -->
+        <div id="game-section">
+            <div class="mb-6">
+                <span id="question-count" class="text-sm font-semibold text-blue-600 uppercase tracking-wider">Spørgsmål 1 af 10</span>
+                <p id="sentence-box" class="text-xl mt-2 leading-relaxed text-slate-800 font-medium italic">
+                    <!-- Sætning indsættes her -->
+                </p>
+            </div>
+
+            <div id="options-grid" class="grid grid-cols-1 gap-3 mb-6">
+                <!-- Svarmuligheder indsættes her -->
+            </div>
+
+            <!-- Feedback Box -->
+            <div id="feedback-box" class="hidden p-4 rounded-lg mb-6 border-l-4">
+                <p id="feedback-text" class="text-sm"></p>
+            </div>
+
+            <button id="next-btn" class="hidden w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition shadow-lg">
+                Næste spørgsmål
+            </button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="result-section" class="hidden text-center py-10">
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">Godt gået!</h2>
+            <p id="score-text" class="text-xl text-slate-600 mb-8"></p>
+            <button onclick="location.reload()" class="bg-slate-800 text-white px-8 py-3 rounded-xl hover:bg-slate-900 transition">
+                Prøv igen
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                sentence: "Jeg har boet i Danmark ___ tre år.",
+                options: ["i", "for", "siden"],
+                correct: 0,
+                explanation: "Vi bruger 'i' ved tidsrum (hvor længe). 'For... siden' bruges om et tidspunkt i fortiden."
+            },
+            {
+                sentence: "Min datter er meget ___ til at tegne.",
+                options: ["dygtige", "dygtigt", "dygtig"],
+                correct: 2,
+                explanation: "'Datter' er fælleskøn (en datter) og ental, derfor skal adjektivet ikke have -t eller -e."
+            },
+            {
+                sentence: "I går ___ jeg en lang tur i skoven.",
+                options: ["går", "gik", "gået"],
+                correct: 1,
+                explanation: "Sætningen starter med 'I går', så vi skal bruge præteritum (datid) af at gå: 'gik'."
+            },
+            {
+                sentence: "Jeg vil gerne invitere dig ___ min fødselsdag.",
+                options: ["på", "til", "hos"],
+                correct: 1,
+                explanation: "Man inviterer 'til' en begivenhed eller fest."
+            },
+            {
+                sentence: "Kan du hjælpe mig? Jeg kan ikke finde ___ nøgler.",
+                options: ["mine", "min", "mit"],
+                correct: 0,
+                explanation: "'Nøgler' er pluralis (flertal), derfor skal det hedde 'mine'."
+            },
+            {
+                sentence: "Vi skal flytte i en ny lejlighed, ___ den er for lille nu.",
+                options: ["men", "derfor", "fordi"],
+                correct: 2,
+                explanation: "'Fordi' forklarer årsagen til, at vi skal flytte."
+            },
+            {
+                sentence: "Hvor tit ___ du dine forældre i dit hjemland?",
+                options: ["besøger", "besøgte", "besøgt"],
+                correct: 0,
+                explanation: "'Hvor tit' indikerer en vane eller noget der sker jævnligt, derfor bruger vi præsens (nutid)."
+            },
+            {
+                sentence: "Min mand er ___ end mig.",
+                options: ["høj", "højere", "højest"],
+                correct: 1,
+                explanation: "Når vi sammenligner to ting/personer med 'end', bruger vi komparativ (-ere)."
+            },
+            {
+                sentence: "Jeg håber, at du ___ en god weekend.",
+                options: ["har", "får", "havde"],
+                correct: 1,
+                explanation: "Vi snakker om fremtiden (jeg håber), derfor er 'får' det mest naturlige valg."
+            },
+            {
+                sentence: "Hun kan ikke komme i dag, ___ hun er syg.",
+                options: ["da", "så", "dog"],
+                correct: 0,
+                explanation: "'Da' fungerer her som en konjunktion, der betyder 'fordi'."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        const sentenceBox = document.getElementById('sentence-box');
+        const optionsGrid = document.getElementById('options-grid');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackText = document.getElementById('feedback-text');
+        const nextBtn = document.getElementById('next-btn');
+        const questionCount = document.getElementById('question-count');
+        const progressBar = document.getElementById('progress-bar');
+        const gameSection = document.getElementById('game-section');
+        const resultSection = document.getElementById('result-section');
+        const scoreText = document.getElementById('score-text');
+
+        function loadQuestion() {
+            answered = false;
+            const q = questions[currentQuestion];
+            sentenceBox.textContent = q.sentence;
+            questionCount.textContent = `Spørgsmål ${currentQuestion + 1} af ${questions.length}`;
+            progressBar.style.width = `${(currentQuestion / questions.length) * 100}%`;
+            
+            optionsGrid.innerHTML = '';
+            feedbackBox.className = 'hidden p-4 rounded-lg mb-6 border-l-4';
+            nextBtn.classList.add('hidden');
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full text-left p-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 transition-all duration-200 text-slate-700 font-medium bg-white";
+                btn.textContent = opt;
+                btn.onclick = () => checkAnswer(index);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(index) {
+            if (answered) return;
+            answered = true;
+
+            const q = questions[currentQuestion];
+            const buttons = optionsGrid.querySelectorAll('button');
+            
+            if (index === q.correct) {
+                score++;
+                buttons[index].classList.replace('border-slate-200', 'border-green-500');
+                buttons[index].classList.add('bg-green-50');
+                showFeedback(true, "Rigtigt! " + q.explanation);
+            } else {
+                buttons[index].classList.replace('border-slate-200', 'border-red-500');
+                buttons[index].classList.add('bg-red-50');
+                buttons[q.correct].classList.replace('border-slate-200', 'border-green-500');
+                showFeedback(false, "Ikke helt. " + q.explanation);
+            }
+
+            buttons.forEach(b => b.disabled = true);
+            nextBtn.classList.remove('hidden');
+        }
+
+        function showFeedback(isCorrect, text) {
+            feedbackBox.classList.remove('hidden');
+            if (isCorrect) {
+                feedbackBox.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                feedbackBox.classList.remove('bg-red-100', 'border-red-500', 'text-red-800');
+            } else {
+                feedbackBox.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+                feedbackBox.classList.remove('bg-green-100', 'border-green-500', 'text-green-800');
+            }
+            feedbackText.textContent = text;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        function showResults() {
+            gameSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            progressBar.style.width = "100%";
+            scoreText.textContent = `Du fik ${score} ud af ${questions.length} rigtige.`;
+        }
+
+        // Start spillet
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
