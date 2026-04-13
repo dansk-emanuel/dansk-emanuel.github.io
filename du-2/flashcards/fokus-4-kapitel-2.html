@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcard Læringsapp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flipped {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        body {
+            background-color: #f3f4f6; /* Lysegrå baggrund */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <div id="app" class="w-full max-w-md mt-8">
+        <!-- Header & Sprogvalg -->
+        <div class="mb-6 text-center">
+            <h1 class="text-2xl font-bold mb-4">Flashcards</h1>
+            <label for="langSelect" class="block text-sm font-medium text-gray-700 mb-2">Vælg målsprog:</label>
+            <select id="langSelect" class="w-full p-2 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                <!-- Sprog tilføjes dynamisk -->
+            </select>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="mb-4 flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+            <span class="text-sm font-medium text-gray-600 uppercase tracking-wider">Status</span>
+            <span id="cardCount" class="text-sm font-bold text-blue-600">Kort tilbage: 0</span>
+        </div>
+
+        <!-- Card Container -->
+        <div id="cardGameContainer" class="relative">
+            <div id="cardWrapper" class="perspective-1000 w-full h-80 cursor-pointer">
+                <div id="cardInner" class="flip-card-inner relative w-full h-full shadow-xl rounded-2xl border border-gray-200">
+                    <!-- Forside (Dansk) -->
+                    <div class="flip-card-front absolute inset-0 bg-white flex items-center justify-center p-6 rounded-2xl">
+                        <p id="danishWord" class="text-2xl font-bold text-gray-800 text-center"></p>
+                    </div>
+                    <!-- Bagside (Oversættelse) -->
+                    <div class="flip-card-back absolute inset-0 bg-[#f5f5dc] flex items-center justify-center p-6 rounded-2xl border-2 border-beige-300">
+                        <p id="translatedWord" class="text-2xl font-bold text-gray-800 text-center"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kontrol Knapper -->
+            <div id="controls" class="mt-8 grid grid-cols-2 gap-4 opacity-0 pointer-events-none transition-opacity duration-300">
+                <button id="btnWrong" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform active:scale-95 transition-all">
+                    Forkert
+                </button>
+                <button id="btnRight" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform active:scale-95 transition-all">
+                    Rigtigt
+                </button>
+            </div>
+        </div>
+
+        <!-- Færdig Skærm -->
+        <div id="finishScreen" class="hidden text-center bg-white p-10 rounded-2xl shadow-xl border border-gray-200">
+            <div class="mb-4 text-5xl">🎉</div>
+            <h2 class="text-2xl font-bold mb-2">Færdig!</h2>
+            <p class="text-gray-600 mb-6">Du har lært alle ordene i denne runde.</p>
+            <button id="btnRestart" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-colors">
+                Start forfra
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Data Struktur
+        const wordData = [
+            { da: "Jeg følges med ......", en: "I go with ......", bn: "আমি সাথে যাই ......", hi: "मैं साथ जाता हूँ ......", ur: "میں ساتھ جاتا ہوں ......", uk: "Я йду з ......", ru: "Я иду с ......", fa: "من با ... می روم", tr: "Birlikte gidiyorum ......", kmr: "Ez bi ... re diçim", sor: "من لەگەڵ ... دەڕۆم", ne: "म सँगै जान्छु ......", sw: "Ninafuatana na ......", fr: "Je suis accompagné de ......", twi: "Me ne ... na ɛnam", bs: "Pratim se sa ......", som: "Waxaan raacaa ......", sr: "Pratim se sa ......", ti: "ምስ ... ይኸይድ ኣለኹ", zh: "我和......一起去" },
+            { da: "Heldigvis", en: "Fortunately", bn: "ভাগ্যক্রমে", hi: "भाग्यवश", ur: "خوش قسمتی سے", uk: "На щастя", ru: "К счастью", fa: "خوشبختانه", tr: "Neyse ki", kmr: "Bi şans", sor: "خۆشبەختانە", ne: "भाग्यवश", sw: "Bahati nzuri", fr: "Heureusement", twi: "Anigyɛm", bs: "Srećom", som: "Nasiib wanaag", sr: "Srećom", ti: "ብዕድል", zh: "幸好" },
+            { da: "Lektier", en: "Homework", bn: "বাড়ির কাজ", hi: "होमवर्क", ur: "ہوم ورک", uk: "Домашнє завдання", ru: "Домашнее задание", fa: "مشق شب", tr: "Ödev", kmr: "Dersên malê", sor: "ئەرکی ماڵەوە", ne: "गृहकार्य", sw: "Kazi za nyumbani", fr: "Devoirs", twi: "Nidwodwee", bs: "Zadaća", som: "Shaqada guriga", sr: "Domaći zadatak", ti: "ናይ ገዛ ዕዩ", zh: "作业" },
+            { da: "Folkeskole/privatskole", en: "Public school / Private school", bn: "পাবলিক স্কুল / প্রাইভেট স্কুল", hi: "सरकारी स्कूल / निजी स्कूल", ur: "پبلک سکول / پرائیویٹ سکول", uk: "Державна школа / приватна школа", ru: "Государственная школа / частная школа", fa: "مدرسه دولتی / مدرسه خصوصی", tr: "Devlet okulu / Özel okul", kmr: "Dibistana giştî / Dibistana taybet", sor: "قوتابخانەی حکومی / قوتابخانەی ئەهلی", ne: "सरकारी विद्यालय / निजी विद्यालय", sw: "Shule ya umma / Shule ya binafsi", fr: "École publique / École privée", twi: "Aban sukuu / Ankorɛankorɛ sukuu", bs: "Državna škola / Privatna škola", som: "Dugsiga dadweynaha / Dugsiga gaarka loo leeyahay", sr: "Državna škola / Privatna škola", ti: "ህዝባዊ ቤት ትምህርቲ / ብሕታዊ ቤት ትምህርቲ", zh: "公立学校/私立学校" },
+            { da: "Det tager 15 minutter", en: "It takes 15 minutes", bn: "১৫ মিনিট সময় লাগে", hi: "इसमें 15 मिनट लगते हैं", ur: "اس میں 15 منٹ لگتے ہیں", uk: "Це займає 15 хвилин", ru: "Это занимает 15 минут", fa: "15 دقیقه طول می کشد", tr: "15 dakika sürüyor", kmr: "15 deqîqe digire", sor: "١٥ خولەکی پێدەچێت", ne: "यसले १५ मिनेट लिन्छ", sw: "Inachukua dakika 15", fr: "Cela prend 15 minutes", twi: "Egye sima duonum", bs: "Traje 15 minuta", som: "Waxay qaadataa 15 daqiiqo", sr: "Traje 15 minuta", ti: "15 ደቓይቕ ይወስድ", zh: "需要15分钟" },
+            { da: "Jeg er ikke god til ......", en: "I am not good at ......", bn: "আমি ...... এ ভালো নই", hi: "मैं ...... में अच्छा नहीं हूँ", ur: "میں ...... میں اچھا نہیں ہوں", uk: "Я не вмію ......", ru: "Я не очень хорош в ......", fa: "من در ... خوب نیستم", tr: "...... konusunda iyi değilim", kmr: "Ez di ... de ne baş im", sor: "من لە ... باش نیم", ne: "म ...... मा राम्रो छैन", sw: "Mimi si mzuri katika ......", fr: "Je ne suis pas bon en ......", twi: "Mennim ... yɛ", bs: "Nisam dobar u ......", som: "Kuma fiicni ......", sr: "Nisam dobar u ......", ti: "ኣብ ... ጽቡቕ ኣይኮንኩን", zh: "我不擅长......" },
+            { da: "Jeg er god til ......", en: "I am good at ......", bn: "আমি ...... এ ভালো", hi: "मैं ...... में अच्छा हूँ", ur: "میں ...... میں اچھا ہوں", uk: "Я добре вмію ......", ru: "Я хорош в ......", fa: "من در ... خوب هستم", tr: "...... konusunda iyiyim", kmr: "Ez di ... de baş im", sor: "من لە ... باشم", ne: "म ...... मा राम्रो छु", sw: "Mimi ni mzuri katika ......", fr: "Je suis bon en ......", twi: "Menim ... yɛ", bs: "Dobar sam u ......", som: "Waan ku fiicnahay ......", sr: "Dobar sam u ......", ti: "ኣብ ... ጽቡቕ እየ", zh: "我擅长......" },
+            { da: "Østlig", en: "Eastern", bn: "পূর্বাঞ্চলীয়", hi: "पूर्वी", ur: "مشرقی", uk: "Східний", ru: "Восточный", fa: "شرقی", tr: "Doğu", kmr: "Rojhilat", sor: "ڕۆژهەڵاتی", ne: "पूर्वी", sw: "Mashariki", fr: "Oriental / Est", twi: "Apueɛ", bs: "Istočni", som: "Bari", sr: "Istočni", ti: "ምብራቓዊ", zh: "东部的" },
+            { da: "Hun kører mig til skole", en: "She drives me to school", bn: "সে আমাকে স্কুলে নিয়ে যায়", hi: "वह मुझे स्कूल छोड़ती है", ur: "وہ مجھے سکول چھوڑتی ہے", uk: "Вона везе мене до школи", ru: "Она везет меня в школу", fa: "او مرا به مدرسه می رساند", tr: "Beni okula o bırakıyor", kmr: "Ew min dibe dibistanê", sor: "ئەو دەمبات بۆ قوتابخانە", ne: "उहाँले मलाई विद्यालय पुर्याउनुहुन्छ", sw: "Ananipeleka shuleni", fr: "Elle m'emmène à l'école en voiture", twi: "Ɔde me kɔ sukuu", bs: "Ona me vozi u školu", som: "Waxay ii kaxaysaa dugsiga", sr: "Ona me vozi u školu", ti: "ንሳ ብመኪና ናብ ቤት ትምህርቲ ተብጽሓኒ", zh: "她开车送我去学校" },
+            { da: "De er strenge og sure", en: "They are strict and grumpy", bn: "তারা কঠোর এবং রাগী", hi: "वे सख्त और चिड़चिड़े हैं", ur: "وہ سخت اور بدتمیز ہیں", uk: "Вони суворі та похмурі", ru: "Они строгие и сердитые", fa: "آنها سخت گیر و بداخلاق هستند", tr: "Sert ve huysuzlar", kmr: "Ew tûj û aciz in", sor: "ئەوان توند و توڕەن", ne: "तिनीहरू कडा र रिसाहा छन्", sw: "Wao ni wakali na wanuna", fr: "Ils sont stricts et grincheux", twi: "Wɔn anim yɛ den na wɔn bo fu", bs: "Strogi su i ljuti", som: "Way adkaayeen oo xanaaqsanaayeen", sr: "Strogi su i ljuti", ti: "ንሳቶም ጽኑዓትን ሓረቕትን እዮም", zh: "他们又严格又爱生气" },
+            { da: "Prøver/tests", en: "Exams / Tests", bn: "পরীক্ষা", hi: "परीक्षा / परीक्षण", ur: "امتحانات / ٹیسٹ", uk: "Іспити / тести", ru: "Экзамены / тесты", fa: "امتحانات / تست ها", tr: "Sınavlar / Testler", kmr: "Îmtîhan / Test", sor: "تاقیکردنەوەکان", ne: "परीक्षा / परीक्षण", sw: "Mitihani / Majaribio", fr: "Examens / Tests", twi: "Sɔhwɛ", bs: "Ispiti / Testovi", som: "Imtixaannada", sr: "Ispiti / Testovi", ti: "ፈተናታት", zh: "考试/测试" },
+            { da: "Landsby", en: "Village", bn: "গ্রাম", hi: "गाँव", ur: "گاؤں", uk: "Село", ru: "Деревня", fa: "روستا", tr: "Köy", kmr: "Gund", sor: "دێ", ne: "गाउँ", sw: "Kijiji", fr: "Village", twi: "Akuraa", bs: "Selo", som: "Tuulo", sr: "Selo", ti: "ገጠር", zh: "村庄" },
+            { da: "Langt fra/tæt på", en: "Far from / Close to", bn: "দূরে / কাছে", hi: "दूर / पास", ur: "دور / قریب", uk: "Далеко від / близько до", ru: "Далеко от / близко к", fa: "دور از / نزدیک به", tr: "Uzak / Yakın", kmr: "Dûr / Nêzîk", sor: "دوور لە / نزیک لە", ne: "टाढा / नजिक", sw: "Mbali na / Karibu na", fr: "Loin de / Proche de", twi: "Ɛkyir / Ɛbɛn", bs: "Daleko / Blizu", som: "Ka fog / U dhow", sr: "Daleko / Blizu", ti: "ርሑቕ ካብ / ቀረባ ናብ", zh: "离得远/离得近" },
+            { da: "Vi har det sjovt", en: "We are having fun", bn: "আমরা মজা করছি", hi: "हम मज़े कर रहे हैं", ur: "ہم مزے کر رہے ہیں", uk: "Нам весело", ru: "Нам весело", fa: "ما خوش می گذرانیم", tr: "Eğleniyoruz", kmr: "Em kêfxweş dibin", sor: "خۆشمان ڕادەبوێرین", ne: "हामी रमाइलो गर्दैछौं", sw: "Tunafurahi", fr: "Nous nous amusons", twi: "Yɛre gye yɛn ani", bs: "Zabavljamo se", som: "Waan baashaalaynaa", sr: "Zabavljamo se", ti: "ንዘናጋዕ ኣለና", zh: "我们玩得很开心" },
+            { da: "Kedeligt", en: "Boring", bn: "একঘেয়ে", hi: "उबाऊ", ur: "بورنگ", uk: "Нудно", ru: "Скучно", fa: "خسته کننده", tr: "Sıkıcı", kmr: "Bêzar", sor: "بێزارکەر", ne: "अल्छी लाग्दो", sw: "Inachosha", fr: "Ennuyeux", twi: "Anigyɛ biara nnim", bs: "Dosadno", som: "Cajiib ma ahan", sr: "Dosadno", ti: "መሰልከዪ", zh: "无聊的" },
+            { da: "Skældud", en: "Scolding", bn: "বকুনি", hi: "डाँट", ur: "ڈانٹ", uk: "Догана", ru: "Выговор", fa: "سرزنش", tr: "Azarlamak", kmr: "Gazin", sor: "سەرزەنشت", ne: "गाली", sw: "Kufokea", fr: "Réprimande", twi: "Animka", bs: "Grdnja", som: "Canaan", sr: "Grdnja", ti: "ተግሳጽ", zh: "责骂" },
+            { da: "Desværre", en: "Unfortunately", bn: "দুর্ভাগ্যবশত", hi: "दुर्भाग्य से", ur: "بدقسمتی سے", uk: "На жаль", ru: "К сожалению", fa: "متاسفانه", tr: "Maalesef", kmr: "Mixabin", sor: "بەداخەوە", ne: "दुर्भाग्यवश", sw: "Kwa bahati mbaya", fr: "Malheureusement", twi: "Enye anigyɛ", bs: "Nažalost", som: "Nasiib darro", sr: "Nažalost", ti: "ዝበዝሐ ግዜ", zh: "可惜" },
+            { da: "Resten", en: "The rest", bn: "বাকিটা", hi: "बाकी", ur: "باقی", uk: "Решта", ru: "Остальное", fa: "بقیه", tr: "Geri kalanı", kmr: "Yên din", sor: "ئەوانی تر", ne: "बाँकी", sw: "Iliyobaki", fr: "Le reste", twi: "Nea ɛka ho", bs: "Ostatak", som: "Inta kale", sr: "Ostatak", ti: "እቲ ዝተረፈ", zh: "剩下的" },
+            { da: "Frikvarter", en: "Recess / Break", bn: "ছুটি", hi: "आधी छुट्टी", ur: "بریک", uk: "Перерва", ru: "Перемена", fa: "زنگ تفریح", tr: "Teneffüs", kmr: "Bêhnvedan", sor: "پشووی نێوان وانەکان", ne: "मध्यान्तर", sw: "Mapumziko", fr: "Récréation", twi: "Ahomegyɛ berɛ", bs: "Odmor", som: "Xilliga nasashada", sr: "Odmor", ti: "ዕረፍቲ", zh: "课间休息" },
+            { da: "Skoleuniform", en: "School uniform", bn: "স্কুল ইউনিফর্ম", hi: "स्कूल यूनिफ़ॉर्म", ur: "سکول یونیفارم", uk: "Шкільна форма", ru: "Школьная форма", fa: "یونیفرم مدرسه", tr: "Okul üniforması", kmr: "Unîformaya dibistanê", sor: "جلی قوتابخانە", ne: "विद्यालयको पोशाक", sw: "Sare ya shule", fr: "Uniforme scolaire", twi: "Sukuu ntadeɛ", bs: "Školska uniforma", som: "Tuubada dugsiga", sr: "Školska uniforma", ti: "ዩኒፎርም ቤት ትምህርቲ", zh: "校服" },
+            { da: "Halstørklæde", en: "Scarf", bn: "স্কার্ফ", hi: "स्कार्फ", ur: "سکارف", uk: "Шарф", ru: "Шарф", fa: "شال گردن", tr: "Atkı", kmr: "Şalger", sor: "ملپێچ", ne: "गलबन्दी", sw: "Skafu", fr: "Écharpe", twi: "Kɔnmuatadeɛ", bs: "Šal", som: "Cumaamad", sr: "Šal", ti: "ሻርፕ", zh: "围巾" },
+            { da: "Indhold", en: "Content", bn: "বিষয়বস্তু", hi: "सामग्री", ur: "مواد", uk: "Зміст", ru: "Содержание", fa: "محتوا", tr: "İçerik", kmr: "Naverok", sor: "ناوەڕۆک", ne: "विषयवस्तु", sw: "Maudhui", fr: "Contenu", twi: "Emu nsɛm", bs: "Sadržaj", som: "Nuxurka", sr: "Sadržaj", ti: "ትሕዝቶ", zh: "内容" },
+            { da: "Sproghjælp", en: "Language help", bn: "ভাষা সহায়তা", hi: "भाषा सहायता", ur: "زبان کی مدد", uk: "Мовна допомога", ru: "Языковая помощь", fa: "کمک زبانی", tr: "Dil yardımı", kmr: "Alîkariya ziman", sor: "یارمەتی زمان", ne: "भाषा सहयोग", sw: "Msaada wa lugha", fr: "Aide linguistique", twi: "Kasa mmoa", bs: "Jezička pomoć", som: "Caawinta luqadda", sr: "Jezička pomoć", ti: "ሓገዝ ቋንቋ", zh: "语言帮助" },
+            { da: "Grammatik", en: "Grammar", bn: "ব্যাকরণ", hi: "व्याकरण", ur: "گرائمر", uk: "Грамматика", ru: "Грамматика", fa: "دستور زبان", tr: "Dilbilgisi", kmr: "Rêzimane", sor: "ڕێزمان", ne: "व्याकरण", sw: "Sarufi", fr: "Grammaire", twi: "Kasa mmara", bs: "Gramatika", som: "Naxwaha", sr: "Gramatika", ti: "ስዋስው", zh: "语法" },
+            { da: "Udtale", en: "Pronunciation", bn: "উচ্চারণ", hi: "उच्चारण", ur: "تلفظ", uk: "Вимова", ru: "Произношение", fa: "تلفظ", tr: "Telaffuz", kmr: "Bilêvkirin", sor: "خوێندنەوە", ne: "उच्चारण", sw: "Matamshi", fr: "Prononciation", twi: "Kasa nnyegyeɛ", bs: "Izgovor", som: "Dhawaaqa", sr: "Izgovor", ti: "ኣደማምጻ", zh: "发音" }
+        ];
+
+        const languages = [
+            { id: "en", name: "Engelsk" },
+            { id: "bn", name: "Bengali" },
+            { id: "hi", name: "Hindi" },
+            { id: "ur", name: "Urdu" },
+            { id: "uk", name: "Ukrainsk" },
+            { id: "ru", name: "Russisk" },
+            { id: "fa", name: "Persisk" },
+            { id: "tr", name: "Tyrkisk" },
+            { id: "kmr", name: "Kurdisk Kurmanji" },
+            { id: "sor", name: "Kurdisk Sorani" },
+            { id: "ne", name: "Nepalesisk" },
+            { id: "sw", name: "Kiswahili" },
+            { id: "fr", name: "Fransk" },
+            { id: "twi", name: "Twi" },
+            { id: "bs", name: "Bosnisk" },
+            { id: "som", name: "Somali" },
+            { id: "sr", name: "Serbisk" },
+            { id: "ti", name: "Tigrinya" },
+            { id: "zh", name: "Mandarin Kinesisk" }
+        ];
+
+        // State
+        let deck = [];
+        let currentCard = null;
+        let selectedLang = "en";
+        let isTransitioning = false;
+        let isFlipped = false;
+
+        // DOM Elementer
+        const langSelect = document.getElementById('langSelect');
+        const cardInner = document.getElementById('cardInner');
+        const cardWrapper = document.getElementById('cardWrapper');
+        const danishWordText = document.getElementById('danishWord');
+        const translatedWordText = document.getElementById('translatedWord');
+        const cardCount = document.getElementById('cardCount');
+        const controls = document.getElementById('controls');
+        const cardGameContainer = document.getElementById('cardGameContainer');
+        const finishScreen = document.getElementById('finishScreen');
+        const btnRight = document.getElementById('btnRight');
+        const btnWrong = document.getElementById('btnWrong');
+        const btnRestart = document.getElementById('btnRestart');
+
+        // Initialisering
+        function init() {
+            // Fyld sprogvælger
+            languages.forEach(lang => {
+                const opt = document.createElement('option');
+                opt.value = lang.id;
+                opt.textContent = lang.name;
+                langSelect.appendChild(opt);
+            });
+
+            startNewGame();
+        }
+
+        function startNewGame() {
+            deck = [...wordData];
+            shuffle(deck);
+            finishScreen.classList.add('hidden');
+            cardGameContainer.classList.remove('hidden');
+            showNextCard();
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function showNextCard() {
+            if (deck.length === 0) {
+                showFinishScreen();
+                return;
+            }
+            
+            currentCard = deck[0];
+            danishWordText.textContent = currentCard.da;
+            translatedWordText.textContent = currentCard[selectedLang];
+            cardCount.textContent = `Kort tilbage: ${deck.length}`;
+            
+            // Nulstil visuel tilstand
+            isFlipped = false;
+            cardInner.classList.remove('flipped');
+            controls.classList.add('opacity-0', 'pointer-events-none');
+            isTransitioning = false;
+        }
+
+        function showFinishScreen() {
+            cardGameContainer.classList.add('hidden');
+            finishScreen.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        langSelect.addEventListener('change', (e) => {
+            selectedLang = e.target.value;
+            if (currentCard) {
+                translatedWordText.textContent = currentCard[selectedLang];
+            }
+        });
+
+        cardWrapper.addEventListener('click', () => {
+            if (isTransitioning || isFlipped) return;
+            
+            isFlipped = true;
+            cardInner.classList.add('flipped');
+            
+            // Vis knapper efter animationen
+            setTimeout(() => {
+                controls.classList.remove('opacity-0', 'pointer-events-none');
+            }, 300);
+        });
+
+        function handleAnswer(isCorrect) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            // 1. Skjul knapper
+            controls.classList.add('opacity-0', 'pointer-events-none');
+
+            // 2. Vend kortet tilbage til forsiden (Dansk)
+            cardInner.classList.remove('flipped');
+
+            // 3. Vent 400ms (isTransitioning logik) før teksten opdateres
+            setTimeout(() => {
+                if (isCorrect) {
+                    deck.shift(); // Fjern fra bunken
+                } else {
+                    // Flyt bagerst i bunken
+                    const moved = deck.shift();
+                    deck.push(moved);
+                }
+                showNextCard();
+            }, 400);
+        }
+
+        btnRight.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleAnswer(true);
+        });
+
+        btnWrong.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleAnswer(false);
+        });
+
+        btnRestart.addEventListener('click', startNewGame);
+
+        // Start app
+        init();
+
+    </script>
+</body>
+</html>
