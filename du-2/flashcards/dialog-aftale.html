@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sproglæring Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .flipped {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 2rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 md:p-8">
+
+    <div id="app" class="w-full max-w-2xl">
+        <!-- Header & Sprogvælger -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Sproglæring</h1>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                <label for="language-select" class="block text-sm font-medium text-gray-700 mb-2">Vælg målsprog:</label>
+                <select id="language-select" class="w-full p-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                    <!-- Options generated via JS -->
+                </select>
+            </div>
+        </header>
+
+        <!-- Status -->
+        <div id="status-bar" class="mb-4 flex justify-between items-center px-2 text-gray-600 font-medium">
+            <span id="cards-left">Kort tilbage: 0</span>
+            <span id="current-lang-display">Sprog: Dansk</span>
+        </div>
+
+        <!-- Spil Område -->
+        <main id="game-container" class="relative">
+            <!-- Flashcard -->
+            <div class="perspective-1000 w-full h-80 cursor-pointer mb-8" id="card-trigger">
+                <div id="card-inner" class="flip-card-inner">
+                    <!-- Forside (Dansk) -->
+                    <div class="flip-card-front bg-white text-black border border-gray-200">
+                        <p id="danish-text">Indlæser...</p>
+                    </div>
+                    <!-- Bagside (Målsprog) -->
+                    <div class="flip-card-back bg-[#f5f5dc] text-black border border-gray-200">
+                        <p id="target-text">Oversættelse</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Knapper (Vises kun når kortet er vendt) -->
+            <div id="action-buttons" class="flex gap-4 justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+                <button id="btn-wrong" class="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-full font-bold shadow-lg transform active:scale-95 transition-all">
+                    Forkert
+                </button>
+                <button id="btn-right" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow-lg transform active:scale-95 transition-all">
+                    Rigtigt
+                </button>
+            </div>
+        </main>
+
+        <!-- Færdig Skærm -->
+        <div id="finished-screen" class="hidden text-center bg-white p-12 rounded-2xl shadow-xl border border-gray-200">
+            <div class="text-5xl mb-4">🎉</div>
+            <h2 class="text-2xl font-bold mb-2">Flot klaret!</h2>
+            <p class="text-gray-600 mb-8">Du har lært alle ordene i denne runde.</p>
+            <button id="btn-restart" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-3 rounded-full font-bold shadow-lg transition-all">
+                Start forfra
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Data Struktur
+        const wordList = [
+            "Hvordan går det?", "Fint", "Godt", "Jeg skal i Tivoli i aften", "Vil I ikke med?", 
+            "Jo, men jeg kan ikke", "Jeg skal på arbejde", "Jeg vil gerne med", "Hvornår?", 
+            "Det er fint", "Vi ses i aften", "Hav en god aften", "Tak i lige måde", 
+            "Hvor skal du/I hen?", "hjem", "i skole", "i byen", "i biografen", "i teatret", 
+            "i banken", "i kirke", "på arbejde", "på café", "på bar", "på restaurant", 
+            "på ferie", "til fest", "til eksamen", "til læge", "til koncert", "i dag", 
+            "i formiddag", "i eftermiddag", "i aften", "i morgen", "i overmorgen"
+        ];
+
+        // Bemærk: I en rigtig produktion ville disse hentes fra en API. 
+        // Her er de mappet præcis som ønsket for alle sprogene.
+        const translations = {
+            "Engelsk": ["How is it going?", "Fine", "Good", "I am going to Tivoli tonight", "Don't you want to come along?", "Yes, but I can't", "I have to work", "I would like to come along", "When?", "That's fine", "See you tonight", "Have a good evening", "Thanks, same to you", "Where are you going?", "home", "to school", "out on the town", "to the cinema", "to the theater", "to the bank", "to church", "at work", "to a café", "to a bar", "to a restaurant", "on holiday", "to a party", "to an exam", "to the doctor", "to a concert", "today", "this morning", "this afternoon", "tonight", "tomorrow", "the day after tomorrow"],
+            "Bengali": ["কেমন চলছে? (Kemon cholche?)", "ঠিক আছে (Thik ache)", "ভালো (Bhalo)", "আমি আজ রাতে টিভোলি যাচ্ছি (Ami aj rate Tivoli jachhi)", "তুমি কি আসতে চাও না? (Tumi ki ashte chao na?)", "হ্যাঁ, কিন্তু আমি পারছি না (He, kintu ami parchi na)", "আমাকে কাজ করতে হবে (Amake kaj korte hobe)", "আমি আসতে চাই (Ami ashte chai)", "কখন? (Kakhon?)", "এটা ঠিক আছে (Eta thik ache)", "আজ রাতে দেখা হবে (Aj rate dekha hobe)", "শুভ সন্ধ্যা (Shubho shondhya)", "ধন্যবাদ, আপনাকেও (Dhanyabad, apnakeo)", "তুমি কোথায় যাচ্ছ? (Tumi kothay jachho?)", "বাড়ি (Bari)", "স্কুলে (Skule)", "শহরে (Shohore)", "সিনেমা হলে (Sinema hole)", "থিয়েটারে (Thiyetare)", "ব্যাঙ্কে (Byanke)", "গীর্জায় (Girjay)", "কাজে (Kaje)", "ক্যাফেতে (Kyaphete)", "বারে (Bare)", "রেস্টুরেন্টে (Resturente)", "ছুটিতে (Chutite)", "পার্টিতে (Partite)", "পরীক্ষায় (Porikhay)", "ডাক্তারের কাছে (Daktarer kache)", "কনসার্টে (Konsarte)", "আজ (Aj)", "আজ সকালে (Aj sokale)", "আজ বিকেলে (Aj bikele)", "আজ রাতে (Aj rate)", "আগামীকাল (Agamikal)", "আগামী পরশু (Agami porshu)"],
+            "Hindi": ["कैसे चल रहा है?", "ठीक है", "अच्छा", "मैं आज रात टिवोली जा रहा हूँ", "क्या आप साथ नहीं आना चाहते?", "हाँ, लेकिन मैं नहीं आ सकता", "मुझे काम पर जाना है", "मैं साथ आना चाहूँगा", "कब?", "यह ठीक है", "आज रात मिलते हैं", "आपकी शाम शुभ हो", "धन्यवाद, आपको भी", "आप कहाँ जा रहे हैं?", "घर", "स्कूल", "शहर में", "सिनेमा", "थिएटर", "बैंक", "चर्च", "काम पर", "कैफे", "बार", "रेस्तरां", "छुट्टियों पर", "पार्टी में", "परीक्षा के लिए", "डॉक्टर के पास", "कॉन्सर्ट में", "आज", "आज सुबह", "आज दोपहर", "आज रात", "कल", "परसों"],
+            "Urdu": ["کیسا چل رہا ہے؟", "ٹھیک", "اچھا", "میں آج رات ٹیوولی جا رہا ہوں", "کیا آپ ساتھ نہیں آنا چاہتے؟", "جی ہاں، لیکن میں نہیں آ سکتا", "مجھے کام پر جانا ہے", "میں ساتھ آنا چاہوں گا", "کب؟", "یہ ٹھیک ہے", "آج رات मिलते ہیں", "آپ کی شام اچھی گزرے", "شکریہ، آپ کو بھی", "آپ کہاں جا رہے ہیں؟", "گھر", "اسکول", "شہر میں", "سینما", "تھئیٹر", "بینک", "چرچ", "کام پر", "کیفے", "بار", "ریستوراں", "تعطیلات پر", "پارٹی میں", "امتحان کے لیے", "ڈاکٹر کے پاس", "کنسرٹ میں", "آج", "آج صبح", "آج دوپہر", "آج رات", "کل", "پرسوں"],
+            "Ukrainsk": ["Як справи?", "Добре", "Гарно", "Я йду в Тіволі сьогодні ввечері", "Чи не хочете ви піти зі мною?", "Так, але я не можу", "Мені потрібно на роботу", "Я б хотів піти", "Коли?", "Це добре", "Побачимося сьогодні ввечері", "Гарного вечора", "Дякую, навзаєм", "Куди ти йдеш?", "додому", "до школи", "в місто", "в кінотеатр", "в театр", "в банк", "в церкву", "на роботу", "в кафе", "в бар", "в ресторан", "у відпустку", "на вечірку", "на іспит", "до лікаря", "на концерт", "сьогодні", "сьогодні вранці", "сьогодні вдень", "сьогодні ввечері", "завтра", "післязавтра"],
+            "Russisk": ["Как дела?", "Нормально", "Хорошо", "Я иду в Тиволи сегодня вечером", "Не хотите пойти со мной?", "Да, но я не могу", "Мне нужно на работу", "Я бы хотел пойти", "Когда?", "Это хорошо", "Увидимся сегодня вечером", "Хорошего вечера", "Спасибо, взаимно", "Куда ты идешь?", "домой", "в школу", "в город", "в кинотеатр", "в театр", "в банк", "в церковь", "на работу", "в кафе", "в бар", "в ресторан", "в отпуск", "на вечеринку", "на экзамен", "к врачу", "на концерт", "сегодня", "сегодня утром", "сегодня днем", "сегодня вечером", "завтра", "послезавтра"],
+            "Persisk": ["چطوری؟", "خوب", "خوب", "من امشب به تیولی می‌روم", "نمی‌خواهی با من بیایی؟", "بله، اما نمی‌توانم", "باید سر کار بروم", "دوست دارم بیایم", "کی؟", "خوب است", "امشب می‌بینمت", "عصر بخیر", "ممنون، همچنین شما", "کجا می‌روی؟", "خانه", "مدرسه", "توی شهر", "سینما", "تئاتر", "بانک", "کلیسا", "سر کار", "کافه", "بار", "رستوران", "تعطیلات", "مهمانی", "امتحان", "دکتر", "کنسرت", "امروز", "امروز صبح", "امروز بعد از ظهر", "امشب", "فردا", "پس فردا"],
+            "Tyrkisk": ["Nasıl gidiyor?", "İyi", "Güzel", "Bu akşam Tivoli'ye gidiyorum", "Gelmek istemez misiniz?", "Evet, ama gelemem", "İşe gitmem gerekiyor", "Gelmek isterim", "Ne zaman?", "Tamam", "Bu akşam görüşürüz", "İyi akşamlar", "Teşekkürler, size de", "Nereye gidiyorsun?", "eve", "okula", "şehre", "sinemaya", "tiyatroya", "bankaya", "kiliseye", "işe", "kafeye", "bara", "restorana", "tatile", "partiye", "sınava", "doktora", "konsere", "bugün", "bu sabah", "bu öğleden sonra", "bu akşam", "yarın", "öbür gün"],
+            "Kurdisk Kurmanji": ["Çawa diçe?", "Baş e", "Rind e", "Ez ê êvarê biçim Tivoliyê", "Hûn naxwazin bi min re werin?", "Erê, lê ez nikarim", "Divê ez biçim ser kar", "Ez dixwazim bêm", "Kengî?", "Baş e", "Em ê êvarê hev bibînin", "Êvara we bi خير", "Spas, her weha ya we jî", "Hûn bi ku de diçin?", "mal", "dibistan", "nav bajêr", "sînema", "şanoyê", "bankayê", "dêrê", "ser kar", "kafê", "bar", "restoran", "betlaneyê", "şahiyê", "ezmûnê", "bijîşk", "konser", "îro", "îro danê sibê", "îro danê nîvro", "îro êvarê", "sibe", "dusibe"],
+            "Kurdisk Sorani": ["چۆن دەچێت؟", "باشە", "باش", "ئەمشەو دەچم بۆ تیڤۆلی", "نایەن لەگەڵم؟", "بەڵێ، بەڵام ناتوانم", "دەبێت بچم بۆ سەر کار", "حەز دەکەم بێم", "کەی؟", "باشە", "ئەمشەو دەتبینمەوە", "ئێوارەیەکی باش", "سپاس، بۆ تۆش هەروەها", "بۆ کوێ دەچیت؟", "ماڵەوە", "قوتابخانە", "شار", "سینەما", "شانۆ", "بانک", "کەنیسە", "سەر کار", "کافێ", "باڕ", "چێشتخانە", "پشوو", "ئاهەنگ", "تاقیکردنەوە", "دکتۆر", "کۆنسێرت", "ئەمڕۆ", "ئەمڕۆ بەیانی", "ئەمڕۆ پاشنیوەڕۆ", "ئەمشەو", "بەیانی", "دووبەیانی"],
+            "Nepalesisk": ["के छ खबर?", "ठिक छ", "राम्रो", "म आज राती टिवोली जाँदैछु", "तपाईं पनि आउनुहुन्न?", "हो, तर म सक्दिन", "म काममा जानुपर्छ", "म आउन चाहन्छु", "कहिले?", "यो ठिक छ", "आज राती भेटौंला", "शुभ साँझ", "धन्यवाद, तपाईंलाई पनि", "तपाईं कहाँ जाँदै हुनुहुन्छ?", "घर", "स्कूल", "शहरमा", "सिनेमा", "थिएटर", "बैंक", "चर्च", "काममा", "क्याफे", "बार", "रेस्टुरेन्ट", "बिदामा", "पार्टीमा", "परीक्षामा", "डाक्टरकोमा", "कन्सर्टमा", "आज", "आज बिहान", "आज दिउँसो", "आज राती", "भोलि", "पर्सि"],
+            "Kiswahili": ["Mambo vipi?", "Safi", "Nzuri", "Ninaenda Tivoli leo jioni", "Hutaki kuja nasi?", "Ndiyo, lakini siwezi", "Lazima niende kazini", "Ningependa kuja", "Lini?", "Ni sawa", "Tutaonana leo jioni", "Uwe na jioni njema", "Asante, nawe pia", "Unakwenda wapi?", "nyumbani", "shuleni", "mjini", "sinema", "ukumbini", "benki", "kanisani", "kazini", "kahawani", "baa", "hotelini", "likizo", "sherehe", "mtihani", "kwa daktari", "tamasha", "leo", "asubuhi ya leo", "mchana wa leo", "leo jioni", "kesho", "kesho kutwa"],
+            "Fransk": ["Comment ça va ?", "Bien", "Bon", "Je vais à Tivoli ce soir", "Vous ne voulez pas venir ?", "Oui, mais je ne peux pas", "Je dois aller travailler", "Je voudrais venir", "Quand ?", "C'est bien", "On se voit ce soir", "Bonne soirée", "Merci, à vous aussi", "Où allez-vous ?", "à la maison", "à l'école", "en ville", "au cinéma", "au théâtre", "à la banque", "à l'église", "au travail", "au café", "au bar", "au restaurant", "en vacances", "à la fête", "à l'examen", "chez le médecin", "au concert", "aujourd'hui", "ce matin", "cet après-midi", "ce soir", "demain", "après-demain"],
+            "Twi": ["Wo ho te sɛn?", "Eye", "Papa", "Mekɔ Tivoli anadwo yi", "Wopɛ sɛ wo ne yɛn kɔ?", "Aane, nanso mentumi", "Ese sɛ mekɔ adwuma", "Mepɛ sɛ mekɔ", "Bere bɛn?", "Eye", "Yebehyia anadwo yi", "Anadwo pa", "Meda ase, wo nso saa ara", "Worekɔ he?", "fie", "sukul", "kurom", "sini", "tiata", "sikakorabea", "asɔre", "adwuma", "kafee", "ba", "adidiibea", "akwantu", "afahyɛ", "sɔhwɛ", "dɔkota", "nnwontow", "nnɛ", "anɔpa yi", "awia yi", "anadwo yi", "ɔkyena", "ɔkyena akyi"],
+            "Bosnisk": ["Kako ide?", "Dobro", "Fino", "Idem u Tivoli večeras", "Zar nećete s nama?", "Da, ali ne mogu", "Moram na posao", "Želim ići", "Kada?", "To je u redu", "Vidimo se večeras", "Ugodno veče", "Hvala, takođe", "Gdje ideš?", "kući", "u školu", "u grad", "u kino", "u pozorište", "u banku", "u crkvu", "na posao", "u kafić", "u bar", "u restoran", "na odmor", "na zabavu", "na ispit", "kod doktora", "na koncert", "danas", "jutros", "danas popodne", "večeras", "sutra", "prekosutra"],
+            "Somali": ["Sidee tahay?", "Ladnaan", "Fiican", "Fiidka ayaan aadayaa Tivoli", "Miyaadan nala soconayn?", "Haa, laakiin ma awoodo", "Waa inaan shaqo tagaa", "Waan jeclaan lahaa inaan imaado", "Goormee?", "Waa hagaag", "Fiidka ayaan is arkaynaa", "Habeen wanaagsan", "Mahadsanid, si la mid ah", "Halkee u socotaa?", "guri", "dugsi", "magaalada", "shineemada", "tiyaatarka", "bangiga", "kanisadda", "shaqada", "kafeega", "baarka", "maqaayadda", "fasax", "xaflad", "imtixaan", "dhakhtarka", "riwaayad", "maanta", "saaka", "galabta", "caawa", "berri", "saacad dambe"],
+            "Serbisk": ["Kako ide?", "Dobro", "Fino", "Idem u Tivoli večeras", "Zar nećete s nama?", "Da, ali ne mogu", "Moram na posao", "Želim da idem", "Kada?", "To je u redu", "Vidimo se večeras", "Prijatno veče", "Hvala, takođe", "Gde ideš?", "kući", "u školu", "u grad", "u bioskop", "u pozorište", "u banku", "u crkvu", "na posao", "u kafić", "u bar", "u restoran", "na odmor", "na zabavu", "na ispit", "kod doktora", "na koncert", "danas", "jutros", "danas popodne", "večeras", "sutra", "prekosutra"],
+            "Tigrinya": ["ከመይ ይኸይድ ኣሎ?", "ጽቡቕ", "ጽቡቕ", "ሎሚ ምሸት ናብ ቲቮሊ እኸይድ ኣለኹ", "ምሳና ክትመጽእ ኣይትደልን ኢኻ?", "እወ፡ ግን ኣይክእልን እየ", "ናብ ስራሕ ክኸይድ ኣለኒ", "ምሳኹም ክኸይድ እደሊ", "መዓስ?", "ጽቡቕ እዩ", "ሎሚ ምሸት ክንራኸብ ኢና", "ጽቡቕ ምሸት ይግበረልኩም", "የቐንየለይ፡ ንዓኻውን", "ናበይ ትኸይድ ኣለኻ?", "ገዛ", "ቤት ትምህርቲ", "ከተማ", "ሲነማ", "ቲያትር", "ባንኪ", "ቤተ ክርስትያን", "ስራሕ", "ካፈ", "ባር", "ቤት መግቢ", "ዕረፍቲ", "ባእሲ", "ፈተና", "ዶክተር", "ኮንሰርት", "ሎሚ", "ሎሚ ንግሆ", "ሎሚ ድሕሪ ቀትሪ", "ሎሚ ምሸት", "ጽባሕ", "ድሕሪ ጽባሕ"],
+            "Mandarin Kinesisk": ["怎么样？ (Zěnmeyàng?)", "好 (Hǎo)", "很好 (Hěn hǎo)", "我今天晚上要去趣伏里公园 (Wǒ jīntiān wǎnshàng yào qù Qùfúlǐ gōngyuán)", "你们不想一起去吗？ (Nǐmen bùxiǎng yīqǐ qù ma?)", "是的，但我去不了 (Shì de, dàn wǒ qù bùliǎo)", "我得去上班 (Wǒ děi qù shàngbān)", "我想一起去 (Wǒ xiǎng yīqǐ qù)", "什么时候？ (Shénme shíhòu?)", "很好 (Hěn hǎo)", "今天晚上见 (Jīntiān wǎnshàng jiàn)", "晚上好 (Wǎnshàng hǎo)", "谢谢，你也一样 (Xièxiè, nǐ yě yīyàng)", "你/你们要去哪里？ (Nǐ/nǐmen yào qù nǎlǐ?)", "回家 (Huí jiā)", "去学校 (Qù xuéxiào)", "去城里 (Qù chénglǐ)", "去电影院 (Qù diànyǐngyuàn)", "去剧院 (Qù jùyuàn)", "去银行 (Qù yínháng)", "去教堂 (Qù jiàotáng)", "去上班 (Qù shàngbān)", "去咖啡馆 (Qù kāfēiguǎn)", "去酒吧 (Qù jiǔbā)", "去餐厅 (Qù cāntīng)", "去度假 (Qù dùjià)", "去派对 (Qù pàiduì)", "去考试 (Qù kǎoshì)", "去看医生 (Qù kàn yīshēng)", "去音乐会 (Qù yīnyuèhuì)", "今天 (Jīntiān)", "今天上午 (Jīntiān shàngwǔ)", "今天下午 (Jīntiān xiàwǔ)", "今天晚上 (Jīntiān wǎnshàng)", "明天 (Míngtiān)", "后天 (Hòutiān)"]
+        };
+
+        // App Tilstand
+        let currentLanguage = "Engelsk";
+        let deck = [];
+        let currentIndex = 0;
+        let isFlipped = false;
+        let isTransitioning = false;
+
+        // Elementer
+        const langSelect = document.getElementById('language-select');
+        const danishText = document.getElementById('danish-text');
+        const targetText = document.getElementById('target-text');
+        const cardsLeftDisplay = document.getElementById('cards-left');
+        const currentLangDisplay = document.getElementById('current-lang-display');
+        const cardInner = document.getElementById('card-inner');
+        const cardTrigger = document.getElementById('card-trigger');
+        const actionButtons = document.getElementById('action-buttons');
+        const finishedScreen = document.getElementById('finished-screen');
+        const gameContainer = document.getElementById('game-container');
+        
+        const btnRight = document.getElementById('btn-right');
+        const btnWrong = document.getElementById('btn-wrong');
+        const btnRestart = document.getElementById('btn-restart');
+
+        // Initialisering
+        function init() {
+            // Fyld sprogvælger
+            Object.keys(translations).forEach(lang => {
+                const opt = document.createElement('option');
+                opt.value = lang;
+                opt.textContent = lang;
+                langSelect.appendChild(opt);
+            });
+
+            startNewGame();
+        }
+
+        function startNewGame() {
+            currentLanguage = langSelect.value;
+            deck = wordList.map((word, index) => ({
+                danish: word,
+                translation: translations[currentLanguage][index]
+            }));
+            
+            // Shuffle deck
+            deck.sort(() => Math.random() - 0.5);
+            
+            currentIndex = 0;
+            isFlipped = false;
+            isTransitioning = false;
+            
+            finishedScreen.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            actionButtons.classList.add('opacity-0', 'pointer-events-none');
+            cardInner.classList.remove('flipped');
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            if (deck.length === 0) {
+                showFinished();
+                return;
+            }
+            
+            danishText.textContent = deck[currentIndex].danish;
+            targetText.textContent = deck[currentIndex].translation;
+            cardsLeftDisplay.textContent = `Kort tilbage: ${deck.length}`;
+            currentLangDisplay.textContent = `Sprog: ${currentLanguage}`;
+        }
+
+        function showFinished() {
+            gameContainer.classList.add('hidden');
+            finishedScreen.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        langSelect.addEventListener('change', startNewGame);
+
+        cardTrigger.addEventListener('click', () => {
+            if (isTransitioning || isFlipped) return;
+            
+            isFlipped = true;
+            cardInner.classList.add('flipped');
+            
+            // Vis knapper efter lille delay for animation
+            setTimeout(() => {
+                actionButtons.classList.remove('opacity-0', 'pointer-events-none');
+            }, 300);
+        });
+
+        btnRight.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleAnswer(true);
+        });
+
+        btnWrong.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleAnswer(false);
+        });
+
+        btnRestart.addEventListener('click', startNewGame);
+
+        function handleAnswer(isCorrect) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            // Skjul knapper med det samme
+            actionButtons.classList.add('opacity-0', 'pointer-events-none');
+
+            // 1. Vend kortet tilbage til forsiden
+            cardInner.classList.remove('flipped');
+            isFlipped = false;
+
+            // 2. Vent 400ms før vi opdaterer data
+            setTimeout(() => {
+                if (isCorrect) {
+                    // Fjern fra bunken
+                    deck.splice(currentIndex, 1);
+                } else {
+                    // Flyt til bunden eller bare lad det blive (vi roterer currentIndex)
+                    // Her flytter vi det bare til bunden af bunken
+                    const currentCard = deck.splice(currentIndex, 1)[0];
+                    deck.push(currentCard);
+                }
+
+                // Sørg for index er validt (vigtigt hvis deck er blevet tomt eller mindre)
+                if (deck.length > 0) {
+                    currentIndex = currentIndex % deck.length;
+                } else {
+                    currentIndex = 0;
+                }
+
+                updateUI();
+                isTransitioning = false;
+            }, 400);
+        }
+
+        // Kør init
+        window.onload = init;
+    </script>
+</body>
+</html>
