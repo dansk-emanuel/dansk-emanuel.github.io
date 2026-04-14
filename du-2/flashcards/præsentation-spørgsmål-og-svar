@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprog Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .is-flipped {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 font-sans text-gray-900">
+
+    <div id="app" class="w-full max-w-md">
+        <!-- Header & Sprogvalg -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold mb-4 text-blue-800">Sprog Flashcards</h1>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+                <label for="languageSelect" class="block text-sm font-medium text-gray-700 mb-2 text-left">Vælg målsprog:</label>
+                <select id="languageSelect" class="w-full p-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                    <!-- Options indsat af JS -->
+                </select>
+            </div>
+        </header>
+
+        <!-- Status Bar -->
+        <div id="status" class="mb-4 flex justify-between items-center px-2">
+            <span class="text-sm font-medium text-gray-600">Kort tilbage: <span id="cardsLeft" class="text-blue-600">0</span></span>
+        </div>
+
+        <!-- Flashcard Container -->
+        <div id="gameArea">
+            <div class="perspective-1000 w-full aspect-[4/3] cursor-pointer" id="cardContainer">
+                <div id="cardInner" class="flip-card-inner relative w-full h-full">
+                    
+                    <!-- Forside (Dansk) -->
+                    <div class="flip-card-front absolute inset-0 bg-white border-2 border-gray-200 rounded-2xl shadow-xl flex items-center justify-center p-8 text-center">
+                        <p id="frontText" class="text-2xl font-semibold leading-tight"></p>
+                    </div>
+
+                    <!-- Bagside (Målsprog) -->
+                    <div class="flip-card-back absolute inset-0 bg-[#F5F5DC] border-2 border-gray-200 rounded-2xl shadow-xl flex items-center justify-center p-8 text-center">
+                        <p id="backText" class="text-2xl font-semibold leading-tight"></p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Kontrolknapper (Kun synlige når kortet er vendt) -->
+            <div id="controls" class="mt-8 flex gap-4 opacity-0 pointer-events-none transition-opacity duration-300">
+                <button id="btnWrong" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition-all">
+                    Forkert
+                </button>
+                <button id="btnRight" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition-all">
+                    Rigtigt
+                </button>
+            </div>
+        </div>
+
+        <!-- Færdig Skærm -->
+        <div id="finishScreen" class="hidden text-center bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+            <div class="text-6xl mb-4">🎉</div>
+            <h2 class="text-2xl font-bold mb-2">Færdig!</h2>
+            <p class="text-gray-600 mb-6">Du har lært alle ordene i denne runde.</p>
+            <button id="btnRestart" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors">
+                Start forfra
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Datasæt med oversættelser
+        const translations = {
+            "english": ["What is your name?", "How old are you?", "Where are you from?", "Where do you live?", "What languages do you speak?", "What is your hobby?", "My name is _____", "I am _____ years old", "I come from ______", "I live in _____", "I speak ________", "My hobby is ________"],
+            "bengali": ["আপনার নাম কি?", "আপনার বয়স কত?", "আপনি কোথা থেকে এসেছেন?", "আপনি কোথায় থাকেন?", "আপনি কোন ভাষায় কথা বলেন?", "আপনার শখ কি?", "আমার নাম _____", "আমার বয়স _____ বছর", "আমি ______ থেকে এসেছি", "আমি _____ এ থাকি", "আমি ________ ভাষায় কথা বলি", "আমার শখ হল ________"],
+            "hindi": ["आपका नाम क्या है?", "आपकी उम्र क्या है?", "आप कहाँ से हैं?", "आप कहाँ रहते हैं?", "आप कौन सी भाषाएं बोलते हैं?", "आपका शौक क्या है?", "मेरा नाम _____ है", "मैं _____ साल का हूँ", "मैं ______ से हूँ", "मैं _____ में रहता हूँ", "मैं ________ बोलता हूँ", "मेरा शौक ________ है"],
+            "urdu": ["آپ کا نام کیا ہے؟", "آپ کی عمر کتنی ہے؟", "آپ کہاں سے ہیں؟", "آپ کہاں رہتے ہیں؟", "آپ کون سی زبانیں بولتے ہیں؟", "آپ کا مشغلہ کیا ہے؟", "میرا نام _____ ہے", "میری عمر _____ سال ہے", "میں ______ سے ہوں", "میں _____ میں رہتا ہوں", "میں ________ بولتا ہوں", "میرا مشغلہ ________ ہے"],
+            "ukrainian": ["Як вас звати?", "Скільки вам років?", "Звідки ви?", "Де ви живете?", "Якими мовами ви розмовляєте?", "Яке ваше хобі?", "Мене звати _____", "Мені _____ років", "Я з ______", "Я живу в _____", "Я розмовляю ________", "Моє хобі — ________"],
+            "russian": ["Как вас зовут?", "Сколько вам лет?", "Откуда вы?", "Где вы живете?", "На каких языках вы говорите?", "Какое у вас хобби?", "Меня зовут _____", "Мне _____ лет", "Я из ______", "Я живу в _____", "Я говорю на ________", "Мое хобби — ________"],
+            "persian": ["نام شما چیست؟", "چند سال دارید؟", "اهل کجا هستید؟", "کجا زندگی می‌کنید؟", "به چه زبان‌هایی صحبت می‌کنید؟", "سرگرمی شما چیست؟", "نام من _____ است", "من _____ سال دارم", "من اهل ______ هستم", "من در _____ زندگی می‌کنم", "من به زبان ________ صحبت می‌کنم", "سرگرمی من ________ است"],
+            "turkish": ["Adınız ne?", "Kaç yaşındasınız?", "Nerelisiniz?", "Nerede yaşıyorsunuz?", "Hangi dilleri konuşuyorsunuz?", "Hobiniz nedir?", "Benim adım _____", "Ben _____ yaşındayım", "Ben ______'dan geliyorum", "Ben _____'da yaşıyorum", "Ben ________ konuşuyorum", "Hobim ________"],
+            "kurmanji": ["Navê te çi ye?", "Tu çend salî yî?", "Tu ji ku derê yî?", "Tu li ku derê dijî?", "Tu bi çi zimanan dipeyivî?", "Hobiya te çi ye?", "Navê min _____ e", "Ez _____ salî me", "Ez ji ______ me", "Ez li _____ dijîm", "Ez bi ________ dipeyivim", "Hobiya min ________ e"],
+            "sorani": ["ناوت چییە؟", "تەمەنت چەند ساڵە؟", "خەڵکی کوێیت؟", "لە کوێ دەژیت؟", "بە چ زمانێک قسە دەکەیت؟", "خولیات چییە؟", "ناوم _____", "تەمەنم _____ ساڵە", "من خەڵکی ______", "من لە _____ دەژیم", "من بە ________ قسە دەکەم", "خولیام ________"],
+            "nepali": ["तपाईंको नाम के हो?", "तपाईं कति वर्षको हुनुभयो?", "तपाईं कहाँबाट हुनुहुन्छ?", "तपाईं कहाँ बस्नुहुन्छ?", "तपाईं कुन भाषाहरू बोल्नुहुन्छ?", "तपाईंको रुचि के हो?", "मेरो नाम _____ हो", "म _____ वर्षको भएँ", "म ______ बाट आएको हुँ", "म _____ मा बस्छु", "म ________ बोल्छु", "मेरो रुचि ________ हो"],
+            "kiswahili": ["Jina lako nani?", "Una umri gani?", "Unatoka wapi?", "Unapoishi wapi?", "Unazungumza lugha gani?", "Hobi yako ni nini?", "Jina langu ni _____", "Nina umri wa miaka _____", "Ninatoka ______", "Ninaishi _____", "Ninazungumza ________", "Hobi yangu ni ________"],
+            "french": ["Comment vous appelez-vous?", "Quel âge avez-vous?", "D'où venez-vous?", "Où habitez-vous?", "Quelles langues parlez-vous?", "Quel est votre passe-temps?", "Je m'appelle _____", "J'ai _____ ans", "Je viens de ______", "J'habite à _____", "Je parle ________", "Mon passe-temps est ________"],
+            "twi": ["Yɛfrɛ wo sɛn?", "Wadi mfeɛ sɛn?", "Wofiri hene?", "Wote hene?", "Kasa bɛn na woka?", "Deɛn na wopɛ sɛ woyɛ?", "Yɛfrɛ me _____", "Madi mfeɛ _____", "Mofiri ______", "Mete _____", "Meka ________", "Me deɛ ɛyɛ me dɛ ne ________"],
+            "bosnian": ["Kako se zoveš?", "Koliko imaš godina?", "Odakle si?", "Gdje živiš?", "Koje jezike govoriš?", "Šta je tvoj hobi?", "Zovem se _____", "Imam _____ godina", "Dolazim iz ______", "Živim u _____", "Govorim ________", "Moj hobi je ________"],
+            "somali": ["Magacaa?", "Immisa jir baad tahay?", "Halkee ka timid?", "Halkee deggan tahay?", "Luqadaha aad ku hadasho?", "Waa maxay hiwaayaddaadu?", "Magacaygu waa _____", "Waxaan ahay _____ jir", "Waxaan ka imid ______", "Waxaan degganahay _____", "Waxaan ku hadlaa ________", "Hiwaayaddaydu waa ________"],
+            "serbian": ["Kako se zoveš?", "Koliko imaš godina?", "Odakle si?", "Gde živiš?", "Koje jezike govoriš?", "Šta je tvoj hobi?", "Zovem se _____", "Imam _____ godina", "Dolazim iz ______", "Živim u _____", "Govorim ________", "Moj hobi je ________"],
+            "tigrinya": ["መን እዩ ስምካ፧", "ክንደይ ዓመትካ፧", "ካበይ መጺኻ፧", "ኣበይ ትነብር፧", "እንታይ ቋንቋታት ትዛረብ፧", "እንታይ እዩ ሕብልካ፧", "ስመይ _____ እዩ", "ዕድመይ _____ ዓመት እዩ", "ካብ ______ መጺአ", "ኣብ _____ ይነብር", "________ እዛረብ", "ሕብለይ ________ እዩ"],
+            "mandarin": ["你叫什么名字？", "你多大了？", "你来自哪里？", "你住在哪里？", "你会说哪些语言？", "你的爱好是什么？", "我叫 _____", "我今年 _____ 岁", "我来自 ______", "我住在 _____", "我会说 ________", "我的爱好是 ________"]
+        };
+
+        const danishWords = [
+            "Hvad hedder du?", "Hvor gammel er du?", "Hvor kommer du fra?", "Hvor bor du?", "Hvilke sprog taler du?", "Hvad er din hobby?", 
+            "Jeg hedder _____", "Jeg er _____ år gammel", "Jeg kommer fra ______", "Jeg bor i _____", "Jeg taler ________", "Min hobby er ________"
+        ];
+
+        const languages = [
+            { id: "english", name: "Engelsk" },
+            { id: "bengali", name: "Bengali" },
+            { id: "hindi", name: "Hindi" },
+            { id: "urdu", name: "Urdu" },
+            { id: "ukrainian", name: "Ukrainsk" },
+            { id: "russian", name: "Russisk" },
+            { id: "persian", name: "Persisk" },
+            { id: "turkish", name: "Tyrkisk" },
+            { id: "kurmanji", name: "Kurdisk Kurmanji" },
+            { id: "sorani", name: "Kurdisk Sorani" },
+            { id: "nepali", name: "Nepalesisk" },
+            { id: "kiswahili", name: "Kiswahili" },
+            { id: "french", name: "Fransk" },
+            { id: "twi", name: "Twi" },
+            { id: "bosnian", name: "Bosnisk" },
+            { id: "somali", name: "Somali" },
+            { id: "serbian", name: "Serbisk" },
+            { id: "tigrinya", name: "Tigrinya" },
+            { id: "mandarin", name: "Mandarin Kinesisk" }
+        ];
+
+        // App Tilstand
+        let currentDeck = [];
+        let currentIndex = 0;
+        let isFlipped = false;
+        let isTransitioning = false;
+        let selectedLang = "english";
+
+        // Elementer
+        const languageSelect = document.getElementById('languageSelect');
+        const cardContainer = document.getElementById('cardContainer');
+        const cardInner = document.getElementById('cardInner');
+        const frontText = document.getElementById('frontText');
+        const backText = document.getElementById('backText');
+        const controls = document.getElementById('controls');
+        const btnRight = document.getElementById('btnRight');
+        const btnWrong = document.getElementById('btnWrong');
+        const cardsLeft = document.getElementById('cardsLeft');
+        const gameArea = document.getElementById('gameArea');
+        const finishScreen = document.getElementById('finishScreen');
+        const btnRestart = document.getElementById('btnRestart');
+
+        // Initialisering
+        function init() {
+            // Fyld sprogvalg
+            languages.forEach(lang => {
+                const opt = document.createElement('option');
+                opt.value = lang.id;
+                opt.textContent = lang.name;
+                languageSelect.appendChild(opt);
+            });
+
+            languageSelect.addEventListener('change', (e) => {
+                selectedLang = e.target.value;
+                resetGame();
+            });
+
+            cardContainer.addEventListener('click', flipCard);
+            btnRight.addEventListener('click', handleRight);
+            btnWrong.addEventListener('click', handleWrong);
+            btnRestart.addEventListener('click', resetGame);
+
+            resetGame();
+        }
+
+        function resetGame() {
+            // Opret kort bunke
+            currentDeck = danishWords.map((word, index) => ({
+                da: word,
+                target: translations[selectedLang][index]
+            }));
+            
+            // Bland bunken
+            currentDeck.sort(() => Math.random() - 0.5);
+            
+            currentIndex = 0;
+            isFlipped = false;
+            isTransitioning = false;
+            
+            finishScreen.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+            document.getElementById('status').classList.remove('hidden');
+            
+            updateCardDisplay();
+        }
+
+        function updateCardDisplay() {
+            if (currentDeck.length === 0) {
+                showFinishScreen();
+                return;
+            }
+            
+            frontText.textContent = currentDeck[currentIndex].da;
+            backText.textContent = currentDeck[currentIndex].target;
+            cardsLeft.textContent = currentDeck.length;
+            
+            // Nulstil visuel tilstand
+            cardInner.classList.remove('is-flipped');
+            controls.classList.add('opacity-0', 'pointer-events-none');
+            isFlipped = false;
+        }
+
+        function flipCard() {
+            if (isTransitioning || isFlipped) return;
+            
+            isFlipped = true;
+            cardInner.classList.add('is-flipped');
+            
+            // Vis knapper efter animation er næsten færdig
+            setTimeout(() => {
+                controls.classList.remove('opacity-0', 'pointer-events-none');
+            }, 300);
+        }
+
+        function handleRight() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            
+            // 1. Skjul knapper med det samme
+            controls.classList.add('opacity-0', 'pointer-events-none');
+            
+            // 2. Vend tilbage til dansk side
+            cardInner.classList.remove('is-flipped');
+            
+            // 3. Vent 400ms (isTransitioning logik)
+            setTimeout(() => {
+                // Fjern det rigtige ord
+                currentDeck.splice(currentIndex, 1);
+                
+                // Hvis der er flere ord, reset index hvis nødvendigt
+                if (currentDeck.length > 0) {
+                    if (currentIndex >= currentDeck.length) currentIndex = 0;
+                    updateCardDisplay();
+                } else {
+                    showFinishScreen();
+                }
+                isTransitioning = false;
+            }, 400);
+        }
+
+        function handleWrong() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            controls.classList.add('opacity-0', 'pointer-events-none');
+            cardInner.classList.remove('is-flipped');
+
+            setTimeout(() => {
+                // Find næste ord eller bland bunken
+                currentIndex = (currentIndex + 1) % currentDeck.length;
+                updateCardDisplay();
+                isTransitioning = false;
+            }, 400);
+        }
+
+        function showFinishScreen() {
+            gameArea.classList.add('hidden');
+            document.getElementById('status').classList.add('hidden');
+            finishScreen.classList.remove('hidden');
+        }
+
+        // Start appen
+        window.onload = init;
+    </script>
+</body>
+</html>
