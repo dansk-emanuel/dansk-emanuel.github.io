@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprog-Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flipped {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 font-sans">
+
+    <div id="app" class="w-full max-w-md">
+        <!-- Overskrift & Sprogvalg -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Flashcards</h1>
+            <div class="bg-white p-2 rounded-lg shadow-sm border border-gray-200">
+                <label for="language-select" class="block text-xs font-semibold text-gray-500 uppercase mb-1">Vælg målsprog</label>
+                <select id="language-select" class="w-full p-2 bg-transparent border-none focus:ring-0 text-gray-700 font-medium">
+                    <!-- Sprogmuligheder genereres via JS -->
+                </select>
+            </div>
+        </header>
+
+        <!-- Status & Spilområde -->
+        <div id="game-container">
+            <div class="flex justify-between items-center mb-4 px-2">
+                <span id="status-text" class="text-sm font-medium text-gray-600">Kort tilbage: 0</span>
+                <button id="reset-btn" class="text-xs text-blue-600 hover:underline">Start forfra</button>
+            </div>
+
+            <!-- 3D Flashcard -->
+            <div class="perspective-1000 w-full aspect-[4/3] cursor-pointer group" id="card-trigger">
+                <div id="card-inner" class="flip-card-inner relative w-full h-full shadow-xl rounded-2xl">
+                    
+                    <!-- Forside (Dansk) -->
+                    <div class="flip-card-front absolute inset-0 bg-white flex items-center justify-center rounded-2xl border-2 border-white">
+                        <span id="front-text" class="text-4xl font-bold text-gray-900"></span>
+                    </div>
+
+                    <!-- Bagside (Målsprog) -->
+                    <div class="flip-card-back absolute inset-0 bg-[#F5F5DC] flex flex-col items-center justify-center rounded-2xl border-2 border-white text-center p-6">
+                        <span id="back-text" class="text-3xl font-bold text-gray-900 mb-2"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kontrolknapper (Kun synlige når vendt) -->
+            <div id="controls" class="mt-8 flex gap-4 opacity-0 pointer-events-none transition-opacity duration-300">
+                <button id="wrong-btn" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition-all">
+                    Forkert
+                </button>
+                <button id="right-btn" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition-all">
+                    Rigtigt
+                </button>
+            </div>
+        </div>
+
+        <!-- Færdig-skærm -->
+        <div id="finish-screen" class="hidden flex flex-col items-center justify-center text-center py-12">
+            <div class="text-6xl mb-4">🎉</div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Du er færdig!</h2>
+            <p class="text-gray-600 mb-8">Du har lært alle ordene i denne runde.</p>
+            <button id="restart-btn" class="bg-blue-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-blue-700 transition-colors">
+                Prøv igen
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Data ordbog
+        const dictionary = {
+            "Hvad": { 
+                english: "What", bengali: "কি", hindi: "क्या", urdu: "کیا", ukrainian: "Що", russian: "Что", 
+                persian: "چی / چه", turkish: "Ne", kurmanji: "Çi", sorani: "چی", nepali: "के", kiswahili: "Nini", 
+                french: "Quoi / Que", twi: "Ɛdeɛn", bosnian: "Šta", somali: "Maxay", serbian: "Šta", tigrinya: "እንታይ", mandarin: "什么"
+            },
+            "Hvor": { 
+                english: "Where", bengali: "কোথায়", hindi: "कहाँ", urdu: "کہاں", ukrainian: "Де", russian: "Где", 
+                persian: "کجا", turkish: "Nerede", kurmanji: "Li ku", sorani: "لەکوێ", nepali: "कहाँ", kiswahili: "Wapi", 
+                french: "Où", twi: "Ɛhe", bosnian: "Gdje", somali: "Halkee", serbian: "Gde", tigrinya: "ኣበይ", mandarin: "哪里"
+            },
+            "Hvordan": { 
+                english: "How", bengali: "কিভাবে", hindi: "कैसे", urdu: "کیسے", ukrainian: "Як", russian: "Как", 
+                persian: "چطور / چگونه", turkish: "Nasıl", kurmanji: "Çawa", sorani: "چۆن", nepali: "कसरी", kiswahili: "Vipi", 
+                french: "Comment", twi: "Ɛsɛn", bosnian: "Kako", somali: "Sidee", serbian: "Kako", tigrinya: "ከመይ", mandarin: "怎么"
+            },
+            "Hvem": { 
+                english: "Who", bengali: "কে", hindi: "कौन", urdu: "کون", ukrainian: "Хто", russian: "Кто", 
+                persian: "کی / چه کسی", turkish: "Kim", kurmanji: "Kî", sorani: "کێ", nepali: "को", kiswahili: "Nani", 
+                french: "Qui", twi: "Hwan", bosnian: "Ko", somali: "Kuma", serbian: "Ko", tigrinya: "መን", mandarin: "谁"
+            },
+            "Hvilke": { 
+                english: "Which", bengali: "কোনটি", hindi: "कौन सा", urdu: "کون سا", ukrainian: "Які", russian: "Какие", 
+                persian: "کدام", turkish: "Hangi", kurmanji: "Kîjan", sorani: "کام", nepali: "कुन", kiswahili: "Ipi", 
+                french: "Quel / Quels", twi: "Ɛhwee", bosnian: "Koji", somali: "Kuwama", serbian: "Koji", tigrinya: "ኣየኖት", mandarin: "哪个 / 哪些"
+            },
+            "Hvad tid": { 
+                english: "What time", bengali: "কয়টা", hindi: "क्या समय", urdu: "کیا وقت", ukrainian: "Котра година", russian: "В какое время", 
+                persian: "چه ساعتی", turkish: "Saat kaçta", kurmanji: "Di çi wextî de", sorani: "چەند", nepali: "कति बजे", kiswahili: "Saa ngapi", 
+                french: "À quelle heure", twi: "Mmere bɛn", bosnian: "U koje vrijeme", somali: "Goormee", serbian: "Koje vreme", tigrinya: "ሰዓት ክንደይ", mandarin: "几点"
+            },
+            "Hvornår": { 
+                english: "When", bengali: "কখন", hindi: "कब", urdu: "کب", ukrainian: "Коли", russian: "Когда", 
+                persian: "کی / چه وقت", turkish: "Ne zaman", kurmanji: "Kengî", sorani: "کەی", nepali: "कहिले", kiswahili: "Lini", 
+                french: "Quand", twi: "Bere bɛn", bosnian: "Kada", somali: "Goormaa", serbian: "Kada", tigrinya: "መዓስ", mandarin: "什么时候"
+            },
+            "Hvorfor": { 
+                english: "Why", bengali: "কেন", hindi: "क्यों", urdu: "کیوں", ukrainian: "Чому", russian: "Почему", 
+                persian: "چرا", turkish: "Neden / Niçin", kurmanji: "Çima", sorani: "بۆچی", nepali: "किन", kiswahili: "Kwa nini", 
+                french: "Pourquoi", twi: "Adɛn", bosnian: "Zašto", somali: "Maxay", serbian: "Zašto", tigrinya: "ስለምንታይ", mandarin: "为什么"
+            }
+        };
+
+        const languages = [
+            { id: "english", name: "Engelsk" },
+            { id: "bengali", name: "Bengali" },
+            { id: "hindi", name: "Hindi" },
+            { id: "urdu", name: "Urdu" },
+            { id: "ukrainian", name: "Ukrainsk" },
+            { id: "russian", name: "Russisk" },
+            { id: "persian", name: "Persisk" },
+            { id: "turkish", name: "Tyrkisk" },
+            { id: "kurmanji", name: "Kurdisk Kurmanji" },
+            { id: "sorani", name: "Kurdisk Sorani" },
+            { id: "nepali", name: "Nepalesisk" },
+            { id: "kiswahili", name: "Kiswahili" },
+            { id: "french", name: "Fransk" },
+            { id: "twi", name: "Twi" },
+            { id: "bosnian", name: "Bosnisk" },
+            { id: "somali", name: "Somali" },
+            { id: "serbian", name: "Serbisk" },
+            { id: "tigrinya", name: "Tigrinya" },
+            { id: "mandarin", name: "Mandarin Kinesisk" }
+        ];
+
+        // Tilstand
+        let currentLanguage = "english";
+        let deck = [];
+        let currentIndex = 0;
+        let isFlipped = false;
+        let isTransitioning = false;
+
+        // DOM Elementer
+        const langSelect = document.getElementById('language-select');
+        const cardTrigger = document.getElementById('card-trigger');
+        const cardInner = document.getElementById('card-inner');
+        const frontText = document.getElementById('front-text');
+        const backText = document.getElementById('back-text');
+        const controls = document.getElementById('controls');
+        const rightBtn = document.getElementById('right-btn');
+        const wrongBtn = document.getElementById('wrong-btn');
+        const statusText = document.getElementById('status-text');
+        const gameContainer = document.getElementById('game-container');
+        const finishScreen = document.getElementById('finish-screen');
+        const restartBtn = document.getElementById('restart-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Initialisering
+        function init() {
+            // Fyld sprogvælger
+            languages.forEach(lang => {
+                const opt = document.createElement('option');
+                opt.value = lang.id;
+                opt.textContent = lang.name;
+                langSelect.appendChild(opt);
+            });
+
+            startNewGame();
+        }
+
+        function startNewGame() {
+            deck = Object.keys(dictionary);
+            shuffleDeck();
+            currentIndex = 0;
+            isFlipped = false;
+            isTransitioning = false;
+            
+            finishScreen.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            
+            updateCardDisplay();
+            resetCardUI();
+        }
+
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function updateCardDisplay() {
+            const word = deck[currentIndex];
+            frontText.textContent = word;
+            backText.textContent = dictionary[word][currentLanguage];
+            statusText.textContent = `Kort tilbage: ${deck.length}`;
+        }
+
+        function resetCardUI() {
+            isFlipped = false;
+            cardInner.classList.remove('flipped');
+            controls.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function flipCard() {
+            if (isTransitioning || isFlipped) return;
+            isFlipped = true;
+            cardInner.classList.add('flipped');
+            controls.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function handleAnswer(isCorrect) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            // 1. Vend kortet tilbage til forsiden først
+            cardInner.classList.remove('flipped');
+            controls.classList.add('opacity-0', 'pointer-events-none');
+            isFlipped = false;
+
+            // 2. Vent 400ms (animationstid) før data opdateres
+            setTimeout(() => {
+                if (isCorrect) {
+                    // Fjern ordet
+                    deck.splice(currentIndex, 1);
+                    if (deck.length === 0) {
+                        showFinishScreen();
+                        isTransitioning = false;
+                        return;
+                    }
+                    // Sørg for at vi ikke ryger ud over kanten
+                    if (currentIndex >= deck.length) currentIndex = 0;
+                } else {
+                    // Bliv i bunken, gå til næste (eller bliv hvis det er den sidste)
+                    currentIndex = (currentIndex + 1) % deck.length;
+                }
+
+                updateCardDisplay();
+                isTransitioning = false;
+            }, 400);
+        }
+
+        function showFinishScreen() {
+            gameContainer.classList.add('hidden');
+            finishScreen.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        langSelect.addEventListener('change', (e) => {
+            currentLanguage = e.target.value;
+            if (!isFlipped) {
+                updateCardDisplay();
+            } else {
+                // Hvis man skifter sprog mens kortet er vendt
+                backText.textContent = dictionary[deck[currentIndex]][currentLanguage];
+            }
+        });
+
+        cardTrigger.addEventListener('click', flipCard);
+
+        rightBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleAnswer(true);
+        });
+
+        wrongBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleAnswer(false);
+        });
+
+        restartBtn.addEventListener('click', startNewGame);
+        resetBtn.addEventListener('click', startNewGame);
+
+        // Start appen
+        init();
+    </script>
+</body>
+</html>
