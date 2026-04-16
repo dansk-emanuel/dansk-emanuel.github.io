@@ -18,7 +18,29 @@
             box-shadow: 0 10px 30px rgba(93, 64, 55, 0.1); 
             text-align: center; border: 1px solid #edbb99;
         }
-        h1 { color: #5d4037; }
+
+        /* Breadcrumb styling */
+        .breadcrumb {
+            text-align: left;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: #8d6e63;
+        }
+        .breadcrumb a {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb span {
+            margin: 0 8px;
+            color: #edbb99;
+        }
+
+        h1 { color: #5d4037; margin-top: 10px; }
+        
         .menu-btn { 
             display: block; background: #e67e22; color: white; 
             padding: 18px; margin: 12px 0; text-decoration: none; 
@@ -28,13 +50,14 @@
         }
         .menu-btn:hover { background: #d35400; transform: translateY(-2px); box-shadow: 0 7px 0 #a04000; }
         .menu-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #a04000; }
-
-        hr { margin: 30px 0; border: 0; border-top: 2px dashed #edbb99; }
-        .back-link { color: #8d6e63; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Hjem</a> <span>/</span> Anbefalinger
+        </div>
+
         <h1>Anbefalinger</h1>
         <p>Find inspiration til dit danskstudie</p>
 
@@ -42,9 +65,6 @@
         <a href="tv.html" class="menu-btn">Tv</a>
         <a href="litteratur.html" class="menu-btn">Litteratur</a>
         <a href="podcast.html" class="menu-btn">Podcast</a>
-
-        <hr>
-        <a href="du2-modul.html" class="back-link">← Tilbage til Modul 3-4</a>
     </div>
 </body>
 </html>
