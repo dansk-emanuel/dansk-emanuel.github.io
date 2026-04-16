@@ -17,7 +17,7 @@
 
         .container { 
             width: 100%;
-            max-width: 600px; /* Gjort lidt bredere for at give plads til 2 kolonner */
+            max-width: 600px; 
             background: white; 
             padding: 30px; 
             border-radius: 20px; 
@@ -26,32 +26,52 @@
             border: 1px solid #edbb99;
         }
 
-        h1 { color: #5d4037; margin-bottom: 5px; } /* Mørkebrun */
+        /* Breadcrumb styling */
+        .breadcrumb {
+            text-align: left;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: #8d6e63;
+        }
+        .breadcrumb a {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb span {
+            margin: 0 8px;
+            color: #edbb99;
+        }
+
+        h1 { color: #5d4037; margin-bottom: 5px; margin-top: 10px; } 
         p { color: #a04000; margin-bottom: 30px; }
 
-        /* NYT: Grid-system til knapper i to kolonner */
+        /* Grid-system til knapper i to kolonner */
         .button-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* To lige store kolonner */
-            gap: 15px; /* Mellemrum mellem knapperne */
-            margin-bottom: 20px;
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+            margin-bottom: 10px;
         }
 
         /* De nye Sunset knapper */
         .menu-btn { 
-            display: flex; /* Gør det nemt at centrere tekst */
+            display: flex; 
             align-items: center;
             justify-content: center;
-            background: #e67e22; /* Varm orange */
+            background: #e67e22; 
             color: white; 
             padding: 15px 10px; 
             text-decoration: none; 
             border-radius: 15px; 
-            font-size: 1rem; /* Lidt mindre skrift for at passe i kolonner */
+            font-size: 1rem; 
             font-weight: bold;
             transition: all 0.2s ease;
-            box-shadow: 0 5px 0 #d35400; /* Mørk orange bund */
-            min-height: 60px; /* Sikrer at knapperne er lige høje */
+            box-shadow: 0 5px 0 #d35400; 
+            min-height: 60px; 
         }
 
         .menu-btn:hover { 
@@ -65,30 +85,22 @@
             box-shadow: 0 2px 0 #a04000;
         }
 
-        /* Mobil-visning: Hvis skærmen er meget lille, går vi tilbage til én kolonne */
+        /* Mobil-visning */
         @media (max-width: 400px) {
             .button-grid {
                 grid-template-columns: 1fr;
             }
-        }
-
-        hr {
-            margin: 30px 0;
-            border: 0;
-            border-top: 2px dashed #edbb99;
-        }
-
-        .back-link { 
-            display: inline-block; 
-            color: #8d6e63; 
-            text-decoration: none; 
-            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="breadcrumb">
+        <a href="../../index.html">Hjem</a> <span>/</span> 
+        <a href="../du2-modul.html">DU 2 Modul 3-4</a> <span>/</span> Flashcards
+    </div>
+
     <h1>Flashcards</h1>
     <p>Vælg et sæt og start din træning</p>
 
@@ -102,10 +114,6 @@
         <a href="hv-ord.html" class="menu-btn">Hv-ord</a>
         <a href="præsentation-spørgsmål-svar.html" class="menu-btn">Præsentation</a>
     </div>
-    
-    <hr>
-    
-    <a href="du2-modul.html" class="back-link">← Tilbage til Modul 3-4</a>
 </div>
 
 </body>
