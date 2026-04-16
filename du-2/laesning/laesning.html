@@ -23,10 +23,33 @@
             text-align: center;
             border: 1px solid #edbb99;
         }
-        h1 { color: #d35400; }
+
+        /* Breadcrumb styling */
+        .breadcrumb {
+            text-align: left;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: #8d6e63;
+        }
+        .breadcrumb a {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb span {
+            margin: 0 8px;
+            color: #edbb99;
+        }
+
+        h1 { color: #5d4037; margin-top: 10px; } /* Mørkebrun for konsistens */
+        p { color: #a04000; margin-bottom: 30px; }
+
         .menu-btn { 
             display: block; 
-            background: #f39c12; 
+            background: #e67e22; 
             color: white; 
             padding: 18px; 
             margin: 15px 0; 
@@ -34,23 +57,32 @@
             border-radius: 15px; 
             font-size: 1.2rem; 
             font-weight: bold;
-            box-shadow: 0 5px 0 #e67e22;
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 0 #d35400;
         }
-        hr { margin: 30px 0; border: 0; border-top: 2px dashed #edbb99; }
-        .back-link { color: #8d6e63; text-decoration: none; font-weight: bold; }
+        .menu-btn:hover { 
+            background: #d35400; 
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #a04000;
+        }
+        .menu-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #a04000;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="breadcrumb">
+            <a href="../../index.html">Hjem</a> <span>/</span> 
+            <a href="../du2-modul.html">DU 2 Modul 3-4</a> <span>/</span> Læsning
+        </div>
+
         <h1>Læseøvelser</h1>
         <p>Vælg en øvelse herunder</p>
 
         <a href="cloze-test.html" class="menu-btn">Cloze-test</a>
         <a href="forklaring-læseopgave.html" class="menu-btn">Forklaring - læseopgave</a>
-
-
-        <hr>
-        <a href="du2-modul.html" class="back-link">← Tilbage til Modul 3-4</a>
     </div>
 </body>
 </html>
