@@ -9,12 +9,38 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .option-btn:hover:not(:disabled) { transform: translateY(-2px); }
+
+        /* Brødsti styling */
+        .breadcrumb {
+            text-align: left;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: #8d6e63;
+        }
+        .breadcrumb a {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb span {
+            margin: 0 8px;
+            color: #edbb99;
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col items-center p-4">
 
     <div id="app" class="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 mt-8">
-        <!-- Header -->
+        
+        <div class="breadcrumb">
+            <a href="../../../index.html">Hjem</a> <span>/</span> 
+            <a href="../../du2-modul.html">DU 2 Modul 3-4</a> <span>/</span> 
+            <a href="../laesning.html">Læsning</a> <span>/</span> Grammatik-test
+        </div>
+
         <div class="mb-8 border-b pb-4">
             <h1 class="text-2xl font-bold text-slate-800">Dansktest: Vælg det rigtige ord</h1>
             <p class="text-slate-600">Niveau: DU2 Modul 3</p>
@@ -23,20 +49,16 @@
             </div>
         </div>
 
-        <!-- Question Section -->
         <div id="game-section">
             <div class="mb-6">
                 <span id="question-count" class="text-sm font-semibold text-blue-600 uppercase tracking-wider">Spørgsmål 1 af 10</span>
                 <p id="sentence-box" class="text-xl mt-2 leading-relaxed text-slate-800 font-medium italic">
-                    <!-- Sætning indsættes her -->
-                </p>
+                    </p>
             </div>
 
             <div id="options-grid" class="grid grid-cols-1 gap-3 mb-6">
-                <!-- Svarmuligheder indsættes her -->
-            </div>
+                </div>
 
-            <!-- Feedback Box -->
             <div id="feedback-box" class="hidden p-4 rounded-lg mb-6 border-l-4">
                 <p id="feedback-text" class="text-sm"></p>
             </div>
@@ -46,7 +68,6 @@
             </button>
         </div>
 
-        <!-- Results Section -->
         <div id="result-section" class="hidden text-center py-10">
             <h2 class="text-3xl font-bold text-slate-800 mb-4">Godt gået!</h2>
             <p id="score-text" class="text-xl text-slate-600 mb-8"></p>
@@ -74,7 +95,7 @@
                 sentence: "I går ___ jeg en lang tur i skoven.",
                 options: ["går", "gik", "gået"],
                 correct: 1,
-                explanation: "Sætningen starter med 'I går', så vi skal bruge præteritum (datid) af at gå: 'gik'."
+                explanation: "Sætningen starter med 'I går', så we skal bruge præteritum (datid) af at gå: 'gik'."
             },
             {
                 sentence: "Jeg vil gerne invitere dig ___ min fødselsdag.",
@@ -206,7 +227,6 @@
             scoreText.textContent = `Du fik ${score} ud af ${questions.length} rigtige.`;
         }
 
-        // Start spillet
         window.onload = loadQuestion;
     </script>
 </body>
