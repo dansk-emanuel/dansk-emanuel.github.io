@@ -5,21 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Musik Anbefalinger</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #fff9f5; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 500px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(93, 64, 55, 0.1); border: 1px solid #edbb99; text-align: center; }
-        h1 { color: #d35400; }
-        .item-list { text-align: left; color: #5d4037; line-height: 1.8; }
-        .back-link { display: block; margin-top: 30px; color: #8d6e63; text-decoration: none; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Musik</h1>
-        <div class="item-list">
-            <a href="https://www.youtube.com/watch?v=3LKxxfvhuO0&list=RD3LKxxfvhuO0&start_radio=1" class="menu-btn" target="_blank">Magtens Korridorer - Snot og Ild</a>
-    
-        </div>
-        <a href="anbefalinger.html" class="back-link">← Tilbage til Anbefalinger</a>
-    </div>
-</body>
-</html>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #fff9f5; 
+            margin: 0; padding: 20px; 
+            display: flex; justify-content: center; 
+        }
+
+        .container { 
+            width: 100%; max-width: 500px; 
+            background: white; padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(93, 64, 55, 0.1); 
+            border: 1px solid #edbb99; 
+            text-align: center; 
+        }
+
+        h1 { color: #d35400; margin-bottom: 25px; }
+
+        /* Dropdown Styling */
+        .category-item { margin-bottom: 15px; text-align: left; }
+
+        .dropdown-btn {
+            width: 100%;
+            background: #e67e22;
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 0 #d35400;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-btn:hover { background: #d35400; }
+        
+        .dropdown-btn::after {
+            content: '▼';
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-btn.active::after { transform: rotate(180deg); }
+        .dropdown-btn.active { transform: translateY(2px); box-shadow: 0 2px 0 #a04000; }
+
+        /* Dropdown Indhold */
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #fffaf0;
+            border-radius: 0 0 15px 15px;
+            border: 1px solid #edbb99;
+            border-top: none;
+            margin-top: -5px;
+        }
+
+        .content-inner { 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        .music-link {
+            color: #5d4037;
+            text-decoration: none;
+            padding: 10px 0;
+            border-bottom: 1
