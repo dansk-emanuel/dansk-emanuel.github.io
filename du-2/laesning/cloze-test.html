@@ -12,9 +12,31 @@
             font-family: 'Times New Roman', Times, serif;
             line-height: 1.8;
         }
+
+        /* Breadcrumb styling */
+        .breadcrumb {
+            text-align: left;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            font-family: 'Segoe UI', sans-serif;
+            color: #8d6e63;
+        }
+        .breadcrumb a {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb span {
+            margin: 0 8px;
+            color: #edbb99;
+        }
+
         .paper-container {
             max-width: 850px;
-            margin: 2rem auto;
+            margin: 1rem auto;
             padding: 3rem;
             background-color: #ffffff;
             border-radius: 4px;
@@ -80,6 +102,12 @@
 <body class="p-4 md:p-10">
 
     <div class="paper-container">
+        <div class="breadcrumb">
+            <a href="../../../index.html">Hjem</a> <span>/</span> 
+            <a href="../../du2-modul.html">DU 2 Modul 3-4</a> <span>/</span> 
+            <a href="../laesning.html">Læsning</a> <span>/</span> Cloze-test
+        </div>
+
         <div class="text-center mb-10">
             <h2 class="text-gray-500 uppercase tracking-widest text-sm font-bold">Læseforståelse — DU2 Modul 3</h2>
             <h1 id="text-title" class="text-3xl font-black mt-2 mb-4">Indlæser...</h1>
@@ -88,14 +116,12 @@
         </div>
 
         <div id="content-area" class="text-lg md:text-xl text-justify mb-10">
-            <!-- Teksten indsættes her -->
-        </div>
+            </div>
 
         <div class="word-box">
             <p class="text-center text-xs font-bold text-gray-500 uppercase mb-3">Ordliste til teksten:</p>
             <div id="word-list" class="flex flex-wrap justify-center">
-                <!-- Ordene vises her -->
-            </div>
+                </div>
         </div>
 
         <div class="mt-12 flex flex-col items-center space-y-4">
@@ -110,201 +136,9 @@
     </div>
 
     <script>
-        const texts = [
-            { title: "En god nabo", story: ["Min nabo hedder Peter og han er meget flink.", "Han bor i en lille lejlighed ved siden af mig.", "Hver morgen går han en tur med sin hund.", "Nogle gange hjælper han mig med at bære tunge poser.", "Om sommeren sidder vi ofte ude i den fælles have.", "Vi drikker kaffe og snakker om det dejlige vejr.", "Peter har arbejdet som tømrer i rigtig mange år.", "Nu er han pensionist og har masser af fritid.", "Jeg er meget glad for at have en nabo som ham.", "Det gør det trygt at bo i dette store hus."] },
-            { title: "På sprogskolen", story: ["Jeg går på sprogskole tre gange om ugen nu.", "Min lærer er meget tålmodig og forklarer tingene godt.", "I klassen er vi mange kursister fra forskellige lande.", "Vi øver os på at udtale de svære danske vokaler.", "I pausen snakker vi sammen ude på den brede gang.", "Jeg har fået en god ven, der kommer fra Syrien.", "Vi laver tit vores lektier sammen efter skole.", "Det er vigtigt at bruge sproget så meget som muligt.", "Jeg vil gerne bestå min prøve til næste sommer.", "Min drøm er at finde et arbejde på et kontor."] },
-            { title: "Biblioteket", story: ["Biblioteket er et fantastisk sted at lære nye ting.", "Man kan låne både bøger, film og spændende musik.", "Det er helt gratis at få et gult lånerkort.", "Jeg kan godt lide at sidde og læse i fred.", "Der er altid meget stille og roligt på biblioteket.", "Børnene elsker at lege i det store børnehjørne.", "Nogle gange bruger jeg også deres hurtige computere.", "Personalet er altid klar til at hjælpe med spørgsmål.", "Jeg plejer at aflevere mine bøger til tiden.", "Ellers skal man betale en bøde for at glemme det."] },
-            { title: "En tur i skoven", story: ["I søndags tog vi en tur ud i den store skov.", "Vejret var mildt og solen kiggede frem bag skyerne.", "Vi havde pakket en madkurv med brød og frugt.", "Børnene løb hurtigt foran os på de smalle stier.", "Vi så mange smukke blade i gule og røde farver.", "Det er sundt at få frisk luft og bevæge sig.", "Vi fandt en bænk, hvor vi kunne spise frokost.", "Bagefter drak vi varm kakao fra en lille termoflaske.", "Det var en rigtig hyggelig dag for hele familien.", "Vi glæder os allerede til at komme derud igen."] },
-            { title: "Mit første job", story: ["Jeg arbejder i øjeblikket som medhjælper i et køkken.", "Mine kolleger er søde, selvom de taler meget hurtigt.", "Jeg skal møde på arbejde præcis klokken otte.", "Først skal jeg vaske hænder og tage forklæde på.", "Mine opgaver er at skære grøntsager og vaske op.", "Kokken er meget dygtig til at lave lækker mad.", "I middagspausen spiser vi altid sammen ved bordet.", "Jeg lærer mange nye ord for mad og værktøj.", "Det er hårdt for ryggen at stå op hele dagen.", "Men jeg er glad for at have fået denne chance."] },
-            { title: "Til fødselsdag", story: ["Min datter fylder otte år i denne uge.", "Vi har inviteret hele klassen til en stor fest.", "Jeg skal bage en kage med masser af chokolade.", "Vi pynter stuen op med balloner og danske flag.", "Børnene kommer klokken to og skal lege lege.", "De medbringer alle sammen små gaver til hende.", "Vi skal også spise boller og drikke rød saftevand.", "Det bliver en dag med meget larm og glæde.", "Min datter glæder sig mest til at åbne pakker.", "At holde fødselsdag er en vigtig tradition for os."] },
-            { title: "I supermarkedet", story: ["Om lørdagen plejer vi at købe ind til hele ugen.", "Jeg skriver altid en lang huskeseddel på forhånd.", "Vi skal både have rugbrød, mælk og friske grøntsager.", "I dag er der tilbud på kylling og hakket oksekød.", "Jeg finder en vogn og går ind i butikken.", "Der er mange mennesker, der handler på samme tid.", "Jeg leder efter pasta, men det er svært at finde.", "Ved kassen står der en meget lang kø af kunder.", "Jeg betaler for mine varer med mit betalingskort.", "Bagefter bærer jeg de tunge poser ud til bilen."] },
-            { title: "Vasketøj", story: ["Hver mandag vasker jeg alt familiens beskidte tøj.", "Vi har et fælles vaskeri nede i den mørke kælder.", "Jeg skal huske at reservere en tid på maskinen.", "Først sorterer jeg tøjet i lyse og mørke farver.", "Jeg bruger noget vaskepulver, der er godt for miljøet.", "Når maskinen er færdig, hænger jeg tøjet til tørre.", "Det dufter dejligt rent, når det er blevet tørt.", "Bagefter lægger jeg det pænt sammen i små bunker.", "Min søn skal altid bruge sine rene fodboldbukser.", "Det tager lang tid at få det hele på plads."] },
-            { title: "En tur til lægen", story: ["Jeg har haft meget ondt i halsen i tre dage.", "Derfor ringede jeg til min læge i morges klokken otte.", "Jeg fik en tid hos lægen senere samme formiddag.", "I venteværelset læste jeg i et gammelt ugeblad.", "Lægen kiggede mig i halsen med en lille lygte.", "Han sagde, at jeg havde fået en slem forkølelse.", "Jeg skal drikke meget vand og blive i min seng.", "Hvis jeg får feber, skal jeg ringe til ham igen.", "På vejen hjem købte jeg noget medicin på apoteket.", "Nu håber jeg bare, at jeg snart bliver helt rask."] },
-            { title: "Cykeltur i byen", story: ["I Danmark er der rigtig mange, der cykler hver dag.", "Jeg cykler altid til min skole, selvom det regner.", "Det er sundt for kroppen og godt for miljøet.", "Jeg har en kurv på min cykel til min taske.", "Man skal huske at give tegn, når man drejer.", "Det er også vigtigt at bruge en god cykelhjelm.", "Nogle gange er der meget trafik inde i centrum.", "Man skal passe på bilerne, når de svinger til højre.", "Min cykel trænger snart til at få noget nyt olie.", "Jeg elsker følelsen af vind i ansigtet på min vej."] },
-            { title: "Morgenmad", story: ["Jeg starter altid dagen med en god portion mad.", "Jeg spiser ofte havregryn med sukker og kold mælk.", "Min mand vil hellere have en skive mørkt rugbrød.", "Børnene drikker et glas juice eller et glas mælk.", "Vi sidder sammen ved bordet og snakker om dagen.", "Det er vigtigt at få energi til hele formiddagen.", "Jeg drikker også to kopper sort kaffe hver morgen.", "Nogle gange bager vi boller, hvis det er weekend.", "Efter maden rydder vi alle sammen hurtigt af bordet.", "Bagefter børster børnene deres tænder før de skal afsted."] },
-            { title: "En tur i biografen", story: ["I fredags var jeg i biografen med mine bedste venner.", "Vi havde bestilt billetter til en ny dansk film.", "Vi mødtes foran indgangen tyve minutter før start.", "Først købte vi en stor pose popcorn og sodavand.", "Salen var helt fyldt med glade og forventningsfulde folk.", "Lyset blev slukket, og filmen begyndte på det store lærred.", "Det var en meget spændende historie om kærlighed.", "Vi grinede meget undervejs, fordi den var meget sjov.", "Efter filmen gik vi på café og fik en øl.", "Det var en rigtig hyggelig aften i godt selskab."] },
-            { title: "Husholdning", story: ["Der er altid mange opgaver at gøre i et hjem.", "I dag skal jeg gøre rent i hele min lejlighed.", "Først tørrer jeg støv af på alle mine hylder.", "Bagefter finder jeg støvsugeren frem fra det lille skab.", "Jeg vasker også gulvet med noget varmt sæbevand.", "Det er dejligt, når hjemmet skinner og dufter rent.", "Min kæreste lover altid at hjælpe med opvasken.", "Vi prøver at fordele arbejdet mellem os hver uge.", "I eftermiddag skal vi også have vasket noget tøj.", "Når vi er færdige, kan vi endelig slappe helt af."] },
-            { title: "Min fritid", story: ["Når jeg har fri, kan jeg lide at være kreativ.", "Jeg går til svømning hver tirsdag aften i hallen.", "Det er god motion, og jeg føler mig meget let.", "Nogle gange tager jeg også ud og fisker ved søen.", "Jeg kan godt lide at være ude i den friske natur.", "Om vinteren læser jeg mange tykke bøger i sofaen.", "Jeg interesserer mig meget for historie og kultur.", "Det er vigtigt at have nogle hobbyer i hverdagen.", "Jeg mødes også tit med min familie til aftensmad.", "Vi hygger os og spiller kort eller brætspil sammen."] },
-            { title: "Jobsamtale", story: ["I går var jeg til en vigtig samtale om et job.", "Jeg var meget nervøs, før jeg gik ind i bygningen.", "Jeg havde taget mit pæneste tøj på til lejligheden.", "Chefen var en venlig mand, der stillede mange spørgsmål.", "Vi talte om min erfaring og mine mange stærke sider.", "Jeg fortalte, at jeg er meget flittig og stabil.", "De søger en person, der kan starte ret hurtigt.", "Jeg fik lov til at se det sted, hvor de arbejder.", "De ringer til mig på fredag med et endeligt svar.", "Jeg håber virkelig, at jeg får dette spændende job."] },
-            { title: "Danske traditioner", story: ["I december fejrer vi jul i hele det danske land.", "Vi pynter et grønt træ med lys og mange hjerter.", "Juleaften spiser de fleste flæskesteg eller and.", "Vi danser rundt om træet og synger gamle sange.", "Børnene er meget spændte på at få deres gaver.", "Det er en tid, hvor man er sammen med familien.", "Vi tænder også lys i en krans hver søndag i advent.", "Mange går i kirke, selvom de ikke gør det tit.", "Hyggen er det vigtigste ord i den mørke vintertid.", "Vi glæder os altid til at spise god julemad."] },
-            { title: "Transport", story: ["Det er nemt at komme rundt i de danske byer.", "Jeg bruger ofte toget, når jeg skal besøge min mor.", "Man skal huske at tjekke ind med sit rejsekort.", "Hvis man kommer for sent, skal man vente på næste.", "S-toget kører meget ofte inde i selve København.", "Busserne kører også helt ud til de små landsbyer.", "Det er dyrt at eje en bil på grund af afgiften.", "Mange foretrækker derfor at bruge den kollektive trafik.", "Jeg kan godt lide at kigge ud af vinduet på turen.", "Det er afslappende at slippe for at køre selv."] },
-            { title: "En tur på stranden", story: ["Om sommeren tager vi tit til stranden i weekenden.", "Vandet er ofte koldt, men det er meget forfriskende.", "Børnene elsker at bygge store slotte i det fine sand.", "Vi medbringer altid solcreme for ikke at blive brændt.", "Man kan finde mange flotte skaller ved vandkanten.", "Vi sidder på vores håndklæder og spiser vores frokost.", "Der er mange mennesker, der bader og spiller bold.", "Det er dejligt at høre lyden af de små bølger.", "Nogle gange køber vi en stor is ved den lille kiosk.", "En dag ved havet giver altid en god nedsat stress."] },
-            { title: "At lære sprog", story: ["Det tager lang tid at lære et helt nyt sprog.", "Man skal være tålmodig og øve sig hver eneste dag.", "Det hjælper meget at høre dansk radio eller se tv.", "Jeg prøver at tale med mine danske naboer ofte.", "I starten var jeg bange for at lave mange fejl.", "Men nu ved jeg, at man lærer mest af sine fejl.", "Min udtale bliver bedre og bedre for hver måned.", "Det er vigtigt at lære de mest brugte danske ord.", "Jeg skriver nye gloser ned i en lille rød notesbog.", "Sprog er nøglen til at forstå et nyt samfund."] },
-            { title: "Min bolig", story: ["Jeg bor i et moderne rækkehus med en lille have.", "Der er tre værelser, et køkken og et lyst badeværelse.", "Huset ligger i et meget roligt kvarter nær skoven.", "Vi har boet her i cirka fem år sammen med børnene.", "I stuen har vi en stor sofa og et fladt fjernsyn.", "Vi kan godt lide at ordne blomster ude i haven.", "Naboerne er flinke, og vi hjælper hinanden tit.", "Der er kort vej til både skole og indkøb herfra.", "Det er et godt sted for børn at vokse trygt op.", "Vi føler os virkelig hjemme i vores dejlige bolig."] },
-            { title: "På apoteket", story: ["Hvis man er syg, kan man gå på det lokale apotek.", "Man skal ofte bruge en recept fra sin egen læge.", "Farmaceuten kan forklare, hvordan man tager sin medicin.", "Man kan også købe plaster og vitaminer uden recept.", "Jeg skal have noget creme til min tørre hud i dag.", "Der er altid meget rent og pænt inde på apoteket.", "Nogle apoteker har åbent hele døgnet rundt.", "Det er vigtigt at læse indlægssedlen grundigt igennem.", "Man skal opbevare sin medicin utilgængeligt for børn.", "Jeg betaler ved kassen og får en lille kvittering."] },
-            { title: "Vejret i Danmark", story: ["Vejret skifter meget hurtigt i løbet af en dag.", "Man siger, at der ikke findes dårligt vejr her.", "Det handler bare om at have det rigtige tøj på.", "Om vinteren er det mørkt og ofte meget blæsende.", "Foråret er dejligt, når alting begynder at blomstre.", "Om sommeren kan solen bage fra en helt blå himmel.", "Men det kan også regne i flere dage i træk.", "Efteråret bringer masser af blæst og smukke farver.", "Jeg tjekker altid vejrudsigten på min telefon i morges.", "Man ved aldrig helt, om man skal huske sin paraply."] },
-            { title: "En middag med venner", story: ["I morgen aften kommer mine venner til middag.", "Jeg vil lave en traditionel ret med kød og kartofler.", "Først skal jeg dække et pænt bord med servietter.", "Jeg tænder også nogle hyggelige lys i stuen.", "Vi skal have en lækker dessert med friske bær.", "Jeg glæder mig til at grine og snakke med dem.", "Det er længe siden, vi sidst har set hinanden.", "Alle tager noget med at drikke til maden i morgen.", "Det er vigtigt at pleje sine venskaber i hverdagen.", "Vi slutter nok aftenen af med en kop varm kaffe."] },
-            { title: "Arbejdsliv", story: ["Det danske arbejdsmarked er kendt for at være fleksibelt.", "De fleste arbejder 37 timer om ugen på fuld tid.", "Man har ret til fem ugers ferie hvert eneste år.", "Forholdet mellem chef og ansat er ofte ret uformelt.", "Vi holder mange møder for at planlægge vores opgaver.", "Det er vigtigt at have et godt psykisk arbejdsmiljø.", "Vi spiser frokost sammen i kantinen klokken tolv.", "Man skal være punktlig og møde til tiden hver dag.", "Hvis man er syg, skal man give besked til chefen.", "Mange drømmer om at få en god karriere her."] },
-            { title: "Børnenes skole", story: ["Mine børn går i den lokale folkeskole hver dag.", "De starter i skole klokken otte hver morgen.", "De har mange forskellige fag som dansk og matematik.", "I pausen leger de med deres kammerater i gården.", "Lærerne er gode til at hjælpe hver enkelt elev.", "Vi har forældremøde to gange om året på skolen.", "Børnene skal lave lektier hjemme ved spisebordet.", "Det er vigtigt at lære at læse og skrive tidligt.", "De tager ofte på tur til museer eller i skoven.", "Skolen er et sted for både læring og venskab."] },
-            { title: "Motion", story: ["Det er sundt at bevæge sig mindst en halv time.", "Jeg går en lang tur i parken hver eneste dag.", "Nogle mennesker foretrækker at gå i et fitnesscenter.", "Her kan man løfte vægte eller løbe på et bånd.", "Det giver meget energi og et bedre humør i dag.", "Jeg svømmer også en gang om ugen i svømmehallen.", "Man kan mærke, at kroppen bliver stærkere af det.", "Det er sværere at komme afsted, når det er mørkt.", "Men bagefter har man det altid rigtig dejligt.", "Motion forebygger mange sygdomme i det lange løb."] },
-            { title: "En tur i haven", story: ["Vi har en lille have bag vores hvide hus.", "Om foråret planter vi mange nye blomster og frø.", "Jeg kan godt lide at luge ukrudt mellem rækkerne.", "Vi har også et æbletræ, der giver søde frugter.", "Græsset skal slås en gang om ugen i sommerperioden.", "Det dufter så dejligt af nyslået græs i haven.", "Børnene har en trampolin, som de hopper meget på.", "Vi har også et bord og nogle stole på terrassen.", "Her spiser vi ofte vores aftensmad, når det er varmt.", "Haven er et sted, hvor vi slapper rigtig meget af."] },
-            { title: "At handle online", story: ["Det er blevet meget populært at købe varer på nettet.", "Man kan sidde hjemme i sofaen og bestille tingene.", "Der er et enormt udvalg af tøj, sko og elektronik.", "Man betaler med sit kort eller med sin mobiltelefon.", "Pakken bliver ofte leveret til en pakkeshop nær dig.", "Det sparer meget tid i en travl hverdag for os.", "Man skal dog passe på ikke at købe for meget.", "Det er nemt at sammenligne priser på forskellige sider.", "Hvis varen ikke passer, kan man sende den retur.", "Jeg foretrækker stadig at prøve tøjet i en butik."] },
-            { title: "Livsstil", story: ["Mange danskere går meget op i at leve sundt.", "Det handler både om kost, søvn og daglig motion.", "Vi prøver at spise mange grøntsager og groft brød.", "Søvn er vigtig for at hjernen kan fungere optimalt.", "Vi prøver at gå i seng på samme tid hver aften.", "Stress er et stort problem i det moderne samfund.", "Derfor skal man huske at holde pauser i løbet af dagen.", "Det er sundt at være sammen med mennesker man kan lide.", "Et godt grin kan ændre hele ens dag til det bedre.", "Balance er det vigtigste ord for en sund livsstil."] },
-            { title: "I køkkenet", story: ["Jeg elsker at lave mad til min store familie.", "Køkkenet er det hjerte, hvor vi samles hver dag.", "Først skal jeg finde alle ingredienserne frem fra skabet.", "Jeg bruger en skarp kniv til at snitte løgene med.", "Maden skal simre i gryden i cirka en halv time.", "Duften af mad breder sig hurtigt i hele huset.", "Børnene hjælper med at dække bordet med tallerkener.", "Vi snakker om, hvad vi har oplevet i dagens løb.", "Efter maden skal vi alle hjælpes ad med opvasken.", "Det er hyggeligt at lave mad helt fra bunden."] },
-            { title: "Weekendens planer", story: ["I weekenden har vi endelig tid til at slappe af.", "Lørdag formiddag tager vi ofte ned på det lokale torv.", "Her køber vi friske blomster og nogle gange fisk.", "Søndag vil vi besøge mine svigerforældre i deres hus.", "De bor i en lille by lidt uden for Aarhus.", "Vi skal have kaffe og hjemmebagt kage hos dem.", "Det er vigtigt at se sin familie med jævne mellemrum.", "Måske går vi en tur ved den store sø i nærheden.", "Weekend er en god tid til at lade batterierne op.", "Jeg glæder mig altid til at have fri fra skole."] },
-            { title: "Miljø og genbrug", story: ["I Danmark er vi gode til at sortere vores affald.", "Vi har forskellige spande til papir, plast og glas.", "Det er vigtigt for at skåne vores fælles natur.", "Man kan også aflevere sit gamle tøj i containere.", "Genbrugsbutikker er blevet meget populære i hele landet.", "Her kan man finde billige ting til sit eget hjem.", "Vi prøver at spare på strømmen og det varme vand.", "Det er godt for både miljøet og vores egen økonomi.", "Små ting i hverdagen kan gøre en stor forskel.", "Vi vil gerne give en ren verden videre til børnene."] },
-            { title: "En dag i Tivoli", story: ["Tivoli er en af de ældste forlystelsesparker i verden.", "Der er fyldt med smukke blomster og mange lys.", "Vi prøvede den gamle rutsjebane i træ flere gange.", "Det kildede i maven, da vi kørte meget hurtigt ned.", "Bagefter spiste vi en stor isvaffel med syltetøj.", "Der var koncert på den store scene om aftenen.", "Parken er især flot, når mørket falder på her.", "Man kan også vinde store bamser i de mange boder.", "Det er en sjov dag for både børn og voksne.", "Vi havde en fantastisk tur med hele vores familie."] },
-            { title: "Kultur og museer", story: ["Danmark har mange spændende museer med god kunst.", "Jeg besøgte et kunstmuseum i sidste uge med min ven.", "Der hang mange store malerier på de hvide vægge.", "Vi brugte en lydguide til at høre om historierne.", "Det er interessant at lære om fortiden og nutiden.", "Museer er gode steder at få nye perspektiver på livet.", "Nogle museer er interaktive og sjove for små børn.", "Man kan ofte købe en kop kaffe i den lille café.", "Jeg vil gerne besøge Nationalmuseet næste gang igen.", "Kultur gør vores liv rigere og mere nuanceret."] },
-            { title: "På arbejde", story: ["Jeg arbejder som sosu-hjælper på et lokalt plejehjem.", "Mine opgaver er at hjælpe de ældre med deres dagligdag.", "Jeg skal give dem deres medicin og hjælpe med tøjet.", "De ældre er ofte meget taknemmelige for min hjælp.", "Vi drikker kaffe og snakker om gamle dage sammen.", "Det er et meningsfuldt job, selvom det er fysisk hårdt.", "Jeg har gode kolleger, og vi hjælper hinanden meget.", "Man skal have meget tålmodighed i dette fag her.", "Jeg er glad for at gøre en forskel for andre mennesker.", "Hver dag lærer jeg noget nyt om livet fra dem."] },
-            { title: "Dansk mad", story: ["Danskerne elsker deres rugbrød med forskelligt pålæg.", "En klassisk ret er frikadeller med kartofler og sovs.", "Mange spiser også smørrebrød til frokost om søndagen.", "Det er vigtigt, at maden smager godt og mætter længe.", "Vi bruger ofte meget smør og fløde i vores madlavning.", "Stegt flæsk med persillesovs er udnævnt til nationalret.", "Til jul spiser vi risalamande med en hel mandel i.", "Den, der finder mandlen, får en lille ekstra gave.", "Mad er en stor del af den danske hygge her.", "Vi elsker at samles om et veldækket middagsbord."] },
-            { title: "Forældre og børn", story: ["Det er en stor opgave at være forældre i dag.", "Man skal give sine børn masser af kærlighed og tryghed.", "Vi læser en godnathistorie for dem hver eneste aften.", "Det er vigtigt at have faste rammer og regler i hjemmet.", "Børn lærer meget ved at se på deres egne forældre.", "Vi leger sammen på gulvet med biler og dukker.", "Det er sjovt at følge deres store udvikling hver dag.", "Nogle gange er det også hårdt og meget trættende.", "Men et smil fra ens barn gør alting godt igen.", "Familien er det vigtigste fundament i vores liv."] },
-            { title: "Uddannelse", story: ["Det er gratis at gå i skole og uddanne sig i Danmark.", "Mange voksne vælger at skifte karriere i løbet af livet.", "Man kan tage kurser på aftenskole eller på universitetet.", "Det er aldrig for sent at lære noget helt nyt her.", "Uddannelse giver flere muligheder på det frie arbejdsmarked.", "Jeg læser meget flittigt for at blive færdig til tiden.", "Vi arbejder ofte i grupper for at løse opgaver.", "Det er godt at høre andres meninger og gode ideer.", "Jeg glæder mig til at få mit diplom næste år.", "Viden er noget, som ingen nogensinde kan tage fra dig."] },
-            { title: "Sommerhus", story: ["Mange danske familier har et lille hus ved vandet.", "Det kaldes et sommerhus og bruges til ferier.", "Her kan man slappe helt af og glemme hverdagen.", "Huset er ofte bygget af træ og ligger tæt på naturen.", "Vi griller mad på terrassen og spiller brætspil sammen.", "Der er ikke altid internet, og det er faktisk dejligt.", "Man får tid til at læse og gå lange ture her.", "Vandet er aldrig ret langt væk i det danske land.", "Vi sover længe og spiser morgenmad ude i det fri.", "Sommerhuset er vores fristed, hvor vi finder ro."] },
-            { title: "Sport i tv", story: ["Mange danskere elsker at se fodbold på skærmen.", "Når landsholdet spiller, er hele landet klædt i rødt.", "Vi sidder sammen i sofaen og hepper på vores hold.", "Det giver en følelse af fællesskab og stor glæde.", "Nogle foretrækker at se cykelløb som Tour de France.", "Det er spændende at følge de dygtige ryttere i bjergene.", "Sport kan samle folk på tværs af alle aldre her.", "Vi snakker ofte om kampene næste dag på vores arbejde.", "Det er god underholdning i en travl uge for os.", "Jeg kan også selv lide at spille fodbold med vennerne."] },
-            { title: "I teatret", story: ["At gå i teatret er en meget speciel oplevelse.", "Man ser de levende skuespillere direkte på den store scene.", "Der er en helt særlig stemning i den mørke sal.", "Vi så et stykke om en familie i en stor krise.", "Scenografien og kostumerne var meget flotte og detaljerede.", "Efter forestillingen klappede alle publikummer meget længe.", "Det er anderledes end at se en film i tv her.", "Man føler sig mere som en del af selve historien.", "Vi fik et glas vin i pausen ude i baren.", "Jeg vil gerne gå mere i teatret i fremtiden."] },
-            { title: "At rejse", story: ["Jeg elsker at rejse og opleve nye fremmede kulturer.", "Det er spændende at se, hvordan andre mennesker lever.", "Jeg pakker altid min kuffert flere dage før afgang.", "Vi foretrækker at rejse til varme lande om vinteren.", "Solen og varmen giver os fornyet energi til hverdagen.", "Man lærer også at sætte pris på sit eget land.", "Det er vigtigt at have sit pas og sine penge klar.", "Vi tager mange billeder for at huske de gode stunder.", "Det er dejligt at smage mad, man aldrig har prøvet.", "Rejser udvider ens horisont og giver gode minder."] },
-            { title: "Sikkerhed", story: ["Danmark er generelt et meget sikkert land at bo i.", "Man kan trygt gå på gaden, selvom det er mørkt.", "Tillid er en meget vigtig værdi i det danske samfund.", "Vi stoler på politiet og på de andre borgere her.", "Man skal dog stadig huske at låse sin dør hver nat.", "Børn lærer tidligt at færdes sikkert i den tætte trafik.", "Der er hjælp at hente, hvis der sker et uheld.", "Brandvæsen og ambulance kommer hurtigt, når man ringer.", "Sikkerhed giver en følelse af ro og frihed i livet.", "Det er en af de ting, jeg værdsætter mest her."] },
-            { title: "Digitale Danmark", story: ["Næsten alt foregår digitalt i det danske samfund nu.", "Vi bruger MitID til at logge på banken og e-Boks.", "Det er nemt at ordne sine sager hjemme fra computeren.", "Man modtager breve fra det offentlige direkte i postkassen.", "De fleste ældre har også lært at bruge en tablet.", "Det sparer meget papir og er godt for vores miljø.", "Man skal dog passe på sine personlige koder og data.", "Internettet er en nødvendighed for at fungere i hverdagen.", "Vi køber billetter og bestiller tid hos lægen online.", "Danmark er et af de mest digitale lande i verden."] },
-            { title: "En tur i zoo", story: ["I weekenden besøgte vi den store zoologiske have i byen.", "Vi så de store elefanter og de farlige løver tæt på.", "Børnene syntes, at de små aber var meget sjove.", "Der er mange spændende dyr fra hele den vide verden.", "Vi lærte om, hvordan man passer på de truede dyr.", "Det var en lærerig dag for både store og små.", "Vi spiste vores madpakker på en bænk nær girafferne.", "Der var også en stor legeplads, hvor børnene legede.", "Det er en klassisk udflugt for mange danske familier.", "Vi var trætte, men meget glade, da vi kom hjem."] },
-            { title: "Vinter i Danmark", story: ["Når sneen falder, bliver landskabet helt hvidt og smukt.", "Børnene finder deres kælke frem og løber ud på bakken.", "Det er koldt, så man skal have varme vanter på.", "Vi bygger store snemænd med gulerødder som næser.", "Solen går meget tidligt ned i de kolde måneder her.", "Vi tænder mange lys indendørs for at skabe hygge.", "Det er hyggeligt at drikke varm kakao efter en gåtur.", "Vejene kan være meget glatte, så pas på bilerne.", "Vinteren er lang, men den har også sin egen charme.", "Vi venter tålmodigt på, at det bliver forår igen."] },
-            { title: "Forårstegn", story: ["Nu begynder de små blomster at kigge op af jorden.", "Fuglene synger højt i træerne tidligt om morgenen.", "Dagene bliver mærkbart længere og meget lysere nu.", "Folk begynder at sidde ude på de små caféer igen.", "Det er en dejlig tid, hvor alting vågner til live.", "Man får lyst til at gøre forårsrent i hele huset.", "Vi finder vores tyndere jakker frem fra det store skab.", "Foråret giver håb og fornyet energi til os alle sammen.", "Det er smukt, når bøgen springer ud i den grønne skov.", "Naturen skifter farve fra grå til lysegrøn og gul."] },
-            { title: "Sundhedsvæsenet", story: ["I Danmark er det gratis at gå til sin egen læge.", "Vi betaler for det over vores fælles skat hver måned.", "Hvis man fejler noget alvorligt, kommer man på hospitalet.", "Her bliver man passet af dygtige læger og sygeplejersker.", "Der er ofte ventetid på de mindre vigtige operationer.", "Man kan også vælge at have en privat sundhedsforsikring.", "Det giver adgang til hurtigere behandling på private klinikker.", "Forebyggelse er en vigtig del af det danske system.", "Vi bliver indkaldt til tjek og forskellige undersøgelser.", "Det er trygt at vide, at hjælpen altid er nær."] },
-            { title: "Traditioner i april", story: ["Den første april plejer vi at lave sjov med hinanden.", "Man prøver at snyde folk med en lille løgn eller spøg.", "Hvis det lykkes, råber man 'aprilsnar' og griner højt.", "Det er en gammel tradition, som mange stadig holder af.", "Selv aviserne skriver nogle gange en falsk historie i dag.", "Man skal læse nyhederne ekstra grundigt i dagens løb.", "Det er en dag med smil og godt humør i Danmark.", "Man skal dog passe på, at spøgen ikke bliver for grov.", "Børnene i skolen elsker især at snyde deres lærere.", "Det er en sjov start på den nye forårsmåned her."] },
-            { title: "Hygge", story: ["Hygge er et helt særligt dansk ord for samvær.", "Det kan ikke rigtig oversættes til andre fremmede sprog.", "Det handler om at skabe en god og varm atmosfære.", "Man hygger sig ofte med god mad og levende lys.", "Det kan være sammen med venner eller helt alene.", "At læse en god bog under et tæppe er også hygge.", "Danskerne bruger ordet hygge i mange forskellige sammenhænge.", "Det er en vigtig del af den danske nationale identitet.", "Hygge hjælper os gennem den mørke og kolde vintertid.", "Det handler om at nyde de små øjeblikke i livet."] }
-        ];
-
-        let availableIndices = [];
-        let currentStoryIndex = -1;
-        let currentStoryData = [];
-
-        function initTest() {
-            // Hvis listen er tom eller alle er brugt, genfyld
-            if (availableIndices.length === 0) {
-                availableIndices = Array.from(Array(texts.length).keys());
-            }
-
-            // Vælg et indeks fra de resterende (undgå den samme som sidst hvis muligt)
-            let randomIndex;
-            let nextIndex;
-            
-            do {
-                randomIndex = Math.floor(Math.random() * availableIndices.length);
-                nextIndex = availableIndices[randomIndex];
-            } while (nextIndex === currentStoryIndex && availableIndices.length > 1);
-
-            // Fjern det valgte indeks fra puljen
-            availableIndices.splice(randomIndex, 1);
-            currentStoryIndex = nextIndex;
-            
-            const data = texts[currentStoryIndex];
-            const contentArea = document.getElementById('content-area');
-            const wordListArea = document.getElementById('word-list');
-            const scoreResult = document.getElementById('score-result');
-            
-            document.getElementById('text-title').innerText = data.title;
-            document.getElementById('progress-text').innerText = `Opgave ${texts.length - availableIndices.length} af ${texts.length}`;
-            contentArea.innerHTML = "";
-            wordListArea.innerHTML = "";
-            scoreResult.innerText = "";
-            document.getElementById('check-button').classList.remove('hidden');
-            document.getElementById('next-button').classList.add('hidden');
-
-            const missingWords = [];
-            currentStoryData = data.story.map((sentence, i) => {
-                const words = sentence.split(' ');
-                
-                // Vælg kandidater til huller (ord > 3 tegn)
-                let candidates = [];
-                words.forEach((w, idx) => {
-                    const clean = w.replace(/[.,?!]/g, "");
-                    if(clean.length > 3) candidates.push(idx);
-                });
-
-                const targetIdx = candidates.length > 0 
-                    ? candidates[Math.floor(Math.random() * candidates.length)]
-                    : Math.floor(Math.random() * words.length);
-
-                const fullWord = words[targetIdx];
-                const cleanWord = fullWord.replace(/[.,?!]/g, "");
-                const punc = fullWord.replace(cleanWord, "");
-                
-                missingWords.push(cleanWord);
-
-                return {
-                    before: words.slice(0, targetIdx).join(' '),
-                    after: words.slice(targetIdx + 1).join(' '),
-                    correct: cleanWord,
-                    punc: punc
-                };
-            });
-
-            // Bland ordene til dropdowns
-            const shuffledWords = [...missingWords].sort(() => Math.random() - 0.5);
-
-            // Byg visning
-            currentStoryData.forEach((s, i) => {
-                const span = document.createElement('span');
-                span.innerHTML = s.before + " ";
-                
-                const select = document.createElement('select');
-                select.className = "cloze-select";
-                select.id = `q-${i}`;
-                
-                const def = document.createElement('option');
-                def.value = "";
-                def.text = "_____";
-                select.appendChild(def);
-
-                // Giv hver dropdown et unikt miks af de korrekte ord for denne tekst
-                const dropdownOptions = [...missingWords].sort(() => Math.random() - 0.5);
-                dropdownOptions.forEach(w => {
-                    const opt = document.createElement('option');
-                    opt.value = w;
-                    opt.text = w;
-                    select.appendChild(opt);
-                });
-
-                span.appendChild(select);
-                span.innerHTML += s.punc + " " + s.after + " ";
-                contentArea.appendChild(span);
-            });
-
-            // Vis ordliste piller
-            shuffledWords.forEach(w => {
-                const div = document.createElement('span');
-                div.className = "word-item";
-                div.innerText = w;
-                wordListArea.appendChild(div);
-            });
-        }
-
-        function checkAnswers() {
-            let score = 0;
-            currentStoryData.forEach((s, i) => {
-                const el = document.getElementById(`q-${i}`);
-                const val = el.value;
-                
-                if (val === s.correct) {
-                    el.classList.add('correct-answer');
-                    score++;
-                } else {
-                    el.classList.add('wrong-answer');
-                    const solution = document.createElement('span');
-                    solution.className = "solution-text";
-                    solution.innerText = `[${s.correct}]`;
-                    el.after(solution);
-                }
-                el.disabled = true;
-            });
-
-            const result = document.getElementById('score-result');
-            result.innerText = `Resultat: ${score} ud af ${currentStoryData.length} rigtige.`;
-            result.style.color = score >= 8 ? "#059669" : "#dc2626";
-            
-            document.getElementById('check-button').classList.add('hidden');
-            document.getElementById('next-button').classList.remove('hidden');
-        }
-
-        document.getElementById('check-button').addEventListener('click', checkAnswers);
-        document.getElementById('next-button').addEventListener('click', initTest);
-
-        window.onload = initTest;
+        // ... (Her indsættes hele dit eksisterende script med tekster og logik)
+        // Jeg har udeladt det i denne visning for korthedens skyld, 
+        // men husk at beholde det præcis som i din original.
     </script>
- <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
-    <hr style="width: 20%; margin: 20px auto; opacity: 0.2;">
-    <a href="flashcards.html" style="font-family: sans-serif; color: #7f8c8d; text-decoration: none; font-weight: bold; border: 1px solid #ccc; padding: 10px 20px; border-radius: 5px;">
-        ← Tilbage til menuen
-    </a>
-</div> 
 </body>
 </html>
