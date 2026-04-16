@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mail</title>
+    <title>Mail - Flashcards</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .perspective-1000 {
@@ -23,23 +23,47 @@
         .flip-card-back {
             transform: rotateY(180deg);
         }
+
+        /* Brødsti styling der matcher Tailwind setup */
+        .breadcrumb {
+            text-align: left;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: #8d6e63;
+        }
+        .breadcrumb a {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb span {
+            margin: 0 8px;
+            color: #edbb99;
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col items-center p-4 font-sans">
 
     <div id="app" class="w-full max-w-2xl">
-        <!-- Header & Sprogvælger -->
+        
+        <div class="breadcrumb">
+            <a href="../../../index.html">Hjem</a> <span>/</span> 
+            <a href="../../du2-modul.html">DU 2 Modul 3-4</a> <span>/</span> 
+            <a href="../skrivning.html">Skrivning</a> <span>/</span> Faste vendinger
+        </div>
+
         <header class="text-center mb-8">
             <h1 class="text-3xl font-bold text-slate-800 mb-4">Emanuels Flashcards</h1>
             <div class="flex flex-wrap justify-center gap-2 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
                 <label class="w-full text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Vælg målsprog:</label>
                 <select id="languageSelect" class="bg-slate-100 border-none text-slate-700 py-2 px-4 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
-                    <!-- Sprog bliver indsat via JS -->
-                </select>
+                    </select>
             </div>
         </header>
 
-        <!-- Status -->
         <div class="flex justify-between items-center mb-4 px-2">
             <span class="text-slate-600 font-medium" id="cardCountDisplay">Kort tilbage: 10</span>
             <div class="h-2 w-32 bg-slate-200 rounded-full overflow-hidden">
@@ -47,18 +71,15 @@
             </div>
         </div>
 
-        <!-- Flashcard Container -->
         <div class="relative h-80 w-full perspective-1000 group cursor-pointer" id="cardContainer">
             <div id="cardInner" class="flip-card-inner relative w-full h-full shadow-xl rounded-2xl">
                 
-                <!-- Forside (Dansk) -->
                 <div class="flip-card-front absolute inset-0 bg-white rounded-2xl flex flex-col items-center justify-center p-8 border border-slate-100">
                     <span class="text-xs font-bold text-blue-500 uppercase tracking-widest mb-2">Dansk</span>
                     <p id="danishText" class="text-2xl md:text-3xl font-semibold text-center text-slate-800">Indlæser...</p>
                     <p class="text-slate-400 text-sm mt-8 italic">Klik for at se oversættelse</p>
                 </div>
 
-                <!-- Bagside (Målsprog) -->
                 <div class="flip-card-back absolute inset-0 bg-blue-600 rounded-2xl flex flex-col items-center justify-center p-8 text-white">
                     <span id="targetLangLabel" class="text-xs font-bold text-blue-200 uppercase tracking-widest mb-2">Oversættelse</span>
                     <p id="translatedText" class="text-2xl md:text-3xl font-semibold text-center">Translation</p>
@@ -67,7 +88,6 @@
             </div>
         </div>
 
-        <!-- Knapper (Vises kun når kortet er vendt) -->
         <div id="controls" class="mt-8 flex gap-4 justify-center opacity-0 pointer-events-none transition-opacity duration-300">
             <button onclick="handleAnswer(false)" class="bg-rose-100 text-rose-600 hover:bg-rose-200 font-bold py-3 px-8 rounded-xl transition-colors border-2 border-rose-200 shadow-sm">
                 Forkert
@@ -77,7 +97,6 @@
             </button>
         </div>
 
-        <!-- Færdig Skærm -->
         <div id="finishScreen" class="hidden fixed inset-0 bg-white/95 flex flex-col items-center justify-center p-6 text-center z-50">
             <div class="bg-white p-10 rounded-3xl shadow-2xl border border-slate-100">
                 <div class="text-6xl mb-4">🎉</div>
@@ -115,13 +134,13 @@
             "Tyrkisk": ["Sevgili Emanuel", "Merhaba Emanuel", "E-postanız için teşekkürler", "Nasıl gidiyor?", "Nasılsınız?", "Umarım her şey yolundadır", "İyiyim", "Size _______ hakkında anlatmak istiyorum", "Umarım yakında görüşürüz", "Saygılarımla"],
             "Kurdisk Kurmanji": ["Emanuelê hêja", "Silav Emanuel", "Spas ji bo e-peyama te", "Çawa diçe?", "Tu çawa yî?", "Hêvî dikim ku her tişt baş diçe", "Ez baş im", "Ez dixwazim li ser _______ biaxivim", "Bi hêviya dîtina nêzîk", "Bi silavên germ"],
             "Kurdisk Sorani": ["ئیمانوێلی ئازیز", "سڵاو ئیمانوێل", "سوپাস بۆ ئیمەیڵەکەت", "چۆن دەچێت؟", "چۆنیت؟", "هیوادارم هەموو شتێک باش بێت", "من باشم", "دەمەوێت باسی _______ بکەم", "بە هیوای دیدار", "لەگەڵ ڕێزدا"],
-            "Nepalesisk": ["प्रिय इमानुएल", "नमस्ते इमानुएल", "तपाईंको इमेलको लागि धन्यवाद", "के छ खबर?", "तपाईंलाई कस्तो छ?", "मलाई आशा छ कि सबै ठीक भइरहेको छ", "मलाई ठीक छ", "म _______ को बारेमा भन्न चाहन्छु", "आशा छ हामी छिट्टै भेट्नेछौं", "शुभकामना सहित"],
+            "Nepalesisk": ["प्रिय इमानुएल", "नमस्ते इमानुएल", "तपाईंको इमेलको लागि धन्यवाद", "के छ खबर?", "तपाईंलाई कस्तो छ?", "मलाई आशा छ कि सबै ठीक भइरहेको छ", "मलाई ঠিক छ", "म _______ को बारेमा भन्न चाहन्छु", "आशा छ हामी छिट्टै भेट्नेछौं", "शुभकामना सहित"],
             "Kiswahili": ["Mpendwa Emanuel", "Habari Emanuel", "Asante kwa barua pepe yako", "Mambo vipi?", "U hali gani?", "Natumai kila kitu ni sawa", "Niko salama", "Ningependa kuelezea kuhusu _______", "Natumai tutaonana hivi karibuni", "Wako wa dhati"],
             "Fransk": ["Cher Emanuel", "Salut Emanuel", "Merci pour votre e-mail", "Comment ça va ?", "Comment allez-vous ?", "J'espère que tout va bien", "Je vais bien", "Je voudrais vous parler de _______", "J'espère vous revoir bientôt", "Cordialement"],
             "Twi": ["Emanuel dɔfo", "Maakye/Maaha Emanuel", "Meda wo ase wo krataa no ho", "Ɛte sɛn?", "Wo ho te sɛn?", "Mepɛ sɛ meka _______ ho asɛm", "Mewɔ anidaso sɛ yɛbehyia nnansa yi", "Yɛ bɛ hyia bio", "Mema wo akye"],
             "Bosnisk": ["Dragi Emanuele", "Zdravo Emanuele", "Hvala na tvom mejlu", "Kako ide?", "Kako si?", "Nadam se da je sve u redu", "Dobro sam", "Želio bih ti ispričati o _______", "Nadam se da se vidimo uskoro", "Srdačan pozdrav"],
             "Somali": ["Gacalle Emanuel", "Inaadeer Emanuel / Haye Emanuel", "Waad ku mahadsantahay iimaylkaaga", "Sidee bay wax u socdaan?", "Sidee tahay?", "Waxaan rajeynayaa inay wax walba si fiican u socdaan", "Waan ladnahay / Waan fiicanahay", "Waxaan rabaa inaan kaaga sheego _______", "Waxaan rajeynayaa inaan dhowaan is aragno", "Wabillaahi tawfiiq / Mahadsanid"],
-            "Tigrinya": ["ቁንጅና ኢማኑኤል", "ሰላም ኢማኑኤል", "ሳላ ኢመይልካ", "ከመይ ይኸይድ ኣሎ?", "ከመይ ኣለኻ?", "ሰላም ክትኸውን ተስፋ እገብር", "ኣነ ደሓን እየ", "ብዛዕባ _______ ክነግረካ እደሊ", "ቀልጢፍና ክንራኸብ ተስፋ እገብር", "ሰላምታ"],
+            "Tigrinya": ["ቁንጅና ኢማኑኤል", "ሰላም ኢማኑኤል", "ሳላ ኢመይልካ", "ከመይ ይኸይድ ኣሎ?", "ከመይ ኣለኻ?", "ሰላም ክትኸውን ተስፋ እገብር", "ኣነ ደሓን እየ", "ብዛዕባ _______ ክነግረካ እደሊ", "ቀልጢፍና ክንራኸብ ተስفا እገብር", "ሰላምታ"],
             "Mandarin Kinesisk": ["亲爱的伊曼纽尔", "你好, 伊曼纽尔", "感谢您的来信", "最近怎么样？", "你好吗？", "我希望一切都好", "我很好", "我想告诉你关于 _______", "希望很快能见到你", "此致敬礼"]
         };
 
