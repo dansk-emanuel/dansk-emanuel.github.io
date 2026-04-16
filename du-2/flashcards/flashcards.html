@@ -17,7 +17,7 @@
 
         .container { 
             width: 100%;
-            max-width: 500px; 
+            max-width: 600px; /* Gjort lidt bredere for at give plads til 2 kolonner */
             background: white; 
             padding: 30px; 
             border-radius: 20px; 
@@ -29,19 +29,29 @@
         h1 { color: #5d4037; margin-bottom: 5px; } /* Mørkebrun */
         p { color: #a04000; margin-bottom: 30px; }
 
+        /* NYT: Grid-system til knapper i to kolonner */
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* To lige store kolonner */
+            gap: 15px; /* Mellemrum mellem knapperne */
+            margin-bottom: 20px;
+        }
+
         /* De nye Sunset knapper */
         .menu-btn { 
-            display: block; 
+            display: flex; /* Gør det nemt at centrere tekst */
+            align-items: center;
+            justify-content: center;
             background: #e67e22; /* Varm orange */
             color: white; 
-            padding: 18px; 
-            margin: 15px 0; 
+            padding: 15px 10px; 
             text-decoration: none; 
             border-radius: 15px; 
-            font-size: 1.2rem; 
+            font-size: 1rem; /* Lidt mindre skrift for at passe i kolonner */
             font-weight: bold;
             transition: all 0.2s ease;
             box-shadow: 0 5px 0 #d35400; /* Mørk orange bund */
+            min-height: 60px; /* Sikrer at knapperne er lige høje */
         }
 
         .menu-btn:hover { 
@@ -53,6 +63,13 @@
         .menu-btn:active {
             transform: translateY(3px);
             box-shadow: 0 2px 0 #a04000;
+        }
+
+        /* Mobil-visning: Hvis skærmen er meget lille, går vi tilbage til én kolonne */
+        @media (max-width: 400px) {
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         hr {
@@ -75,14 +92,16 @@
     <h1>Flashcards</h1>
     <p>Vælg et sæt og start din træning</p>
 
-    <a href="mundtlig-test-modul-3.html" class="menu-btn">Mundtlig test modul 3</a>
-    <a href="mundtlig-test-modul-4.html" class="menu-btn">Mundtlig test modul 4</a>
-    <a href="uregelmæssige-adjektiver.html" class="menu-btn">Uregelmæssige adjektiver</a>
-    <a href="konjunktioner.html" class="menu-btn">Vigtige konjunktioner</a>
-    <a href="fokus-4-kapitel-2.html" class="menu-btn">Fokus 4 - Skole og uddannelse</a>
-    <a href="dialog-aftale.html" class="menu-btn">Dialog - aftale</a>
-    <a href="hv-ord.html" class="menu-btn">Hv-ord</a>
-    <a href="præsentation-spørgsmål-svar.html" class="menu-btn">Præsentation - spørgsmål og svar</a>
+    <div class="button-grid">
+        <a href="mundtlig-test-modul-3.html" class="menu-btn">Mundtlig test modul 3</a>
+        <a href="mundtlig-test-modul-4.html" class="menu-btn">Mundtlig test modul 4</a>
+        <a href="uregelmæssige-adjektiver.html" class="menu-btn">Uregelmæssige adjektiver</a>
+        <a href="konjunktioner.html" class="menu-btn">Vigtige konjunktioner</a>
+        <a href="fokus-4-kapitel-2.html" class="menu-btn">Fokus 4 - Uddannelse</a>
+        <a href="dialog-aftale.html" class="menu-btn">Dialog - aftale</a>
+        <a href="hv-ord.html" class="menu-btn">Hv-ord</a>
+        <a href="præsentation-spørgsmål-svar.html" class="menu-btn">Præsentation</a>
+    </div>
     
     <hr>
     
