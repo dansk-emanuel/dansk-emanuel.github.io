@@ -18,8 +18,29 @@
             box-shadow: 0 10px 30px rgba(93, 64, 55, 0.1); 
             text-align: center; border: 1px solid #edbb99;
         }
-        h1 { color: #5d4037; }
-        p { color: #8d6e63; }
+
+        /* Breadcrumb styling */
+        .breadcrumb {
+            text-align: left;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: #8d6e63;
+        }
+        .breadcrumb a {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb span {
+            margin: 0 8px;
+            color: #edbb99;
+        }
+
+        h1 { color: #5d4037; margin-top: 10px; }
+        p { color: #8d6e63; margin-bottom: 30px; }
         
         .menu-btn { 
             display: block; background: #e67e22; color: white; 
@@ -29,20 +50,20 @@
             box-shadow: 0 5px 0 #d35400;
         }
         .menu-btn:hover { background: #d35400; transform: translateY(-2px); box-shadow: 0 7px 0 #a04000; }
-        
-        hr { margin: 30px 0; border: 0; border-top: 2px dashed #edbb99; }
-        .back-link { color: #8d6e63; text-decoration: none; font-weight: bold; }
+        .menu-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #a04000; }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="breadcrumb">
+            <a href="../../index.html">Hjem</a> <span>/</span> 
+            <a href="../du2-modul.html">DU 2 Modul 3-4</a> <span>/</span> Skrivning
+        </div>
+
         <h1>Skrivning</h1>
         <p>Her kan du finde skriveøvelser</p>
 
         <a href="skriv-mail.html" class="menu-btn">Faste vendinger i mails</a>
-
-        <hr>
-        <a href="du2-modul.html" class="back-link">← Tilbage til Modul 3-4</a>
     </div>
 </body>
 </html>
