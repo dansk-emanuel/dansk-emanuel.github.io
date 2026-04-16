@@ -21,7 +21,27 @@
             text-align: center; 
         }
 
-        h1 { color: #d35400; margin-bottom: 25px; }
+        /* Breadcrumb styling */
+        .breadcrumb {
+            text-align: left;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: #8d6e63;
+        }
+        .breadcrumb a {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb span {
+            margin: 0 8px;
+            color: #edbb99;
+        }
+
+        h1 { color: #d35400; margin-bottom: 25px; margin-top: 10px; }
 
         /* Dropdown Styling */
         .category-item { margin-bottom: 15px; text-align: left; }
@@ -84,19 +104,16 @@
 
         .music-link:last-child { border: none; }
         .music-link:hover { color: #e67e22; }
-
-        .back-link { 
-            display: block; 
-            margin-top: 30px; 
-            color: #8d6e63; 
-            text-decoration: none; 
-            font-weight: bold; 
-        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <div class="breadcrumb">
+            <a href="../../index.html">Hjem</a> <span>/</span> 
+            <a href="anbefalinger.html">Anbefalinger</a> <span>/</span> Musik
+        </div>
+
         <h1>Musik</h1>
 
         <div class="category-item">
@@ -104,7 +121,7 @@
             <div class="dropdown-content">
                 <div class="content-inner">
                     <a href="https://www.youtube.com/watch?v=h3Uj6pPI08Q&list=RDh3Uj6pPI08Q&start_radio=1" class="music-link" target="_blank">When Saints Go Machine - Hos Mig Igen (feat. Coco O.)</a>
-                    <a href="https://www.youtube.com/watch?v=2z0pia1wiLY&list=RD2z0pia1wiLY&start_radio=1" class="music-link" target="_blank">Rest in Beats - Fugle Kan Dø"></a>
+                    <a href="https://www.youtube.com/watch?v=2z0pia1wiLY&list=RD2z0pia1wiLY&start_radio=1" class="music-link" target="_blank">Rest in Beats - Fugle Kan Dø</a>
                 </div>
             </div>
         </div>
@@ -128,12 +145,9 @@
                 </div>
             </div>
         </div>
-
-        <a href="anbefalinger.html" class="back-link">← Tilbage til Anbefalinger</a>
     </div>
 
     <script>
-        // Funktion til at åbne/lukke dropdowns
         const dropdowns = document.querySelectorAll(".dropdown-btn");
 
         dropdowns.forEach(btn => {
