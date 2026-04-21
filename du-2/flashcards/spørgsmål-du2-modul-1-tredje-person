@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprog Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flipped {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 font-sans text-gray-900">
+
+    <div id="app" class="w-full max-w-2xl">
+        <!-- Header & Sprogvalg -->
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-bold mb-4">Sprog Flashcards</h1>
+            <div class="bg-white p-4 rounded-xl shadow-sm inline-block w-full">
+                <label for="languageSelect" class="block text-sm font-medium text-gray-700 mb-2">Vælg målsprog:</label>
+                <select id="languageSelect" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                    <!-- Options genereres af JS -->
+                </select>
+            </div>
+        </div>
+
+        <!-- Status & Kort -->
+        <div id="game-container">
+            <div class="flex justify-between items-center mb-4 px-2">
+                <span class="text-sm font-semibold bg-white px-3 py-1 rounded-full shadow-sm">
+                    Kort tilbage: <span id="cards-left">0</span>
+                </span>
+                <button id="reset-btn" class="text-sm text-blue-600 hover:underline">Start forfra</button>
+            </div>
+
+            <!-- Flashcard -->
+            <div class="perspective-1000 w-full h-80 cursor-pointer" id="card-trigger">
+                <div id="card-inner" class="flip-card-inner relative w-full h-full shadow-xl rounded-2xl">
+                    <!-- Forside (Dansk) -->
+                    <div class="flip-card-front absolute inset-0 bg-white rounded-2xl flex items-center justify-center p-8 text-center border border-gray-200">
+                        <p id="danish-text" class="text-2xl md:text-3xl font-medium"></p>
+                    </div>
+                    <!-- Bagside (Målsprog) -->
+                    <div class="flip-card-back absolute inset-0 bg-[#F5F5DC] rounded-2xl flex items-center justify-center p-8 text-center border border-gray-200 text-black">
+                        <p id="target-text" class="text-2xl md:text-3xl font-medium"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kontrolknapper -->
+            <div id="controls" class="mt-8 flex gap-4 justify-center opacity-0 transition-opacity duration-300">
+                <button id="wrong-btn" class="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg transform active:scale-95 transition-all">
+                    Forkert
+                </button>
+                <button id="right-btn" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg transform active:scale-95 transition-all">
+                    Rigtigt
+                </button>
+            </div>
+        </div>
+
+        <!-- Færdig Skærm -->
+        <div id="finish-screen" class="hidden text-center py-12 bg-white rounded-2xl shadow-xl">
+            <div class="text-5xl mb-4">🎉</div>
+            <h2 class="text-3xl font-bold mb-2">Færdig!</h2>
+            <p class="text-gray-600 mb-8">Du har lært alle ordene i denne runde.</p>
+            <button id="restart-btn" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-700 transition-colors">
+                Prøv igen
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Datagrundlag med alle oversættelser
+        const translations = {
+            "Engelsk": ["What is her/his first name?", "What is her/his last name?", "When is her/his birthday?", "Where is she/he from?", "Where does she/he live?", "What is her/his phone number?", "What is her/his email?", "Her/his first name is ____.", "Her/his last name is ____.", "Her/his birthday is on ____________.", "She/he comes from _______.", "She/he lives in _______.", "Her/his phone number is __________.", "Her/his email is ________."],
+            "Bengali": ["তার প্রথম নাম কি?", "তার পদবি কি?", "তার জন্মদিন কবে?", "তিনি কোথা থেকে এসেছেন?", "তিনি কোথায় থাকেন?", "তার ফোন নম্বর কি?", "তার ইমেল কি?", "তার প্রথম নাম হল ____।", "তার পদবি হল ____।", "তার জন্মদিন ____________ তারিখে।", "তিনি _______ থেকে এসেছেন।", "তিনি _______ এ থাকেন।", "তার ফোন নম্বর হল __________।", "তার ইমেল হল ________।"],
+            "Hindi": ["उसका पहला नाम क्या है?", "उसका उपनाम क्या है?", "उसका जन्मदिन कब है?", "वह कहाँ से है?", "वह कहाँ रहता/रहती है?", "उसका फोन नंबर क्या है?", "उसका ईमेल क्या है?", "उसका पहला नाम ____ है।", "उसका उपनाम ____ है।", "उसका जन्मदिन ____________ को है।", "वह _______ से है।", "वह _______ में रहता/रहती है।", "उसका फोन नंबर __________ है।", "उसका ईमेल ________ है।"],
+            "Urdu": ["اس کا پہلا نام کیا ہے؟", "اس کا آخری نام کیا ہے؟", "اس کی سالگرہ کب ہے؟", "وہ کہاں سے ہے؟", "وہ کہاں رہتا/رہتی ہے؟", "اس کا فون نمبر کیا ہے؟", "اس کا ای میل کیا ہے؟", "اس کا پہلا نام ____ ہے۔", "اس کا آخری نام ____ ہے۔", "اس کی سالگرہ ____________ کو ہے۔", "وہ _______ سے ہے۔", "وہ _______ میں رہتا/رہتی ہے۔", "اس کا فون نمبر __________ ہے۔", "اس کا ای میل ________ ہے۔"],
+            "Ukrainsk": ["Як її/його звати (ім'я)?", "Яке її/його прізвище?", "Коли у неї/нього день народження?", "Звідки вона/він?", "Де вона/він живе?", "Який її/його номер телефону?", "Яка її/його електронна адреса?", "Її/його ім'я — ____.", "Її/його прізвище — ____.", "Її/його день народження ____________.", "Вона/він родом із _______.", "Вона/він живе в _______.", "Її/його номер телефону — __________.", "Її/його електронна адреса — ________."],
+            "Russisk": ["Как её/его зовут (имя)?", "Какая её/его фамилия?", "Когда у неё/него день рождения?", "Откуда она/он?", "Где она/он живёт?", "Какой её/его номер телефона?", "Какой её/его адрес электронной почты?", "Её/его имя — ____.", "Её/его фамилия — ____.", "Её/его день рождения ____________.", "Она/он из _______.", "Она/он живёт в _______.", "Её/его номер телефона — __________.", "Её/его адрес электронной почты — ________."],
+            "Persisk": ["نام کوچک او چیست؟", "نام خانوادگی او چیست؟", "تولد او چه زمانی است؟", "او اهل کجاست؟", "او کجا زندگی می‌کند؟", "شماره تلفن او چیست؟", "ایمیل او چیست؟", "نام کوچک او ____ است.", "نام خانوادگی او ____ است.", "تولد او در تاریخ ____________ است.", "او اهل _______ است.", "او در _______ زندگی می‌کند.", "شماره تلفن او __________ است.", "ایمیل او ________ است."],
+            "Tyrkisk": ["Onun adı ne?", "Onun soyadı ne?", "Onun doğum günü ne zaman?", "O nereli?", "O nerede yaşıyor?", "Onun telefon numarası ne?", "Onun e-posta adresi ne?", "Onun adı ____.", "Onun soyadı ____.", "Onun doğum günü ____________ tarihinde.", "O _______'dan geliyor.", "O _______'da yaşıyor.", "Onun telefon numarası __________.", "Onun e-posta adresi ________."],
+            "Kurdisk Kurmanji": ["Navê wê/wî yê pêşî çi ye?", "Paşnavê wê/wî çi ye?", "Rojbûna wê/wî kengî ye?", "Ew ji kuderê ye?", "Ew li kuderê dijî?", "Hejmara telefona wê/wî çi ye?", "E-maila wê/wî çi ye?", "Navê wê/wî yê pêşî ____ e.", "Paşnavê wê/wî ____ e.", "Rojbûna wê/wî di ____________ de ye.", "Ew ji _______ tê.", "Ew li _______ dijî.", "Hejmara telefona wê/wî __________ e.", "E-maila wê/wî ________ e."],
+            "Kurdisk Sorani": ["ناوی یەکەمی چییە؟", "ناوی کۆتایی چییە؟", "ڕۆژی لەدایکبوونی کەییە؟", "خەڵکی کوێیە؟", "لە کوێ دەژی؟", "ژمارەی تەلەفۆنەکەی چییە؟", "ئیمەیڵەکەی چییە؟", "ناوی یەکەمی ____.", "ناوی کۆتایی ____.", "ڕۆژی لەدایکبوونی لە ____________.", "خەڵکی _______.", "لە _______ دەژی.", "ژمارەی تەلەفۆنەکەی __________.", "ئیمەیڵەکەی ________."],
+            "Nepalesisk": ["उसको पहिलो नाम के हो?", "उसको थर के हो?", "उसको जन्मदिन कहिले हो?", "उनी कहाँबाट हुन्?", "उनी कहाँ बस्छन्?", "उसको फोन नम्बर के हो?", "उसको इमेल के हो?", "उसको पहिलो नाम ____ हो।", "उसको थर ____ हो।", "उसको जन्मदिन ____________ मा हो।", "उनी _______ बाट हुन्।", "उनी _______ मा बस्छन्।", "उसको फोन नम्बर __________ हो।", "उसको इमेल ________ हो।"],
+            "Kiswahili": ["Jina lake la kwanza ni nani?", "Jina lake la ukoo ni nani?", "Siku yake ya kuzaliwa ni lini?", "Anatoka wapi?", "Anaishi wapi?", "Namba yake ya simu ni ipi?", "Barua pepe yake ni ipi?", "Jina lake la kwanza ni ____.", "Jina lake la ukoo ni ____.", "Siku yake ya kuzaliwa ni ____________.", "Anatoka _______.", "Anaishi _______.", "Namba yake ya simu ni __________.", "Barua pepe yake ni ________."],
+            "Fransk": ["Quel est son prénom ?", "Quel est son nom de famille ?", "C'est quand son anniversaire ?", "D'où vient-elle/il ?", "Où habite-elle/il ?", "Quel est son numéro de téléphone ?", "Quel est son e-mail ?", "Son prénom est ____.", "Son nom de famille est ____.", "Son anniversaire est le ____________.", "Elle/il vient de _______.", "Elle/il habite à _______.", "Son numéro de téléphone est __________.", "Son e-mail est ________."],
+            "Twi": ["Ne din de bɛn?", "Ne nananom din de bɛn?", "Bere bɛn na wɔwoo no?", "Ofiri he?", "Ɔte he?", "Ne tɛlɛfɔn nɔma de bɛn?", "Ne e-mail de bɛn?", "Ne din de ____.", "Ne nananom din de ____.", "Wɔwoo no ____________.", "Ofiri _______.", "Ɔte _______.", "Ne tɛlɛfɔn nɔma de __________.", "Ne e-mail de ________."],
+            "Bosnisk": ["Kako se ona/on zove (ime)?", "Kako se ona/on preziva?", "Kada joj/mu je rođendan?", "Odakle je ona/on?", "Gdje ona/on živi?", "Koji je njen/njegov broj telefona?", "Koji je njen/njegov e-mail?", "Njeno/njegovo ime je ____.", "Njeno/njegovo prezime je ____.", "Njen/njegov rođendan je ____________.", "Ona/on dolazi iz _______.", "Ona/on živi u _______.", "Njen/njegov broj telefona je __________.", "Njen/njegov e-mail je ________."],
+            "Somali": ["Magaciisa/Magaceeda koowaad waa maxay?", "Naanaystiisa/Naanaysteeda waa maxay?", "Goormuu/Goormay dhashay?", "Xagee buu/bay ka yimid?", "Xagee buu/bay degan yahay?", "Waa maxay lambarkiisa/lambarkeeda telefoonka?", "Waa maxay iimaylkiisa/iimaylkiisu?", "Magaciisa/Magaceeda koowaad waa ____.", "Naanaystiisa/Naanaysteeda waa ____.", "Dhalashadiisu/Dhalashadeedu waa ____________.", "Wuxuu/Waxay ka yimid _______.", "Wuxuu/Waxay degan yahay _______.", "Lambarkiisa/Lambarkeeda telefoonka waa __________.", "Iimaylkiisa/Iimaylkiisu waa ________."],
+            "Serbisk": ["Kako se ona/on zove (ime)?", "Kako se ona/on preziva?", "Kada joj/mu je rođendan?", "Odakle je ona/on?", "Gde ona/on živi?", "Koji je njen/njegov broj telefona?", "Koji je njen/njegov e-mail?", "Njeno/njegovo ime je ____.", "Njeno/njegovo prezime je ____.", "Njen/njegov rođendan je ____________.", "Ona/on dolazi iz _______.", "Ona/on živi u _______.", "Njen/njegov broj telefona je __________.", "Njen/njegov e-mail je ________."],
+            "Tigrinya": ["ሽሙ/ሽማ መን እዩ?", "መጸውዒ ስሙ/ስማ መን እዩ?", "ልደቱ/ልደታ መዓስ እዩ?", "ካበይ መጺኡ/መጺኣ?", "ኣበይ ይነብር/ትነብር?", "ቁጽሪ ተለፎኑ/ተለፎና ክንደይ እዩ?", "ኢመይሉ/ኢመይላ እንታይ እዩ?", "ሽሙ/ሽማ ____ እዩ/እያ።", "መጸውዒ ስሙ/ስማ ____ እዩ/እያ።", "ልደቱ/ልደታ ብ ____________ እዩ።", "ካብ _______ መጺኡ/መጺኣ።", "ኣብ _______ ይነብር/ትነብር።", "ቁጽሪ ተለፎኑ/ተለፎና __________ እዩ/እያ።", "ኢመይሉ/ኢመይላ ________ እዩ/እያ።"],
+            "Mandarin Kinesisk": ["她/他的名字是什么？", "她/他的姓是什么？", "她/他的生日是什么时候？", "她/他来自哪里？", "她/他住在哪里？", "她/他的电话号码是多少？", "她/他的电子邮件是什么？", "她/他的名字是 ____。", "她/他的姓是 ____。", "她/他的生日是 ____________。", "她/他来自 _______。", "她/他住在 _______。", "她/他的电话号码是 __________。", "她/他的电子邮件是 ________。"],
+            "Tadjikisk": ["Номи ӯ чист?", "Насаби ӯ чист?", "Зодрӯзи ӯ кай аст?", "Ӯ аз куҷост?", "Ӯ дар куҷо зиндагӣ мекунад?", "Рақами телефони ӯ чанд аст?", "Почтаи электронии ӯ чист?", "Номи ӯ ____ аст.", "Насаби ӯ ____ аст.", "Зодрӯзи ӯ ____________ аст.", "Ӯ аз _______ аст.", "Ӯ дар _______ зиндагӣ мекунад.", "Рақами телефони ӯ __________ аст.", "Почтаи электронии ӯ ________ аст."]
+        };
+
+        const danishPhrases = [
+            "Hvad er hendes/hans fornavn?",
+            "Hvad er hendes/hans efternavn?",
+            "Hvornår har hun/han fødselsdag?",
+            "Hvor kommer hun/han fra?",
+            "Hvor bor hun/han?",
+            "Hvad er hendes/hans telefonnummer?",
+            "Hvad er hendes/hans e-mail?",
+            "Hendes/hans fornavn er ____.",
+            "Hendes/hans efternavn er ____.",
+            "Hun/han har fødselsdag den ____________.",
+            "Hun/han kommer fra _______.",
+            "Hun/han bor i _______.",
+            "Hans/hendes telefonnummer er __________.",
+            "Hans/hendes e-mail er ________."
+        ];
+
+        // Tilstand
+        let currentDeck = [];
+        let currentCardIndex = 0;
+        let isFlipped = false;
+        let isTransitioning = false;
+        let selectedLang = "Engelsk";
+
+        // Elementer
+        const langSelect = document.getElementById('languageSelect');
+        const cardInner = document.getElementById('card-inner');
+        const cardTrigger = document.getElementById('card-trigger');
+        const danishText = document.getElementById('danish-text');
+        const targetText = document.getElementById('target-text');
+        const controls = document.getElementById('controls');
+        const cardsLeftEl = document.getElementById('cards-left');
+        const gameContainer = document.getElementById('game-container');
+        const finishScreen = document.getElementById('finish-screen');
+        const rightBtn = document.getElementById('right-btn');
+        const wrongBtn = document.getElementById('wrong-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Initialisering
+        function init() {
+            // Fyld sprogvælger
+            Object.keys(translations).forEach(lang => {
+                const opt = document.createElement('option');
+                opt.value = lang;
+                opt.textContent = lang;
+                langSelect.appendChild(opt);
+            });
+
+            startNewGame();
+        }
+
+        function startNewGame() {
+            selectedLang = langSelect.value;
+            // Opret bunke med objekter {da, target}
+            currentDeck = danishPhrases.map((phrase, index) => ({
+                da: phrase,
+                target: translations[selectedLang][index]
+            }));
+            // Shuffle
+            currentDeck.sort(() => Math.random() - 0.5);
+            
+            currentCardIndex = 0;
+            isFlipped = false;
+            isTransitioning = false;
+            
+            gameContainer.classList.remove('hidden');
+            finishScreen.classList.add('hidden');
+            updateCard();
+        }
+
+        function updateCard() {
+            if (currentDeck.length === 0) {
+                showFinishScreen();
+                return;
+            }
+            
+            // Sikr os at vi er inden for rækkevidde
+            if (currentCardIndex >= currentDeck.length) currentCardIndex = 0;
+            
+            const card = currentDeck[currentCardIndex];
+            danishText.textContent = card.da;
+            targetText.textContent = card.target;
+            cardsLeftEl.textContent = currentDeck.length;
+            
+            // Reset visuel tilstand
+            cardInner.classList.remove('flipped');
+            controls.classList.add('opacity-0');
+            controls.style.pointerEvents = 'none';
+            isFlipped = false;
+        }
+
+        function showFinishScreen() {
+            gameContainer.classList.add('hidden');
+            finishScreen.classList.remove('hidden');
+        }
+
+        // Event Listeners
+        cardTrigger.addEventListener('click', () => {
+            if (isTransitioning || isFlipped) return;
+            
+            isFlipped = true;
+            cardInner.classList.add('flipped');
+            
+            // Vis knapper efter animation er næsten færdig
+            setTimeout(() => {
+                controls.classList.remove('opacity-0');
+                controls.style.pointerEvents = 'auto';
+            }, 300);
+        });
+
+        function handleAnswer(isCorrect) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            // 1. Vend tilbage til forsiden
+            cardInner.classList.remove('flipped');
+            controls.classList.add('opacity-0');
+            controls.style.pointerEvents = 'none';
+
+            setTimeout(() => {
+                // 2. Opdater logikken bag kulissen
+                if (isCorrect) {
+                    currentDeck.splice(currentCardIndex, 1);
+                    // Hvis vi slettede det sidste element, hop til start
+                    if (currentCardIndex >= currentDeck.length) currentCardIndex = 0;
+                } else {
+                    // Gå til næste kort i bunken
+                    currentCardIndex = (currentCardIndex + 1) % currentDeck.length;
+                }
+
+                // 3. Opdater tekst og gør klar
+                updateCard();
+                isTransitioning = false;
+            }, 400); // 400ms timing som requested
+        }
+
+        rightBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleAnswer(true);
+        });
+
+        wrongBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleAnswer(false);
+        });
+
+        langSelect.addEventListener('change', startNewGame);
+        restartBtn.addEventListener('click', startNewGame);
+        resetBtn.addEventListener('click', startNewGame);
+
+        // Start appen
+        init();
+    </script>
+</body>
+</html>
