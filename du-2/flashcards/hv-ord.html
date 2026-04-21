@@ -28,41 +28,34 @@
 <body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 font-sans">
 
     <div id="app" class="w-full max-w-md">
-        <!-- Overskrift & Sprogvalg -->
         <header class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800 mb-4">Flashcards</h1>
             <div class="bg-white p-2 rounded-lg shadow-sm border border-gray-200">
                 <label for="language-select" class="block text-xs font-semibold text-gray-500 uppercase mb-1">Vælg målsprog</label>
                 <select id="language-select" class="w-full p-2 bg-transparent border-none focus:ring-0 text-gray-700 font-medium">
-                    <!-- Sprogmuligheder genereres via JS -->
-                </select>
+                    </select>
             </div>
         </header>
 
-        <!-- Status & Spilområde -->
         <div id="game-container">
             <div class="flex justify-between items-center mb-4 px-2">
                 <span id="status-text" class="text-sm font-medium text-gray-600">Kort tilbage: 0</span>
                 <button id="reset-btn" class="text-xs text-blue-600 hover:underline">Start forfra</button>
             </div>
 
-            <!-- 3D Flashcard -->
             <div class="perspective-1000 w-full aspect-[4/3] cursor-pointer group" id="card-trigger">
                 <div id="card-inner" class="flip-card-inner relative w-full h-full shadow-xl rounded-2xl">
                     
-                    <!-- Forside (Dansk) -->
                     <div class="flip-card-front absolute inset-0 bg-white flex items-center justify-center rounded-2xl border-2 border-white">
                         <span id="front-text" class="text-4xl font-bold text-gray-900"></span>
                     </div>
 
-                    <!-- Bagside (Målsprog) -->
                     <div class="flip-card-back absolute inset-0 bg-[#F5F5DC] flex flex-col items-center justify-center rounded-2xl border-2 border-white text-center p-6">
                         <span id="back-text" class="text-3xl font-bold text-gray-900 mb-2"></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Kontrolknapper (Kun synlige når vendt) -->
             <div id="controls" class="mt-8 flex gap-4 opacity-0 pointer-events-none transition-opacity duration-300">
                 <button id="wrong-btn" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition-all">
                     Forkert
@@ -73,7 +66,6 @@
             </div>
         </div>
 
-        <!-- Færdig-skærm -->
         <div id="finish-screen" class="hidden flex flex-col items-center justify-center text-center py-12">
             <div class="text-6xl mb-4">🎉</div>
             <h2 class="text-2xl font-bold text-gray-800 mb-2">Du er færdig!</h2>
@@ -90,42 +82,50 @@
             "Hvad": { 
                 english: "What", bengali: "কি", hindi: "क्या", urdu: "کیا", ukrainian: "Що", russian: "Что", 
                 persian: "چی / چه", turkish: "Ne", kurmanji: "Çi", sorani: "چی", nepali: "के", kiswahili: "Nini", 
-                french: "Quoi / Que", twi: "Ɛdeɛn", bosnian: "Šta", somali: "Maxay", serbian: "Šta", tigrinya: "እንታይ", mandarin: "什么"
+                french: "Quoi / Que", twi: "Ɛdeɛn", bosnian: "Šta", somali: "Maxay", serbian: "Šta", tigrinya: "እንታይ", mandarin: "什么",
+                tajiki: "Чӣ"
             },
             "Hvor": { 
                 english: "Where", bengali: "কোথায়", hindi: "कहाँ", urdu: "کہاں", ukrainian: "Де", russian: "Где", 
                 persian: "کجا", turkish: "Nerede", kurmanji: "Li ku", sorani: "لەکوێ", nepali: "कहाँ", kiswahili: "Wapi", 
-                french: "Où", twi: "Ɛhe", bosnian: "Gdje", somali: "Halkee", serbian: "Gde", tigrinya: "ኣበይ", mandarin: "哪里"
+                french: "Où", twi: "Ɛhe", bosnian: "Gdje", somali: "Halkee", serbian: "Gde", tigrinya: "ኣበይ", mandarin: "哪里",
+                tajiki: "Дар куҷо"
             },
             "Hvordan": { 
                 english: "How", bengali: "কিভাবে", hindi: "कैसे", urdu: "کیسے", ukrainian: "Як", russian: "Как", 
                 persian: "چطور / چگونه", turkish: "Nasıl", kurmanji: "Çawa", sorani: "چۆن", nepali: "कसरी", kiswahili: "Vipi", 
-                french: "Comment", twi: "Ɛsɛn", bosnian: "Kako", somali: "Sidee", serbian: "Kako", tigrinya: "ከመይ", mandarin: "怎么"
+                french: "Comment", twi: "Ɛsɛn", bosnian: "Kako", somali: "Sidee", serbian: "Kako", tigrinya: "ከመይ", mandarin: "怎么",
+                tajiki: "Чӣ тавр"
             },
             "Hvem": { 
                 english: "Who", bengali: "কে", hindi: "कौन", urdu: "کون", ukrainian: "Хто", russian: "Кто", 
                 persian: "کی / چه کسی", turkish: "Kim", kurmanji: "Kî", sorani: "کێ", nepali: "को", kiswahili: "Nani", 
-                french: "Qui", twi: "Hwan", bosnian: "Ko", somali: "Kuma", serbian: "Ko", tigrinya: "መን", mandarin: "谁"
+                french: "Qui", twi: "Hwan", bosnian: "Ko", somali: "Kuma", serbian: "Ko", tigrinya: "መን", mandarin: "谁",
+                tajiki: "Кӣ"
             },
             "Hvilke": { 
                 english: "Which", bengali: "কোনটি", hindi: "कौन सा", urdu: "کون سا", ukrainian: "Які", russian: "Какие", 
                 persian: "کدام", turkish: "Hangi", kurmanji: "Kîjan", sorani: "کام", nepali: "कुन", kiswahili: "Ipi", 
-                french: "Quel / Quels", twi: "Ɛhwee", bosnian: "Koji", somali: "Kuwama", serbian: "Koji", tigrinya: "ኣየኖት", mandarin: "哪个 / 哪些"
+                french: "Quel / Quels", twi: "Ɛhwee", bosnian: "Koji", somali: "Kuwama", serbian: "Koji", tigrinya: "ኣየኖት", mandarin: "哪个 / 哪些",
+                tajiki: "Кадом"
             },
             "Hvad tid": { 
                 english: "What time", bengali: "কয়টা", hindi: "क्या समय", urdu: "کیا وقت", ukrainian: "Котра година", russian: "В какое время", 
                 persian: "چه ساعتی", turkish: "Saat kaçta", kurmanji: "Di çi wextî de", sorani: "چەند", nepali: "कति बजे", kiswahili: "Saa ngapi", 
-                french: "À quelle heure", twi: "Mmere bɛn", bosnian: "U koje vrijeme", somali: "Goormee", serbian: "Koje vreme", tigrinya: "ሰዓት ክንደይ", mandarin: "几点"
+                french: "À quelle heure", twi: "Mmere bɛn", bosnian: "U koje vrijeme", somali: "Goormee", serbian: "Koje vreme", tigrinya: "ሰዓት ክንደይ", mandarin: "几点",
+                tajiki: "Чӣ вақт"
             },
             "Hvornår": { 
                 english: "When", bengali: "কখন", hindi: "कब", urdu: "کب", ukrainian: "Коли", russian: "Когда", 
                 persian: "کی / چه وقت", turkish: "Ne zaman", kurmanji: "Kengî", sorani: "کەی", nepali: "कहिले", kiswahili: "Lini", 
-                french: "Quand", twi: "Bere bɛn", bosnian: "Kada", somali: "Goormaa", serbian: "Kada", tigrinya: "መዓስ", mandarin: "什么时候"
+                french: "Quand", twi: "Bere bɛn", bosnian: "Kada", somali: "Goormaa", serbian: "Kada", tigrinya: "መዓስ", mandarin: "什么时候",
+                tajiki: "Кай"
             },
             "Hvorfor": { 
                 english: "Why", bengali: "কেন", hindi: "क्यों", urdu: "کیوں", ukrainian: "Чому", russian: "Почему", 
                 persian: "چرا", turkish: "Neden / Niçin", kurmanji: "Çima", sorani: "بۆچی", nepali: "किन", kiswahili: "Kwa nini", 
-                french: "Pourquoi", twi: "Adɛn", bosnian: "Zašto", somali: "Maxay", serbian: "Zašto", tigrinya: "ስለምንታይ", mandarin: "为什么"
+                french: "Pourquoi", twi: "Adɛn", bosnian: "Zašto", somali: "Maxay", serbian: "Zašto", tigrinya: "ስለምንታይ", mandarin: "为什么",
+                tajiki: "Чаро"
             }
         };
 
@@ -148,7 +148,8 @@
             { id: "somali", name: "Somali" },
             { id: "serbian", name: "Serbisk" },
             { id: "tigrinya", name: "Tigrinya" },
-            { id: "mandarin", name: "Mandarin Kinesisk" }
+            { id: "mandarin", name: "Mandarin Kinesisk" },
+            { id: "tajiki", name: "Tadsjikisk" }
         ];
 
         // Tilstand
