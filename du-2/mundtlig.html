@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mundtlig - Menu</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #fff9f5; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center;
+        }
+        .container { 
+            width: 100%;
+            max-width: 500px; 
+            background: white; 
+            padding: 40px 30px; 
+            border-radius: 25px; 
+            box-shadow: 0 10px 30px rgba(93, 64, 55, 0.1); 
+            text-align: center;
+            border: 1px solid #edbb99;
+        }
+
+        h1 { color: #5d4037; font-size: 2rem; margin-bottom: 10px; margin-top: 10px; }
+        p { color: #8d6e63; margin-bottom: 30px; }
+
+        .menu-btn { 
+            display: block; 
+            background: #e67e22; 
+            color: white; 
+            padding: 20px; 
+            margin: 15px 0; 
+            text-decoration: none; 
+            border-radius: 15px; 
+            font-size: 1.3rem; 
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 0 #d35400;
+        }
+        .menu-btn:hover { 
+            background: #d35400; 
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #a04000;
+        }
+        .menu-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #a04000;
+        }
+        
+        /* En lille note nederst hvis nødvendigt */
+        .footer-text {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            color: #edbb99;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>Mundtlig</h1>
+        <p>Vælg en øvelse nedenfor</p>
+
+        <a href="program1/program1.html" class="menu-btn">Mundtlig øvelse 1</a>
+        <a href="program2/program2.html" class="menu-btn">Præsentation</a>
+        <a href="program3/program3.html" class="menu-btn">Samtale-træning</a>
+
+        <div class="footer-text">Dansk Uddannelse 2</div>
+    </div>
+</body>
+</html>
