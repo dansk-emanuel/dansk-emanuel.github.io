@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dansk Test: Datid vs. Førnutid</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f9; padding: 20px; color: #333; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        .intro { margin-bottom: 25px; line-height: 1.6; }
+        .question-card { margin-bottom: 25px; padding: 15px; border-bottom: 1px solid #eee; }
+        .question-text { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; }
+        .options { display: flex; gap: 10px; }
+        button { 
+            padding: 10px 20px; border: 2px solid #3498db; background: white; 
+            border-radius: 5px; cursor: pointer; transition: 0.3s; font-size: 1em;
+        }
+        button:hover { background: #3498db; color: white; }
+        .feedback { margin-top: 10px; font-weight: bold; display: none; padding: 10px; border-radius: 5px; }
+        .correct { color: #27ae60; background: #e8f5e9; display: block; }
+        .incorrect { color: #c0392b; background: #fbe9e7; display: block; }
+        #result { text-align: center; font-size: 1.5em; margin-top: 20px; font-weight: bold; color: #2c3e50; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Test: DU2 Modul 3-4</h1>
+    <p class="intro">Vælg den rigtige form af verbet: <strong>Datid</strong> eller <strong>Førnutid</strong>.</p>
+    
+    <div id="quiz"></div>
+    <div id="result"></div>
+</div>
+
+<script>
+    const quizData = [
+        { q: "Jeg ______ en god film i går aftes.", options: ["så", "har set"], correct: 0 },
+        { q: "Jeg ______ her i Danmark i tre år nu.", options: ["boede", "har boet"], correct: 1 },
+        { q: "Han ______ sin cykel i morges.", options: ["reparerede", "har repareret"], correct: 0 },
+        { q: "Vi ______ allerede morgenmad.", options: ["spiste", "har spist"], correct: 1 },
+        { q: "I 2010 ______ de til Odense.", options: ["flyttede", "er flyttet"], correct: 0 },
+        { q: "Jeg ______ aldrig sushi før.", options: ["smagte", "har smagt"], correct: 1 },
+        { q: "Min datter ______ sin eksamen i sidste uge.", options: ["bestod", "har bestået"], correct: 0 },
+        { q: "______ du din mobil? Jeg kan ikke finde den.", options: ["Fandt", "Har fundet"], correct: 1 },
+        { q: "Da jeg var barn, ______ jeg meget fodbold.", options: ["spillede", "har spillet"], correct: 0 },
+        { q: "Vi ______ mange nye ord i denne uge.", options: ["lærte", "har lært"], correct: 1 },
+        { q: "I går ______ det hele dagen.", options: ["regnede", "har regnet"], correct: 0 },
+        { q: "Bussen ______ lige, så vi må vente.", options: ["kørte", "er kørt"], correct: 1 },
+        { q: "Han ______ tysk i skolen for mange år siden.", options: ["læste", "har læst"], correct: 0 },
+        { q: "Jeg ______ min nøgle. Kan du hjælpe mig?", options: ["tabte", "har tabt"], correct: 1 },
+        { q: "Sidste sommer ______ vi til Italien.", options: ["rejste", "er rejst"], correct: 0 },
+        { q: "Hun ______ ikke sin kaffe endnu.", options: ["drak", "har drukket"], correct: 1 },
+        { q: "I morges ______ jeg klokken 7.", options: ["vågnede", "er vågnet"], correct: 0 },
+        { q: "De ______ hinanden i over ti år.", options: ["kendte", "har kendt"], correct: 1 },
+        { q: "For to timer siden ______ jeg en mail.", options: ["sendte", "har sendt"], correct: 0 },
+        { q: "Hvor ______ du hen? Du er her jo ikke.", options: ["gik", "er du gået"], correct: 1 }
+    ];
+
+    let score = 0;
+    const quizContainer = document.getElementById('quiz');
+
+    quizData.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        
+        const text = document.createElement('div');
+        text.className = 'question-text';
+        text.innerText = `${index + 1}. ${item.q}`;
+        card.appendChild(text);
+
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'options';
+
+        item.options.forEach((opt, optIndex) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(index, optIndex, btn, card);
+            optionsDiv.appendChild(btn);
+        });
+
+        card.appendChild(optionsDiv);
+        
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        card.appendChild(feedback);
+        
+        quizContainer.appendChild(card);
+    });
+
+    function checkAnswer(qIdx, choiceIdx, btn, card) {
+        const feedback = card.querySelector('.feedback');
+        const buttons = card.querySelectorAll('button');
+        
+        // Deaktiver knapper efter valg
+        buttons.forEach(b => b.disabled = true);
+
+        if (choiceIdx === quizData[qIdx].correct) {
+            feedback.innerText = "Rigtigt!";
+            feedback.className = "feedback correct";
+            score++;
+        } else {
+            feedback.innerText = "Forkert. Det rigtige svar er: " + quizData[qIdx].options[quizData[qIdx].correct];
+            feedback.className = "feedback incorrect";
+        }
+        
+        updateTotal();
+    }
+
+    function updateTotal() {
+        const res = document.getElementById('result');
+        res.innerText = `Resultat: ${score} ud af ${quizData.length}`;
+    }
+</script>
+
+</body>
+</html>
