@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprog Flashcards</title>
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <style>
+        .perspective-1000 { perspective: 1000px; }
+        .preserve-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .flip-card-inner { transition: transform 0.6s; }
+        .flipped { transform: rotateY(180deg); }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4 font-sans">
+
+    <div id="app" class="w-full max-w-md">
+        <!-- Overskrift & Sprogvalg -->
+        <header class="mb-8 text-center">
+            <h1 class="text-2xl font-bold mb-4 text-gray-800">Flashcards</h1>
+            <select id="languageSelect" class="w-full p-2 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-blue-500">
+                <!-- Sprog bliver indsat her via JS -->
+            </select>
+        </header>
+
+        <!-- Status -->
+        <div id="status" class="mb-4 text-center font-semibold text-gray-600">
+            Kort tilbage: <span id="cardsRemaining">0</span>
+        </div>
+
+        <!-- Flashcard Container -->
+        <div id="cardContainer" class="relative h-64 perspective-1000 cursor-pointer">
+            <div id="cardInner" class="w-full h-full preserve-3d flip-card-inner relative">
+                
+                <!-- Forside (Dansk) -->
+                <div class="absolute inset-0 bg-white border-2 border-gray-200 rounded-xl shadow-xl flex items-center justify-center p-6 backface-hidden">
+                    <p id="danishWord" class="text-3xl font-bold text-gray-800 text-center"></p>
+                </div>
+
+                <!-- Bagside (Målsprog) -->
+                <div class="absolute inset-0 bg-[#F5F5DC] border-2 border-gray-200 rounded-xl shadow-xl flex items-center justify-center p-6 backface-hidden rotate-y-180">
+                    <p id="translatedWord" class="text-2xl font-semibold text-gray-800 text-center"></p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Kontrolknapper -->
+        <div id="controls" class="mt-8 flex justify-between gap-4 opacity-0 transition-opacity duration-300">
+            <button onclick="handleAnswer(false)" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-bold shadow-lg transition">Forkert</button>
+            <button onclick="handleAnswer(true)" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-bold shadow-lg transition">Rigtigt</button>
+        </div>
+
+        <!-- Færdig-skærm -->
+        <div id="doneScreen" class="hidden fixed inset-0 bg-gray-100 flex flex-col items-center justify-center z-50">
+            <h2 class="text-4xl font-bold mb-4 text-green-600">Færdig!</h2>
+            <p class="mb-6 text-gray-600">Du har lært alle ordene i denne runde.</p>
+            <button onclick="resetGame()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-bold transition shadow-lg">Start forfra</button>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            "2. verdenskrig": { "engelsk": "World War II", "bengali": "দ্বিতীয় বিশ্বযুদ্ধ", "hindi": "द्वितीय विश्व युद्ध", "urdu": "دوسری جنگ عظیم", "ukrainsk": "Друга світова війна", "russisk": "Вторая мировая война", "persisk": "جنگ جهانی دوم", "tyrkisk": "II. Dünya Savaşı", "kurdisk kurmanji": "Şerê Cîhanê yê Duyem", "kurdisk sorani": "جەنگی جیهانیی دووەم", "nepalesisk": "दोस्रो विश्वयुद्ध", "kiswahili": "Vita vya Pili vya Dunia", "fransk": "Seconde Guerre mondiale", "twi": "Wiase Akoko kɛseɛ a ɛtɔ so mmienu", "bosnisk": "Drugi svjetski rat", "somali": "Dagaalkii Labaad ee Adduunka", "serbisk": "Други светски рат", "tigrinya": "ካልኣይ ውግእ ዓለም", "mandarin kinesisk": "第二次世界大战", "tadjikisk": "Ҷанги дуюми ҷаҳон", "spansk": "Segunda Guerra Mundial" },
+            "selvstændig": { "engelsk": "independent", "bengali": "স্বাধীন", "hindi": "स्वतंत्र", "urdu": "خود مختار", "ukrainsk": "самостійний, незалежний", "russisk": "самостоятельный, независимый", "persisk": "مستقل", "tyrkisk": "bağımsız", "kurdisk kurmanji": "serbixwe", "kurdisk sorani": "سەربەخۆ", "nepalesisk": "स्वतन्त्र", "kiswahili": "huru", "fransk": "indépendant", "twi": "woatumi ne ho", "bosnisk": "samostalan, nezavisan", "somali": "madax-bannaan", "serbisk": "самосталан, независан", "tigrinya": "ርእሰ-መከላኸሊ, ነጻ", "mandarin kinesisk": "独立的", "tadjikisk": "мустақил", "spansk": "independiente" },
+            "at bestemme": { "engelsk": "to decide, to determine", "bengali": "ঠিক করা, নির্ধারণ করা", "hindi": "तय करना, निर्धारित करना", "urdu": "فیصلہ کرنا", "ukrainsk": "вирішувати", "russisk": "решать, определять", "persisk": "تصمیم گرفتن", "tyrkisk": "karar vermek", "kurdisk kurmanji": "biryar dan", "kurdisk sorani": "بڕیاردان", "nepalesisk": "निर्णय गर्नु", "kiswahili": "kuamua", "fransk": "décider", "twi": "si gyinaeɛ", "bosnisk": "odlučiti", "somali": "go'aamin", "serbisk": "одлучити", "tigrinya": "ምውሳን", "mandarin kinesisk": "决定", "tadjikisk": "қарор додан", "spansk": "decidir" },
+            "fremlægge": { "engelsk": "to present", "bengali": "উপস্থাপন করা", "hindi": "प्रस्तुत करना", "urdu": "پیش کرنا", "ukrainsk": "представляти, викладати", "russisk": "представлять, излагать", "persisk": "ارائه دادن", "tyrkisk": "sunmak", "kurdisk kurmanji": "pêşkêş kirin", "kurdisk sorani": "خستنەڕوو", "nepalesisk": "प्रस्तुत गर्नु", "kiswahili": "kuwasilisha", "fransk": "présenter", "twi": "kyerɛ mu", "bosnisk": "izložiti, prezentirati", "somali": "soo bandhigid", "serbisk": "изложити", "tigrinya": "ምቕራብ", "mandarin kinesisk": "展示, 提出", "tadjikisk": "пешниҳод кардан", "spansk": "presentar" },
+            "at lære udenad": { "engelsk": "to learn by heart, to memorize", "bengali": "মুখস্থ করা", "hindi": "रटना, याद करना", "urdu": "زبانی یاد کرنا", "ukrainsk": "вчити напам'ять", "russisk": "учить наизусть", "persisk": "از بر کردن", "tyrkisk": "ezberlemek", "kurdisk kurmanji": "ezber kirin", "kurdisk sorani": "لەبەرکردن", "nepalesisk": "कण्ठ गर्नु", "kiswahili": "kukariri", "fransk": "apprendre par cœur", "twi": "sua gu w'adwene mu", "bosnisk": "učiti napamet", "somali": "kandidid", "serbisk": "учити напамет", "tigrinya": "ብቓልካ ምፍላጥ", "mandarin kinesisk": "背诵", "tadjikisk": "аз ёд кардан", "spansk": "aprender de memoria" },
+            "at larme": { "engelsk": "to make noise", "bengali": "গোলমাল করা", "hindi": "शोर मचाना", "urdu": "شور کرنا", "ukrainsk": "шуміти", "russisk": "шуметь", "persisk": "سر و صدا کردن", "tyrkisk": "gürültü yapmak", "kurdisk kurmanji": "deng kirin", "kurdisk sorani": "دەنگەدەنگکردن", "nepalesisk": "हल्ला गर्नु", "kiswahili": "piga kelele", "fransk": "faire du bruit", "twi": "yɛ dede", "bosnisk": "bukati, praviti buku", "somali": "buuqid", "serbisk": "правити буку", "tigrinya": "ጫውጫው ምባል", "mandarin kinesisk": "吵闹", "tadjikisk": "ғавғо кардан", "spansk": "hacer ruido" },
+            "hovedstad": { "engelsk": "capital city", "bengali": "রাজধানী", "hindi": "राजधानी", "urdu": "دارالحکومت", "ukrainsk": "столиця", "russisk": "столица", "persisk": "پایتخت", "tyrkisk": "başkent", "kurdisk kurmanji": "paytext", "kurdisk sorani": "پایتەخت", "nepalesisk": "राजधानी", "kiswahili": "mji mkuu", "fransk": "capitale", "twi": "ahenkuro", "bosnisk": "glavni grad", "somali": "magaalo madax", "serbisk": "главни град", "tigrinya": "ርእሰ ከተማ", "mandarin kinesisk": "首都", "tadjikisk": "пойтахт", "spansk": "capital" },
+            "at være skrap": { "engelsk": "to be strict", "bengali": "কঠোর হওয়া", "hindi": "सख्त होना", "urdu": "سخت ہونا", "ukrainsk": "бути суворим", "russisk": "быть строгим", "persisk": "سخت‌گیر بودن", "tyrkisk": "sert olmak, katı olmak", "kurdisk kurmanji": "tund bûn", "kurdisk sorani": "توندوتیژ بوون", "nepalesisk": "कडा हुनु", "kiswahili": "kuwa mkali", "fransk": "être sévère", "twi": "yɛ krakra", "bosnisk": "biti strog", "somali": "adkaansho", "serbisk": "бити строг", "tigrinya": "ትርር ምባል", "mandarin kinesisk": "严厉", "tadjikisk": "сахтгир будан", "spansk": "ser estricto" },
+            "lussing": { "engelsk": "slap in the face", "bengali": "চড়", "hindi": "थप्पड़", "urdu": "تھپڑ", "ukrainsk": "ляпас", "russisk": "пощёчина", "persisk": "سیلی", "tyrkisk": "tokat", "kurdisk kurmanji": "sille", "kurdisk sorani": "زله", "nepalesisk": "थप्पड", "kiswahili": "kofi", "fransk": "gifle", "twi": "asotɔ", "bosnisk": "šamar", "somali": "dharbaaxo", "serbisk": "шамар", "tigrinya": "ጣቕዒት", "mandarin kinesisk": "耳光", "tadjikisk": "сапед", "spansk": "bofetada" },
+            "at rejse sig op": { "engelsk": "to stand up", "bengali": "দাঁড়ানো", "hindi": "खड़े होना", "urdu": "کھڑے ہونا", "ukrainsk": "вставати", "russisk": "вставать", "persisk": "بلند شدن", "tyrkisk": "ayağa kalkmak", "kurdisk kurmanji": "rabûn ser xwe", "kurdisk sorani": "هەستانەوە", "nepalesisk": "उभिनु", "kiswahili": "kusimama", "fransk": "se lever", "twi": "sɔre gyina hɔ", "bosnisk": "ustati", "somali": "istaagid", "serbisk": "устати", "tigrinya": "ምትንሳእ", "mandarin kinesisk": "站起来", "tadjikisk": "бархостан", "spansk": "levantarse" },
+            "at skynde sig": { "engelsk": "to hurry", "bengali": "তাড়াতাড়ি করা", "hindi": "जल्दी करना", "urdu": "جلدی کرنا", "ukrainsk": "поспішати", "russisk": "спешить", "persisk": "عجله کردن", "tyrkisk": "acele etmek", "kurdisk kurmanji": "lez kirin", "kurdisk sorani": "پەلەکردن", "nepalesisk": "हतार गर्नु", "kiswahili": "kufanya haraka", "fransk": "se dépêcher", "twi": "yɛ ntɛm", "bosnisk": "žuriti", "somali": "degdegid", "serbisk": "журити", "tigrinya": "ምቅልጣፍ", "mandarin kinesisk": "赶紧", "tadjikisk": "шитоб карدان", "spansk": "darse prisa" }
+        };
+
+        const languages = Object.keys(translations["2. verdenskrig"]).sort();
+        const danishWords = Object.keys(translations);
+        
+        let deck = [];
+        let currentWordIndex = 0;
+        let isFlipped = false;
+        let isTransitioning = false;
+
+        const langSelect = document.getElementById('languageSelect');
+        const danishText = document.getElementById('danishWord');
+        const translatedText = document.getElementById('translatedWord');
+        const cardInner = document.getElementById('cardInner');
+        const cardContainer = document.getElementById('cardContainer');
+        const controls = document.getElementById('controls');
+        const cardsRemainingSpan = document.getElementById('cardsRemaining');
+        const doneScreen = document.getElementById('doneScreen');
+
+        // Init sprogvalg
+        languages.forEach(lang => {
+            const opt = document.createElement('option');
+            opt.value = lang;
+            opt.textContent = lang.charAt(0).toUpperCase() + lang.slice(1);
+            langSelect.appendChild(opt);
+        });
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function startGame() {
+            deck = shuffle([...danishWords]);
+            currentWordIndex = 0;
+            isFlipped = false;
+            isTransitioning = false;
+            cardInner.classList.remove('flipped');
+            controls.classList.add('opacity-0');
+            doneScreen.classList.add('hidden');
+            updateUI();
+        }
+
+        function updateUI() {
+            if (deck.length === 0) {
+                doneScreen.classList.remove('hidden');
+                return;
+            }
+            danishText.textContent = deck[0];
+            const targetLang = langSelect.value;
+            translatedText.textContent = translations[deck[0]][targetLang];
+            cardsRemainingSpan.textContent = deck.length;
+        }
+
+        cardContainer.addEventListener('click', () => {
+            if (isTransitioning || isFlipped) return;
+            isFlipped = true;
+            cardInner.classList.add('flipped');
+            controls.classList.remove('opacity-0');
+        });
+
+        function handleAnswer(isCorrect) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            const answeredWord = deck.shift();
+            if (!isCorrect) {
+                deck.push(answeredWord); // Tilbage i bunden
+            }
+
+            // Flip tilbage til forsiden
+            cardInner.classList.remove('flipped');
+            controls.classList.add('opacity-0');
+
+            // Vent på animation (400ms) før indhold opdateres
+            setTimeout(() => {
+                isFlipped = false;
+                updateUI();
+                isTransitioning = false;
+            }, 400);
+        }
+
+        function resetGame() {
+            startGame();
+        }
+
+        langSelect.addEventListener('change', () => {
+            if (!isFlipped) {
+                updateUI();
+            }
+        });
+
+        // Start ved load
+        startGame();
+    </script>
+</body>
+</html>
