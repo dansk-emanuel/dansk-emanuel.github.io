@@ -84,19 +84,19 @@
     </div>
 
     <script>
-        // Data Struktur
+        // Data Struktur med tilføjet Thai (th)
         const vocabulary = [
-            { dk: "2. verdenskrig", en: "World War II", bn: "দ্বিতীয় বিশ্বযুদ্ধ", hi: "द्वितीय विश्व युद्ध", ur: "دوسری عالمی جنگ", uk: "Друга світова війна", ru: "Вторая мировая война", fa: "جنگ جهانی دوم", tr: "İkinci Dünya Savaşı", km: "Şerê Cîhanê yê Duyem", so: "Dagaalkii Labaad ee Adduunka", ne: "दोस्रो विश्वयुद्ध", sw: "Vita vya Pili vya Dunia", fr: "Seconde Guerre mondiale", tw: "Wiase Ko a Ɛtɔ so Mmienu", bs: "Drugi svjetski rat", som: "Dagaalkii Labaad ee Adduunka", sr: "Други светски рат", ti: "ካልኣይ ውግእ ዓለም", zh: "第二次世界大战", tg: "Ҷанги дуюми ҷаҳон", es: "Segunda Guerra Mundial" },
-            { dk: "selvstændig", en: "independent", bn: "স্বাধীন", hi: "स्वतंत्र", ur: "آزاد", uk: "незалежний", ru: "независимый", fa: "مستقل", tr: "bağımsız", km: "serbixwe", so: "serbixwe", ne: "स्वतन्त्र", sw: "kujitegemea", fr: "indépendant", tw: "wo ho nso", bs: "samostalan", som: "madax-bannaan", sr: "самосталан", ti: "ነጻ", zh: "独立", tg: "мустақил", es: "independiente" },
-            { dk: "at bestemme", en: "to decide / to determine", bn: "স্থির করা", hi: "तय करना", ur: "فیصلہ کرنا", uk: "вирішувати", ru: "решать", fa: "تصمیم گرفتن", tr: "karar vermek", km: "biryar dan", so: "biryar dan", ne: "निर्णय गर्नु", sw: "kuamua", fr: "décider", tw: "si gyinae", bs: "odlučiti", som: "go'aansasho", sr: "одлучити", ti: "ምውሳን", zh: "决定", tg: "тасмим гирифтан", es: "decidir" },
-            { dk: "fremlægge", en: "to present / to submit", bn: "পেশ করা", hi: "प्रस्तुत करना", ur: "پیش کرنا", uk: "представляти", ru: "представлять", fa: "ارائه دادن", tr: "sunmak", km: "pêşkêş kirin", so: "pêşkêş kirin", ne: "प्रस्तुत गर्नु", sw: "kuwasilisha", fr: "présenter", tw: "da no adi", bs: "izlagati", som: "soo bandhigid", sr: "представити", ti: "ምቕራብ", zh: "陈述 / 展示", tg: "пешниҳод кардан", es: "presentar" },
-            { dk: "at lære udenad", en: "to memorize", bn: "মুখস্থ করা", hi: "कंठस्थ करना", ur: "زبانی یاد کرنا", uk: "вивчати напам'ять", ru: "учить наизусть", fa: "حفظ کردن", tr: "ezberlemek", km: "ezber kirin", so: "ezber kirin", ne: "कण्ठ गर्नु", sw: "kukariri", fr: "apprendre par cœur", tw: "sua ne tiri mu", bs: "učiti napamet", som: "kordahabasho", sr: "учити напамет", ti: "ብቓልካ ምፍላጥ", zh: "背诵", tg: "аз ёд кардан", es: "memorizar" },
-            { dk: "at larme", en: "to make noise", bn: "গোলমাল করা", hi: "शोर मचाना", ur: "شور مچانا", uk: "шуміти", ru: "шуметь", fa: "سر و صدا کردن", tr: "gürültü yapmak", km: "deng kirin", so: "deng kirin", ne: "हल्ला गर्नु", sw: "kupiga kelele", fr: "faire du bruit", tw: "yɛ dede", bs: "praviti buku", som: "buuq samayn", sr: "правити буку", ti: "ጫውጫው ምባል", zh: "吵闹", tg: "ғавғо кардан", es: "hacer ruido" },
-            { dk: "hovedstad", en: "capital city", bn: "রাজধানী", hi: "राजधानी", ur: "دارالحکومت", uk: "столиця", ru: "столица", fa: "پایتخت", tr: "başkent", km: "paytext", so: "paytext", ne: "राजधानी", sw: "mji mkuu", fr: "capitale", tw: "ahenkuro", bs: "glavni grad", som: "magaalo madax", sr: "главни град", ti: "ርእሰ ከተማ", zh: "首都", tg: "пойтахт", es: "capital" },
-            { dk: "at være skrap", en: "to be strict / to be tough", bn: "কঠোর হওয়া", hi: "सख्त होना", ur: "سخت ہونا", uk: "бути суворим", ru: "быть строгим", fa: "سخت‌گیر بودن", tr: "sert olmak", km: "tund bûn", so: "tund bûn", ne: "कडा हुनु", sw: "kuwa mkali", fr: "être sévère", tw: "yɛ denden", bs: "biti strog", som: "ahaan adag", sr: "бити строг", ti: "ጥንኩር ምዃን", zh: "严厉", tg: "сахтгир будан", es: "ser estricto" },
-            { dk: "lussing", en: "slap", bn: "চড়", hi: "थप्पड़", ur: "تھپڑ", uk: "ляпас", ru: "пощечина", fa: "سیلی", tr: "tokat", km: "şeqam", so: "şeqam", ne: "थप्पड", sw: "kofi", fr: "gifle", tw: "asotɔ", bs: "šamar", som: "dharbaaxo", sr: "шамар", ti: "ጣቕዒት", zh: "耳光", tg: "силлӣ", es: "bofetada" },
-            { dk: "at rejse sig op", en: "to stand up", bn: "উঠে দাঁড়ানো", hi: "खड़े होना", ur: "کھڑے ہونا", uk: "підводитися", ru: "вставать", fa: "بلند شدن", tr: "ayağa kalkmak", km: "rabûn ser xwe", so: "rabûn ser xwe", ne: "उठ्नु", sw: "kusimama", fr: "se lever", tw: "sɔre gyina hɔ", bs: "ustati", som: "kacyahay", sr: "устати", ti: "ምትንሳእ", zh: "站起来", tg: "бархостан", es: "levantarse" },
-            { dk: "at skynde sig", en: "to hurry", bn: "তাড়াতাড়ি করা", hi: "जल्दी करना", ur: "جلدی کرنا", uk: "поспішати", ru: "спешить", fa: "عجله کردن", tr: "acele etmek", km: "lez kirin", so: "lez kirin", ne: "हतार गर्नु", sw: "kufanya haraka", fr: "se dépêcher", tw: "yɛ ntɛm", bs: "žuriti", som: "degdegid", sr: "журити", ti: "ምቅልጣፍ", zh: "赶快", tg: "шитоб кардан", es: "darse prisa" }
+            { dk: "2. verdenskrig", en: "World War II", bn: "দ্বিতীয় বিশ্বযুদ্ধ", hi: "द्वितीय विश्व युद्ध", ur: "دوسری عالمی جنگ", uk: "Друга світова війна", ru: "Вторая мировая война", fa: "جنگ جهانی دوم", tr: "İkinci Dünya Savaşı", km: "Şerê Cîhanê yê Duyem", so: "Dagaalkii Labaad ee Adduunka", ne: "दोस्रो विश्वयुद्ध", sw: "Vita vya Pili vya Dunia", fr: "Seconde Guerre mondiale", tw: "Wiase Ko a Ɛtɔ so Mmienu", bs: "Drugi svjetski rat", som: "Dagaalkii Labaad ee Adduunka", sr: "Други светски рат", ti: "ካልኣይ ውግእ ዓለም", zh: "第二次世界大战", tg: "Ҷанги дуюми ҷаҳон", es: "Segunda Guerra Mundial", th: "สงครามโลกครั้งที่สอง" },
+            { dk: "selvstændig", en: "independent", bn: "স্বাধীন", hi: "स्वतंत्र", ur: "آزاد", uk: "незалежний", ru: "независимый", fa: "مستقل", tr: "bağımsız", km: "serbixwe", so: "serbixwe", ne: "स्वतन्त्र", sw: "kujitegemea", fr: "indépendant", tw: "wo ho nso", bs: "samostalan", som: "madax-bannaan", sr: "самосталан", ti: "ነጻ", zh: "独立", tg: "мустақил", es: "independiente", th: "เป็นอิสระ / พึ่งพาตนเอง" },
+            { dk: "at bestemme", en: "to decide / to determine", bn: "স্থির করা", hi: "तย करना", ur: "فیصلہ کرنا", uk: "вирішувати", ru: "решать", fa: "تصمیم گرفتن", tr: "karar vermek", km: "biryar dan", so: "biryar dan", ne: "निर्णय गर्नु", sw: "kuamua", fr: "décider", tw: "si gyinae", bs: "odlučiti", som: "go'aansasho", sr: "одлучити", ti: "ምውሳን", zh: "决定", tg: "тасмим гирифтан", es: "decidir", th: "ตัดสินใจ / กำหนด" },
+            { dk: "fremlægge", en: "to present / to submit", bn: "পেশ করা", hi: "प्रस्तुत करना", ur: "پیش کرنا", uk: "представляти", ru: "представлять", fa: "ارائه دادن", tr: "sunmak", km: "pêşkêş kirin", so: "pêşkêş kirin", ne: "प्रस्तुत गर्नु", sw: "kuwasilisha", fr: "présenter", tw: "da no adi", bs: "izlagati", som: "soo bandhigid", sr: "представити", ti: "ምቕራብ", zh: "陈述 / 展示", tg: "пешниҳод кардан", es: "presentar", th: "นำเสนอ" },
+            { dk: "at lære udenad", en: "to memorize", bn: "মুখস্থ করা", hi: "कंठस्थ करना", ur: "زبانی یاد کرنا", uk: "вивчати напам'ять", ru: "учить наизусть", fa: "حفظ کردن", tr: "ezberlemek", km: "ezber kirin", so: "ezber kirin", ne: "कण्ठ गर्नु", sw: "kukariri", fr: "apprendre par cœur", tw: "sua ne tiri mu", bs: "učiti napamet", som: "kordahabasho", sr: "учити напамет", ti: "ብቓልካ ምፍላጥ", zh: "背诵", tg: "аз ёд кардан", es: "memorizar", th: "ท่องจำ" },
+            { dk: "at larme", en: "to make noise", bn: "গোলমাল করা", hi: "शोर मचाना", ur: "شور مچانا", uk: "шуміти", ru: "шуметь", fa: "سر و صدا کردن", tr: "gürültü yapmak", km: "deng kirin", so: "deng kirin", ne: "हल्ला गर्नु", sw: "kupiga kelele", fr: "faire du bruit", tw: "yɛ dede", bs: "praviti buku", som: "buuq samayn", sr: "правити буку", ti: "ጫውጫው ምባል", zh: "吵闹", tg: "ғавғо кардан", es: "hacer ruido", th: "ทำเสียงดัง" },
+            { dk: "hovedstad", en: "capital city", bn: "রাজধানী", hi: "राजधानी", ur: "دارالحکومت", uk: "столиця", ru: "столица", fa: "پایتخت", tr: "başkent", km: "paytext", so: "paytext", ne: "राजधानी", sw: "mji mkuu", fr: "capitale", tw: "ahenkuro", bs: "glavni grad", som: "magaalo madax", sr: "главни град", ti: "ርእሰ ከተማ", zh: "首都", tg: "пойтахт", es: "capital", th: "เมืองหลวง" },
+            { dk: "at være skrap", en: "to be strict / to be tough", bn: "কঠোর হওয়া", hi: "सख्त होना", ur: "سخت ہونا", uk: "бути суворим", ru: "быть строгим", fa: "سخت‌گیر بودن", tr: "sert olmak", km: "tund bûn", so: "tund bûn", ne: "कडा हुनु", sw: "kuwa mkali", fr: "être sévère", tw: "yɛ denden", bs: "biti strog", som: "ahaan adag", sr: "бити строг", ti: "ጥንኩር ምዃን", zh: "严厉", tg: "сахтгир будан", es: "ser estricto", th: "เข้มงวด / ดุ" },
+            { dk: "lussing", en: "slap", bn: "চড়", hi: "थप्पड़", ur: "تھپڑ", uk: "ляпас", ru: "пощечина", fa: "سیลิ", tr: "tokat", km: "şeqam", so: "şeqam", ne: "थप्पड", sw: "kofi", fr: "gifle", tw: "asotɔ", bs: "šamar", som: "dharbaaxo", sr: "шамар", ti: "ጣቕዒት", zh: "耳光", tg: "силлӣ", es: "bofetada", th: "การตบหน้า" },
+            { dk: "at rejse sig op", en: "to stand up", bn: "উঠে দাঁড়ানো", hi: "खड़े होना", ur: "کھڑے ہونا", uk: "підводитися", ru: "вставать", fa: "بلند شدن", tr: "ayağa kalkmak", km: "rabûn ser xwe", so: "rabûn ser xwe", ne: "उठ्नु", sw: "kusimama", fr: "se lever", tw: "sɔre gyina hɔ", bs: "ustati", som: "kacyahay", sr: "устати", ti: "ምትንሳእ", zh: "站起来", tg: "бархостан", es: "levantarse", th: "ลุกขึ้นยืน" },
+            { dk: "at skynde sig", en: "to hurry", bn: "তাড়াতাড়ি করা", hi: "जल्दी करना", ur: "جلدی کرنا", uk: "поспішати", ru: "спешить", fa: "عجله کردن", tr: "acele etmek", km: "lez kirin", so: "lez kirin", ne: "हतार गर्नु", sw: "kufanya haraka", fr: "se dépêcher", tw: "yɛ ntɛm", bs: "žuriti", som: "degdegid", sr: "журити", ti: "ምቅልጣፍ", zh: "赶快", tg: "шитоб кардан", es: "darse prisa", th: "รีบเร่ง" }
         ];
 
         const languages = [
@@ -109,7 +109,7 @@
             { code: 'fa', name: 'Persisk' },
             { code: 'tr', name: 'Tyrkisk' },
             { code: 'km', name: 'Kurdisk (Kurmanji)' },
-            { code: 'so', name: 'Kurdisk (Sorani)' }, // Vedligeholdt som "so" pga. data matching
+            { code: 'so', name: 'Kurdisk (Sorani)' },
             { code: 'ne', name: 'Nepalesisk' },
             { code: 'sw', name: 'Kiswahili' },
             { code: 'fr', name: 'Fransk' },
@@ -120,7 +120,8 @@
             { code: 'ti', name: 'Tigrinya' },
             { code: 'zh', name: 'Mandarin Kinesisk' },
             { code: 'tg', name: 'Tadjikisk' },
-            { code: 'es', name: 'Spansk' }
+            { code: 'es', name: 'Spansk' },
+            { code: 'th', name: 'Thai' }
         ];
 
         // State
@@ -228,7 +229,7 @@
                     // Fjern fra bunken
                     currentDeck.splice(currentCardIndex, 1);
                 } else {
-                    // Flyt bagerst i bunken (eller bare skift til næste, så man ser det igen senere)
+                    // Flyt bagerst i bunken
                     const item = currentDeck.splice(currentCardIndex, 1)[0];
                     currentDeck.push(item);
                 }
@@ -237,7 +238,6 @@
                 if (currentDeck.length === 0) {
                     finishScreen.classList.remove('hidden');
                 } else {
-                    // Nulstil index hvis vi er nået bunden (selvom vi splicer)
                     if (currentCardIndex >= currentDeck.length) {
                         currentCardIndex = 0;
                     }
