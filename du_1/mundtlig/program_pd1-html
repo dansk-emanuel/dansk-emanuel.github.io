@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smartboard Dansk-Træner (DU1 Modul 3-5)</title>
+    <!-- Tailwind CSS til stilrent og responsivt layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter til nem læsning -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome til flotte ikoner -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none; /* Forhindrer uhensigtsmæssig tekstmarkering på smartboardet under tryk */
+        }
+        /* Smartboard-venlige store skygger og effekter */
+        .smart-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        .active-tab {
+            border-bottom: 4px solid #4f46e5;
+            color: #4f46e5;
+            font-weight: 700;
+        }
+        /* Lykkehjul animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spinning {
+            animation: spin 3s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Top Bar / Navigation -->
+    <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-white text-indigo-600 p-2.5 rounded-full text-2xl font-black">DU1</div>
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tight">Smartboard Dansk-Træner</h1>
+                    <p class="text-xs text-indigo-100">Udviklet til Danskuddannelse 1, Modul 3, 4 og 5 (Hverdag i Danmark)</p>
+                </div>
+            </div>
+            <!-- Menu Knapper til Smartboard -->
+            <nav class="flex flex-wrap gap-2">
+                <button onclick="switchTab('wheel-tab')" id="btn-wheel-tab" class="px-4 py-2 bg-indigo-700 hover:bg-indigo-800 rounded-lg font-bold transition flex items-center gap-2 text-sm md:text-base">
+                    <i class="fa-solid fa-circle-notch"></i> Lykkehjulet
+                </button>
+                <button onclick="switchTab('training-tab')" id="btn-training-tab" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-lg font-bold transition flex items-center gap-2 text-sm md:text-base">
+                    <i class="fa-solid fa-graduation-cap"></i> Spørgsmåls-Træner
+                </button>
+                <button onclick="switchTab('dialogue-tab')" id="btn-dialogue-tab" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-lg font-bold transition flex items-center gap-2 text-sm md:text-base">
+                    <i class="fa-solid fa-comments"></i> Dialog-Spillet
+                </button>
+                <button onclick="switchTab('wordbank-tab')" id="btn-wordbank-tab" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-lg font-bold transition flex items-center gap-2 text-sm md:text-base">
+                    <i class="fa-solid fa-book-open"></i> Visuel Ordbog
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hovedindhold -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col">
+
+        <!-- ALERTS & FEEDBACK OMRÅDE -->
+        <div id="feedback-toast" class="hidden fixed bottom-5 right-5 bg-emerald-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 z-50 transform translate-y-0 transition-all duration-300">
+            <i class="fa-solid fa-circle-check text-2xl"></i>
+            <div>
+                <p class="font-bold">Super flot!</p>
+                <p class="text-sm">Sætningen er helt rigtig.</p>
+            </div>
+        </div>
+
+        <!-- ================= TAB 1: LYKKEHJULET ================= -->
+        <section id="wheel-tab" class="tab-content flex-grow flex flex-col lg:flex-row gap-6">
+            <!-- Venstre: Selve hjulet -->
+            <div class="bg-white p-6 rounded-2xl smart-shadow flex-grow flex flex-col items-center justify-center text-center lg:w-1/2">
+                <h2 class="text-2xl font-black text-indigo-900 mb-2">Hvad skal vi træne nu?</h2>
+                <p class="text-slate-500 mb-6">Tryk på SPIN for at trække et tilfældigt spørgsmål på klassen!</p>
+                
+                <!-- Hjulet grafik -->
+                <div class="relative w-72 h-72 md:w-96 md:h-96 mb-6 flex items-center justify-center">
+                    <!-- Pil der peger på det valgte felt -->
+                    <div class="absolute -top-4 text-red-500 text-4xl z-20 animate-bounce">
+                        <i class="fa-solid fa-caret-down"></i>
+                    </div>
+                    <!-- Hjulet cirkel -->
+                    <div id="wheel" class="w-full h-full rounded-full border-8 border-slate-800 shadow-xl overflow-hidden relative flex items-center justify-center" style="background: conic-gradient(#3b82f6 0% 20%, #ef4444 20% 40%, #10b981 40% 60%, #f59e0b 60% 80%, #8b5cf6 80% 100%);">
+                        <!-- Felt overskrifter (kun visuelt på hjulet) -->
+                        <div class="absolute w-full h-full text-white font-extrabold text-xs md:text-sm pointer-events-none">
+                            <span class="absolute top-12 left-1/2 -translate-x-1/2 rotate-0">Hvad kan du bedst lide?</span>
+                            <span class="absolute right-6 top-1/3 rotate-[72deg]">Hvad synes du om...?</span>
+                            <span class="absolute right-14 bottom-12 rotate-[144deg]">X eller Y?</span>
+                            <span class="absolute left-14 bottom-12 rotate-[216deg]">Forklar det lidt mere...</span>
+                            <span class="absolute left-6 top-1/3 rotate-[288deg]">Fortæl noget mere...</span>
+                        </div>
+                        <div class="w-16 h-16 bg-white rounded-full absolute z-10 shadow-md flex items-center justify-center font-black text-slate-800 border-4 border-slate-800">
+                            DU1
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="spinWheel()" id="spin-button" class="w-full md:w-auto px-12 py-5 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-2xl font-black text-2xl shadow-lg hover:scale-105 active:scale-95 transition-all">
+                    <i class="fa-solid fa-play mr-2"></i> SPIN HJULET!
+                </button>
+            </div>
+
+            <!-- Højre: Spørgsmåls-detaljer (vises når hjulet stopper) -->
+            <div class="bg-indigo-50 p-6 rounded-2xl border-4 border-indigo-200 lg:w-1/2 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-indigo-200 text-indigo-800 text-xs font-bold uppercase px-2.5 py-1 rounded-full">Dagens opgave</span>
+                        <span class="text-slate-400">|</span>
+                        <span class="text-slate-600 font-medium">Plenum-aktivitet</span>
+                    </div>
+                    
+                    <div id="wheel-instruction" class="text-center py-12">
+                        <i class="fa-solid fa-circle-notch text-6xl text-indigo-300 animate-spin mb-4"></i>
+                        <h3 class="text-xl font-bold text-slate-700">Spin hjulet for at starte</h3>
+                        <p class="text-slate-500 text-sm mt-2">Når hjulet stopper, viser vi en opgave, I skal løse sammen på tavlen.</p>
+                    </div>
+
+                    <div id="wheel-result-container" class="hidden space-y-6">
+                        <div class="bg-white p-5 rounded-xl border border-indigo-100 shadow-sm">
+                            <p class="text-xs text-indigo-500 font-bold uppercase mb-1">Struktur der trænes:</p>
+                            <h3 id="result-structure" class="text-2xl font-black text-slate-800"></h3>
+                        </div>
+
+                        <div class="bg-amber-100 border-l-4 border-amber-500 p-4 rounded-r-xl">
+                            <h4 class="font-bold text-amber-900 flex items-center gap-2">
+                                <i class="fa-solid fa-circle-info"></i> Hvad betyder det?
+                            </h4>
+                            <p id="result-meaning" class="text-amber-800 text-sm mt-1"></p>
+                        </div>
+
+                        <!-- Spørgsmåls-kortet der skal besvares -->
+                        <div class="bg-white p-6 rounded-xl border-2 border-dashed border-indigo-300 relative">
+                            <p class="text-xs text-slate-400 font-semibold mb-1">Spørgsmål til klassen:</p>
+                            <p id="result-question" class="text-xl md:text-2xl font-bold text-indigo-900"></p>
+                        </div>
+
+                        <!-- Hjælp til svar -->
+                        <div class="space-y-2">
+                            <p class="text-sm font-bold text-slate-600">Hvordan kan kursisten starte sit svar?</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2" id="result-starters">
+                                <!-- Dynamisk genererede svarskabloner -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="action-footer" class="hidden mt-6 pt-4 border-t border-indigo-100 flex gap-2">
+                    <button onclick="goToSelectedTraining()" class="flex-grow py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-center transition">
+                        Gå til træner <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 2: SPØRGSMÅLS-TRÆNER ================= -->
+        <section id="training-tab" class="tab-content hidden flex-grow flex flex-col gap-6">
+            <!-- Vælg hvilken struktur du vil træne -->
+            <div class="bg-white p-4 rounded-xl shadow-sm flex flex-wrap gap-2 items-center">
+                <span class="font-bold text-sm text-slate-500 mr-2 uppercase">Vælg fokus:</span>
+                <button onclick="selectTraining(1)" id="train-btn-1" class="px-3 py-1.5 rounded-lg text-sm font-bold bg-indigo-100 text-indigo-700 border-2 border-indigo-500">1. Hvad kan du bedst lide?</button>
+                <button onclick="selectTraining(2)" id="train-btn-2" class="px-3 py-1.5 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 border-2 border-transparent hover:bg-slate-200">2. Hvad synes du om...?</button>
+                <button onclick="selectTraining(3)" id="train-btn-3" class="px-3 py-1.5 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 border-2 border-transparent hover:bg-slate-200">3. X eller Y?</button>
+                <button onclick="selectTraining(4)" id="train-btn-4" class="px-3 py-1.5 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 border-2 border-transparent hover:bg-slate-200">4. Forklar mere</button>
+                <button onclick="selectTraining(5)" id="train-btn-5" class="px-3 py-1.5 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 border-2 border-transparent hover:bg-slate-200">5. Fortæl mere</button>
+            </div>
+
+            <!-- Selve trænerområdet -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
+                <!-- Venstre: Spørgsmålet & Forklaringen (5 kolonner) -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    <!-- Spørgsmålskort -->
+                    <div class="bg-white p-6 rounded-2xl smart-shadow relative flex-grow flex flex-col justify-between border-t-8 border-indigo-600">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="bg-indigo-100 text-indigo-800 text-xs font-black uppercase px-2.5 py-1 rounded">Træningstype</span>
+                            </div>
+                            <p class="text-sm text-slate-400 font-bold uppercase">Spørgsmål til kursisten:</p>
+                            <h2 id="training-question-text" class="text-2xl md:text-3xl font-black text-indigo-900 mt-2 mb-4 leading-snug">
+                                Hvad kan du bedst lide i Danmark?
+                            </h2>
+                        </div>
+
+                        <!-- Visuel ledsager (Billede/Emoji-område) -->
+                        <div id="training-visual-box" class="my-4 p-4 bg-slate-50 rounded-xl flex items-center justify-center text-7xl select-none">
+                            🇩🇰
+                        </div>
+
+                        <div class="space-y-2 mt-auto">
+                            <!-- Nyt spørgsmål knap -->
+                            <button onclick="generateNewQuestion()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition">
+                                <i class="fa-solid fa-rotate"></i> Nyt emne / Nyt spørgsmål
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Enkel grammatisk pædagogisk hjælp -->
+                    <div class="bg-amber-50 p-5 rounded-2xl border-l-4 border-amber-500">
+                        <h4 class="font-extrabold text-amber-900 flex items-center gap-2 text-base">
+                            <i class="fa-solid fa-lightbulb"></i> Læreren forklarer på klassen:
+                        </h4>
+                        <p id="training-explanation-text" class="text-amber-800 text-sm mt-2 font-medium">
+                            Når nogen spørger "Hvad kan du bedst lide?", skal du vælge én ting, som er din absolutte favorit.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Højre: Interaktiv Svar-bygger (7 kolonner) -->
+                <div class="lg:col-span-7 flex flex-col gap-4">
+                    <div class="bg-white p-6 rounded-2xl smart-shadow flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xl font-extrabold text-slate-800 mb-2">Puslespil: Byg dit svar på tavlen</h3>
+                            <p class="text-sm text-slate-500 mb-6">Tryk på ordene i bunden i den rigtige rækkefølge for at udfylde de tomme felter.</p>
+
+                            <!-- Den færdige sætning under opbygning -->
+                            <div class="bg-slate-50 p-6 rounded-xl border-2 border-indigo-200 min-h-[120px] flex flex-wrap gap-2 items-center content-center justify-center text-xl md:text-2xl font-bold text-slate-800 shadow-inner">
+                                <div id="sentence-construction-area" class="flex flex-wrap gap-2 items-center justify-center">
+                                    <!-- Her placeres de valgte ord -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ordbrikker der kan vælges imellem -->
+                        <div class="mt-6">
+                            <p class="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">Tryk på ordene:</p>
+                            <div id="word-bricks-container" class="flex flex-wrap gap-2.5 justify-center">
+                                <!-- Dynamisk genererede brikker -->
+                            </div>
+                        </div>
+
+                        <!-- Bund: Handlinger -->
+                        <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between items-center gap-4">
+                            <button onclick="resetSentenceBuilder()" class="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition">
+                                <i class="fa-solid fa-trash-can mr-1"></i> Ryd tavlen
+                            </button>
+                            <button onclick="checkSentenceBuilder()" class="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl transition shadow-md flex items-center gap-2">
+                                <i class="fa-solid fa-check text-xl"></i> Tjek svar!
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: DIALOG-SPILLET ================= -->
+        <section id="dialogue-tab" class="tab-content hidden flex-grow flex flex-col gap-6">
+            <div class="bg-white p-6 rounded-2xl smart-shadow">
+                <div class="max-w-3xl mx-auto text-center mb-8">
+                    <h2 class="text-3xl font-black text-indigo-900">Klasse-dialogen (Rollestrukturer)</h2>
+                    <p class="text-slate-500 mt-2">To kursister kommer op til Smartboardet. Kursist A taler først. Kursist B lytter og stiller de rigtige opfølgende spørgsmål.</p>
+                </div>
+
+                <!-- Trin-indikatorer -->
+                <div class="flex justify-center items-center gap-2 mb-8 max-w-xl mx-auto">
+                    <div id="step-dot-1" class="w-10 h-10 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center">1</div>
+                    <div class="h-1 flex-grow bg-indigo-600" id="step-line-1"></div>
+                    <div id="step-dot-2" class="w-10 h-10 rounded-full bg-slate-200 text-slate-600 font-black flex items-center justify-center">2</div>
+                    <div class="h-1 flex-grow bg-slate-200" id="step-line-2"></div>
+                    <div id="step-dot-3" class="w-10 h-10 rounded-full bg-slate-200 text-slate-600 font-black flex items-center justify-center">3</div>
+                </div>
+
+                <!-- Rollespillets Scener -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+                    
+                    <!-- Venstre: Rolle A (Kursist 1) -->
+                    <div class="bg-blue-50 border-2 border-blue-200 p-6 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Kursist A</span>
+                                <span class="text-slate-500 font-medium">Udsagn</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-blue-900 mb-4">Du skal sige dette på dansk:</h3>
+                            
+                            <div class="bg-white p-5 rounded-xl border border-blue-100 relative min-h-[100px] flex items-center">
+                                <p id="dialogue-statement" class="text-xl font-bold text-slate-800">Jeg spiser meget rugbrød i Danmark.</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-xs text-blue-700 italic">
+                            * Tip: Prøv at udtale ordene så tydeligt som muligt overfor din makker.
+                        </div>
+                    </div>
+
+                    <!-- Højre: Rolle B (Kursist 2) -->
+                    <div class="bg-purple-50 border-2 border-purple-200 p-6 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Kursist B</span>
+                                <span class="text-slate-500 font-medium">Spørgsmål & Svar</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-purple-900 mb-4" id="role-b-title">Din tur! Spørg Kursist A:</h3>
+                            
+                            <!-- Dynamisk indhold baseret på trin -->
+                            <div id="role-b-content" class="space-y-4">
+                                <!-- Trin 1: Vælg det rigtige opfølgende spørgsmål -->
+                                <p class="text-sm font-semibold text-slate-600">Vælg det rigtige spørgsmål til Kursist A:</p>
+                                <div class="space-y-2">
+                                    <button onclick="advanceDialogueStep(2, true)" class="w-full text-left p-4 bg-white hover:bg-purple-100 border border-purple-200 rounded-xl font-bold text-purple-900 transition flex items-center gap-3">
+                                        <i class="fa-regular fa-circle-question text-xl text-purple-500"></i>
+                                        <span>"Du sagde, at du spiser meget rugbrød. Kan du fortælle noget mere om dette?"</span>
+                                    </button>
+                                    <button onclick="advanceDialogueStep(2, false)" class="w-full text-left p-4 bg-white hover:bg-red-50 border border-red-100 rounded-xl font-medium text-slate-600 transition flex items-center gap-3">
+                                        <i class="fa-regular fa-circle-xmark text-xl text-red-400"></i>
+                                        <span>"Hvad kan du bedst lide?" (Passer ikke perfekt til opfølgning)</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-purple-100 flex justify-between items-center">
+                            <button onclick="resetDialogue()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-sm transition">
+                                Genstart samtale
+                            </button>
+                            <button onclick="nextDialogueScenario()" class="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-sm transition">
+                                Næste emne <i class="fa-solid fa-forward ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 4: VISUEL ORDBANK ================= -->
+        <section id="wordbank-tab" class="tab-content hidden flex-grow">
+            <div class="bg-white p-6 rounded-2xl smart-shadow">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-black text-slate-800">Ordbank: Min hverdag i Danmark</h2>
+                    <p class="text-slate-500">Brug disse ord og billeder, når du skal besvare spørgsmålene på klassen.</p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <!-- Kort 1: Sprogskole -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col justify-between hover:scale-105 transition">
+                        <div class="text-5xl mb-3">🏫</div>
+                        <p class="font-extrabold text-slate-800">Sprogskolen</p>
+                        <p class="text-xs text-indigo-600 mt-1">"Jeg lærer dansk"</p>
+                    </div>
+                    <!-- Kort 2: Cykel -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col justify-between hover:scale-105 transition">
+                        <div class="text-5xl mb-3">🚲</div>
+                        <p class="font-extrabold text-slate-800">At cykle</p>
+                        <p class="text-xs text-indigo-600 mt-1">"Jeg cykler på arbejde"</p>
+                    </div>
+                    <!-- Kort 3: Regnvejr -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col justify-between hover:scale-105 transition">
+                        <div class="text-5xl mb-3">🌧️</div>
+                        <p class="font-extrabold text-slate-800">Vejret</p>
+                        <p class="text-xs text-indigo-600 mt-1">"Det regner meget"</p>
+                    </div>
+                    <!-- Kort 4: Rugbrød -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col justify-between hover:scale-105 transition">
+                        <div class="text-5xl mb-3">🍞</div>
+                        <p class="font-extrabold text-slate-800">Rugbrød</p>
+                        <p class="text-xs text-indigo-600 mt-1">"Rugbrød med pålæg"</p>
+                    </div>
+                    <!-- Kort 5: Arbejde -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col justify-between hover:scale-105 transition">
+                        <div class="text-5xl mb-3">💼</div>
+                        <p class="font-extrabold text-slate-800">Arbejde</p>
+                        <p class="text-xs text-indigo-600 mt-1">"Jeg vil have et job"</p>
+                    </div>
+                    <!-- Kort 6: Familie -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col justify-between hover:scale-105 transition">
+                        <div class="text-5xl mb-3">👨‍👩‍👧‍👦</div>
+                        <p class="font-extrabold text-slate-800">Familie</p>
+                        <p class="text-xs text-indigo-600 mt-1">"Mine børn går i skole"</p>
+                    </div>
+                    <!-- Kort 7: Fritid -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col justify-between hover:scale-105 transition">
+                        <div class="text-5xl mb-3">🌳</div>
+                        <p class="font-extrabold text-slate-800">Fritid</p>
+                        <p class="text-xs text-indigo-600 mt-1">"Jeg går en tur i parken"</p>
+                    </div>
+                    <!-- Kort 8: Bus -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col justify-between hover:scale-105 transition">
+                        <div class="text-5xl mb-3">🚌</div>
+                        <p class="font-extrabold text-slate-800">Bus</p>
+                        <p class="text-xs text-indigo-600 mt-1">"Jeg tager bussen"</p>
+                    </div>
+                    <!-- Kort 9: Netto / Handle -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col justify-between hover:scale-105 transition">
+                        <div class="text-5xl mb-3">🛒</div>
+                        <p class="font-extrabold text-slate-800">Indkøb</p>
+                        <p class="text-xs text-indigo-600 mt-1">"Jeg køber mad i Netto"</p>
+                    </div>
+                    <!-- Kort 10: Hygge -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col justify-between hover:scale-105 transition">
+                        <div class="text-5xl mb-3">🕯️</div>
+                        <p class="font-extrabold text-slate-800">Hygge</p>
+                        <p class="text-xs text-indigo-600 mt-1">"Dansk hygge med kaffe"</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bund/Footer med anvisninger til læreren -->
+    <footer class="bg-slate-800 text-slate-400 py-6 px-4 border-t border-slate-700 text-center text-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+            <p>© 2026 - Smartboard-ressource til Danskuddannelse 1 (Modul 3-5). Fri afbenyttelse.</p>
+        </div>
+    </footer>
+
+    <!-- JS LOGIK FOR HELE APPEN -->
+    <script>
+        // Global State
+        let currentActiveTab = 'wheel-tab';
+        let selectedStructureIndex = 1; // 1-5
+        let currentTargetQuestion = "";
+        let currentCorrectSentence = [];
+        let userConstructedSentence = [];
+
+        // De 5 centrale strukturer og deres forklaringer og svarskabeloner
+        const structuresData = {
+            1: {
+                title: "Hvad kan du bedst lide?",
+                meaning: "Du skal fortælle om din absolutte favorit eller bedste ting. Du skal kun vælge én ting.",
+                questions: [
+                    { q: "Hvad kan du bedst lide ved Danmark?", visual: "🇩🇰", puzzle: ["Jeg", "kan", "bedst", "lide", "naturen", "i", "Danmark"], alternatives: ["og", "ikke", "meget"] },
+                    { q: "Hvad kan du bedst lide at spise til frokost?", visual: "🥪", puzzle: ["Jeg", "kan", "bedst", "lide", "rugbrød", "med", "ost"], alternatives: ["bussen", "læse", "arbejde"] },
+                    { q: "Hvad kan du bedst lide at lave i weekenden?", visual: "🌳", puzzle: ["Jeg", "kan", "bedst", "lide", "at", "gå", "en", "tur"], alternatives: ["regner", "svært", "meget"] }
+                ],
+                starters: ["Jeg kan bedst lide...", "Min yndlings... er..."]
+            },
+            2: {
+                title: "Hvad synes du om...?",
+                meaning: "Man spørger efter din mening eller holdning. Det kan være godt, svært, hyggeligt eller mærkeligt.",
+                questions: [
+                    { q: "Hvad synes du om sprogskolen?", visual: "🏫", puzzle: ["Jeg", "synes", "at", "lærerne", "er", "meget", "søde"], alternatives: ["cykler", "regner", "sove"] },
+                    { q: "Hvad synes du om hverdagen i Danmark?", visual: "📅", puzzle: ["Jeg", "synes", "hverdagen", "er", "meget", "travl"], alternatives: ["kaffe", "gået", "rugbrød"] },
+                    { q: "Hvad synes du om vejret i Danmark?", visual: "🌧️", puzzle: ["Jeg", "synes", "at", "det", "regner", "for", "meget"], alternatives: ["glad", "bussen", "læse"] }
+                ],
+                starters: ["Jeg synes, at...", "Jeg synes, det er..."]
+            },
+            3: {
+                title: "Kan du bedst lide X eller Y?",
+                meaning: "Du får to muligheder. Du skal vælge én af dem og sige hvorfor.",
+                questions: [
+                    { q: "Kan du bedst lide sommer eller vinter?", visual: "☀️❄️", puzzle: ["Jeg", "kan", "bedst", "lide", "sommer", "fordi", "det", "er", "varmt"], alternatives: ["regn", "bussen", "svært"] },
+                    { q: "Kan du bedst lide at cykle eller at tage bussen?", visual: "🚲🚌", puzzle: ["Jeg", "kan", "bedst", "lide", "at", "cykle", "fordi", "det", "er", "sundt"], alternatives: ["vinter", "rugbrød", "skole"] },
+                    { q: "Kan du bedst lide kaffe eller te?", visual: "☕🍵", puzzle: ["Jeg", "kan", "bedst", "lide", "kaffe", "om", "morgenen"], alternatives: ["regnvejr", "arbejde", "svært"] }
+                ],
+                starters: ["Jeg kan bedst lide... fordi...", "Jeg kan ikke lide... så jeg vælger..."]
+            },
+            4: {
+                title: "Du sagde, at... Det forstod jeg ikke helt. Vil du forklare det lidt mere?",
+                meaning: "Når en samtalepartner ikke forstår dig. Du skal sige det samme igen, men med andre ord eller give et eksempel.",
+                questions: [
+                    { q: "Du sagde, at du ikke kan lide rugbrød. Vil du forklare det lidt mere?", visual: "❓", puzzle: ["Ja", "det", "er", "fordi", "det", "smager", "meget", "surt"], alternatives: ["bussen", "solskin", "arbejde"] },
+                    { q: "Du sagde, at sprogskolen er svær. Vil du forklare det lidt mere?", visual: "🏫❓", puzzle: ["Ja", "vi", "skal", "lære", "mange", "nye", "ord"], alternatives: ["te", "cykle", "rugbrød"] }
+                ],
+                starters: ["Det betyder, at...", "Ja, fordi..."]
+            },
+            5: {
+                title: "Du sagde, at... Kan du fortælle noget mere om dette?",
+                meaning: "Din samtalepartner vil gerne vide mere og er nysgerrig. Du skal give ekstra information om emnet.",
+                questions: [
+                    { q: "Du sagde, at du cykler hver dag. Kan du fortælle noget more om det?", visual: "🚲", puzzle: ["Ja", "jeg", "cykler", "ti", "kilometer", "til", "mit", "arbejde"], alternatives: ["kaffe", "regnvejr", "surt"] },
+                    { q: "Du sagde, at du boede i Italien før. Kan du fortælle noget mere om det?", visual: "🇮🇹", puzzle: ["Ja", "jeg", "boede", "der", "i", "tre", "år", "med", "min", "familie"], alternatives: ["regner", "lærer", "surt"] }
+                ],
+                starters: ["Ja, jeg kan fortælle, at...", "Ja, for eksempel..."]
+            }
+        };
+
+        // Dialog scenarier
+        const dialogueScenarios = [
+            {
+                statement: "Jeg cykler altid til sprogskole, selvom det regner.",
+                correctQuestion: "Du sagde, at du cykler i regnvejr. Vil du forklare, hvorfor du gør det?",
+                incorrectQuestion: "Kan du bedst lide solskin eller regnvejr?",
+                correctReply: "Ja, det er fordi jeg ikke har en bil, og bussen er for dyr.",
+                topic: "Cykling"
+            },
+            {
+                statement: "Min familie og jeg spiser sjældent dansk mad.",
+                correctQuestion: "Du sagde, at I sjældent spiser dansk mad. Kan du fortælle noget mere om, hvad I så spiser?",
+                incorrectQuestion: "Hvad kan du bedst lide ved Danmark?",
+                correctReply: "Ja, vi spiser mest ris, grøntsager og krydret kylling fra mit hjemland.",
+                topic: "Madvaner"
+            },
+            {
+                statement: "Jeg synes, det er meget svært at forstå danskere på gaden.",
+                correctQuestion: "Du sagde, det er svært at forstå folk. Kan du forklare lidt mere om, hvorfor det er svært?",
+                incorrectQuestion: "Synes du godt om danskere på gaden?",
+                correctReply: "Ja, de taler rigtig hurtigt, og de udtaler ikke alle bogstaverne.",
+                topic: "Dansk sprog"
+            }
+        ];
+        let currentDialogueIndex = 0;
+        let dialogueStep = 1; // 1: Vælg opfølgende spørgsmål, 2: Svar
+
+        // Skift tab navigation
+        function switchTab(tabId) {
+            currentActiveTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Opdater knap-farver
+            const navButtons = ['wheel-tab', 'training-tab', 'dialogue-tab', 'wordbank-tab'];
+            navButtons.forEach(btn => {
+                const element = document.getElementById(`btn-${btn}`);
+                if (btn === tabId) {
+                    element.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+                    element.classList.add('bg-indigo-800', 'ring-4', 'ring-indigo-300');
+                } else {
+                    element.classList.remove('bg-indigo-800', 'ring-4', 'ring-indigo-300');
+                    element.classList.add('bg-indigo-500', 'hover:bg-indigo-600');
+                }
+            });
+
+            // Initialiser indhold baseret på tab
+            if (tabId === 'training-tab') {
+                selectTraining(selectedStructureIndex);
+            } else if (tabId === 'dialogue-tab') {
+                resetDialogue();
+            }
+        }
+
+        // Lykkehjul Logik
+        function spinWheel() {
+            const wheel = document.getElementById('wheel');
+            const btn = document.getElementById('spin-button');
+            
+            btn.disabled = true;
+            btn.innerText = "SPINNER...";
+            
+            // Tilføj animation
+            wheel.classList.remove('spinning');
+            // Force reflow
+            void wheel.offsetWidth; 
+            
+            // Generer en tilfældig rotation og tilføj klassen
+            const randomRotation = Math.floor(Math.random() * 360) + 1440; // mindst 4 omgange
+            wheel.style.transform = `rotate(${randomRotation}deg)`;
+            wheel.classList.add('spinning');
+
+            const normalizedAngle = (360 - (randomRotation % 360)) % 360;
+            let resultIndex = Math.floor(normalizedAngle / 72) + 1;
+            if (resultIndex > 5) resultIndex = 5;
+
+            setTimeout(() => {
+                showWheelResult(resultIndex);
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-play mr-2"></i> SPIN HJULET!`;
+            }, 3000);
+        }
+
+        function showWheelResult(index) {
+            selectedStructureIndex = index;
+            const data = structuresData[index];
+            
+            const randomQ = data.questions[Math.floor(Math.random() * data.questions.length)];
+            currentTargetQuestion = randomQ.q;
+
+            document.getElementById('wheel-instruction').classList.add('hidden');
+            const resultBox = document.getElementById('wheel-result-container');
+            resultBox.classList.remove('hidden');
+
+            document.getElementById('result-structure').innerText = data.title;
+            document.getElementById('result-meaning').innerText = data.meaning;
+            document.getElementById('result-question').innerText = randomQ.q;
+
+            // Byg startere uden klik-opkald til lyd
+            const startersContainer = document.getElementById('result-starters');
+            startersContainer.innerHTML = '';
+            data.starters.forEach(starter => {
+                const starterBtn = document.createElement('button');
+                starterBtn.className = "p-3 bg-white border border-indigo-200 rounded-lg text-indigo-700 text-sm font-bold shadow-sm text-left flex items-center justify-between pointer-events-none";
+                starterBtn.innerHTML = `<span>"${starter}"</span>`;
+                startersContainer.appendChild(starterBtn);
+            });
+
+            document.getElementById('action-footer').classList.remove('hidden');
+        }
+
+        function goToSelectedTraining() {
+            switchTab('training-tab');
+        }
+
+        // Spørgsmåls-Træner Logik
+        let activeQuestionObj = null;
+
+        function selectTraining(index) {
+            selectedStructureIndex = index;
+            
+            // Opdater knap-visuel
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`train-btn-${i}`);
+                if (i === index) {
+                    btn.className = "px-3 py-1.5 rounded-lg text-sm font-bold bg-indigo-600 text-white border-2 border-indigo-600";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-lg text-sm font-bold bg-slate-100 text-slate-700 border-2 border-transparent hover:bg-slate-200";
+                }
+            }
+
+            const data = structuresData[index];
+            document.getElementById('training-explanation-text').innerText = data.meaning;
+
+            generateNewQuestion();
+        }
+
+        function generateNewQuestion() {
+            const data = structuresData[selectedStructureIndex];
+            let qObj = data.questions[Math.floor(Math.random() * data.questions.length)];
+            
+            activeQuestionObj = qObj;
+            document.getElementById('training-question-text').innerText = qObj.q;
+            document.getElementById('training-visual-box').innerText = qObj.visual || "🇩🇰";
+
+            setupSentenceBuilder(qObj);
+        }
+
+        // Puslespils Sætnings-bygger
+        function setupSentenceBuilder(questionObj) {
+            currentCorrectSentence = [...questionObj.puzzle];
+            userConstructedSentence = [];
+
+            let allBricks = [...questionObj.puzzle, ...questionObj.alternatives];
+            
+            // Bland brikkerne
+            for (let i = allBricks.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allBricks[i], allBricks[j]] = [allBricks[j], allBricks[i]];
+            }
+
+            renderConstructionArea();
+            renderWordBricks(allBricks);
+        }
+
+        function renderWordBricks(bricks) {
+            const container = document.getElementById('word-bricks-container');
+            container.innerHTML = '';
+
+            bricks.forEach((word) => {
+                const btn = document.createElement('button');
+                btn.className = "px-5 py-3.5 bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-200 text-indigo-900 border-2 border-indigo-200 rounded-xl text-lg md:text-xl font-bold shadow-sm transition active:scale-95";
+                btn.innerText = word;
+                btn.onclick = () => addWordToSentence(word, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function addWordToSentence(word, brickElement) {
+            userConstructedSentence.push(word);
+            renderConstructionArea();
+            
+            brickElement.classList.add('opacity-40', 'pointer-events-none');
+            brickElement.id = `brick-${word}-${userConstructedSentence.length}`;
+        }
+
+        function renderConstructionArea() {
+            const area = document.getElementById('sentence-construction-area');
+            area.innerHTML = '';
+
+            if (userConstructedSentence.length === 0) {
+                area.innerHTML = '<span class="text-slate-400 italic font-medium">Tryk på ordene herunder for at svare...</span>';
+                return;
+            }
+
+            userConstructedSentence.forEach((word, index) => {
+                const span = document.createElement('span');
+                span.className = "inline-flex items-center gap-1 px-3 py-1.5 bg-white border-2 border-indigo-400 rounded-lg shadow-sm text-indigo-900 font-extrabold cursor-pointer hover:bg-red-50 hover:border-red-400 transition";
+                span.innerHTML = `${word} <i class="fa-solid fa-circle-xmark text-slate-300 hover:text-red-500 text-sm"></i>`;
+                span.onclick = () => removeWordFromSentence(index);
+                area.appendChild(span);
+            });
+        }
+
+        function removeWordFromSentence(index) {
+            const removedWord = userConstructedSentence[index];
+            userConstructedSentence.splice(index, 1);
+            renderConstructionArea();
+
+            const bricks = document.getElementById('word-bricks-container').children;
+            for (let brick of bricks) {
+                if (brick.innerText === removedWord && brick.classList.contains('opacity-40')) {
+                    brick.classList.remove('opacity-40', 'pointer-events-none');
+                    break;
+                }
+            }
+        }
+
+        function resetSentenceBuilder() {
+            if (activeQuestionObj) {
+                setupSentenceBuilder(activeQuestionObj);
+            }
+        }
+
+        function checkSentenceBuilder() {
+            const userString = userConstructedSentence.join(' ');
+            const correctString = currentCorrectSentence.join(' ');
+
+            if (userString === correctString) {
+                showToast(true);
+            } else {
+                showToast(false);
+            }
+        }
+
+        function showToast(isCorrect) {
+            const toast = document.getElementById('feedback-toast');
+            toast.classList.remove('hidden');
+            
+            if (isCorrect) {
+                toast.className = "fixed bottom-5 right-5 bg-emerald-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 z-50 transform translate-y-0 transition-all duration-300";
+                toast.innerHTML = `<i class="fa-solid fa-circle-check text-2xl"></i>
+                                   <div>
+                                       <p class="font-bold">Super flot!</p>
+                                       <p class="text-sm">Sætningen er helt rigtig.</p>
+                                   </div>`;
+            } else {
+                toast.className = "fixed bottom-5 right-5 bg-rose-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 z-50 transform translate-y-0 transition-all duration-300";
+                toast.innerHTML = `<i class="fa-solid fa-circle-xmark text-2xl"></i>
+                                   <div>
+                                       <p class="font-bold">Ikke helt rigtigt...</p>
+                                       <p class="text-sm">Prøv en anden rækkefølge eller ryd tavlen.</p>
+                                   </div>`;
+            }
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+
+        // Dialog-spillet Logik
+        function resetDialogue() {
+            dialogueStep = 1;
+            updateDialogueUI();
+        }
+
+        function nextDialogueScenario() {
+            currentDialogueIndex = (currentDialogueIndex + 1) % dialogueScenarios.length;
+            resetDialogue();
+        }
+
+        function updateDialogueUI() {
+            const scenario = dialogueScenarios[currentDialogueIndex];
+            
+            document.getElementById('dialogue-statement').innerText = scenario.statement;
+
+            const dot1 = document.getElementById('step-dot-1');
+            const dot2 = document.getElementById('step-dot-2');
+            const dot3 = document.getElementById('step-dot-3');
+            const line1 = document.getElementById('step-line-1');
+            const line2 = document.getElementById('step-line-2');
+
+            dot1.className = "w-10 h-10 rounded-full font-black flex items-center justify-center " + (dialogueStep >= 1 ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-600");
+            dot2.className = "w-10 h-10 rounded-full font-black flex items-center justify-center " + (dialogueStep >= 2 ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-600");
+            dot3.className = "w-10 h-10 rounded-full font-black flex items-center justify-center " + (dialogueStep >= 3 ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-600");
+            
+            line1.className = "h-1 flex-grow " + (dialogueStep >= 2 ? "bg-indigo-600" : "bg-slate-200");
+            line2.className = "h-1 flex-grow " + (dialogueStep >= 3 ? "bg-indigo-600" : "bg-slate-200");
+
+            const containerB = document.getElementById('role-b-content');
+            const titleB = document.getElementById('role-b-title');
+
+            if (dialogueStep === 1) {
+                titleB.innerText = "Din tur! Spørg Kursist A:";
+                containerB.innerHTML = `
+                    <p class="text-sm font-semibold text-slate-600">Vælg det rigtige opfølgende spørgsmål til Kursist A:</p>
+                    <div class="space-y-2">
+                        <button onclick="advanceDialogueStep(2, true)" class="w-full text-left p-4 bg-white hover:bg-purple-100 border border-purple-200 rounded-xl font-bold text-purple-900 transition flex items-center gap-3">
+                            <i class="fa-regular fa-circle-question text-xl text-purple-500"></i>
+                            <span>"${scenario.correctQuestion}"</span>
+                        </button>
+                        <button onclick="advanceDialogueStep(2, false)" class="w-full text-left p-4 bg-white hover:bg-red-50 border border-red-100 rounded-xl font-medium text-slate-600 transition flex items-center gap-3">
+                            <i class="fa-regular fa-circle-xmark text-xl text-red-400"></i>
+                            <span>"${scenario.incorrectQuestion}"</span>
+                        </button>
+                    </div>
+                `;
+            } else if (dialogueStep === 2) {
+                titleB.innerText = "Godt spurgt! Kursist A svarer:";
+                containerB.innerHTML = `
+                    <p class="text-sm font-semibold text-slate-600">Nu skal Kursist A svare med dette:</p>
+                    <div class="bg-white p-5 rounded-xl border border-indigo-100 relative min-h-[100px] flex items-center">
+                        <p class="text-lg font-bold text-slate-800">"${scenario.correctReply}"</p>
+                    </div>
+                    <button onclick="advanceDialogueStep(3, true)" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl mt-4">
+                        Afslut dialogen <i class="fa-solid fa-check ml-1"></i>
+                    </button>
+                `;
+            } else if (dialogueStep === 3) {
+                titleB.innerText = "Super godt klaret!";
+                containerB.innerHTML = `
+                    <div class="text-center py-6">
+                        <i class="fa-solid fa-face-smile text-6xl text-emerald-500 mb-3"></i>
+                        <h4 class="text-xl font-bold text-slate-800">I har gennemført dialogen!</h4>
+                        <p class="text-slate-500 text-sm mt-1">I forstod hinanden, stillede opfølgende spørgsmål og uddybede svaret.</p>
+                        <button onclick="nextDialogueScenario()" class="mt-4 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-sm transition">
+                            Prøv et nyt emne
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function advanceDialogueStep(nextStep, isCorrect) {
+            if (dialogueStep === 1 && !isCorrect) {
+                showToast(false);
+                return;
+            }
+
+            if (dialogueStep === 1 && isCorrect) {
+                showToast(true);
+            }
+
+            dialogueStep = nextStep;
+            updateDialogueUI();
+        }
+
+        // Kør på load
+        window.onload = function() {
+            switchTab('wheel-tab');
+        }
+    </script>
+</body>
+</html>
