@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards - Sunset Warmth</title>
+    <style>
+        /* Sunset Warmth Farvetema */
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #fff9f5; /* Lys sandfarve */
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center;
+        }
+
+        .container { 
+            width: 100%;
+            max-width: 600px; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(93, 64, 55, 0.1); 
+            text-align: center;
+            border: 1px solid #edbb99;
+        }
+
+        /* Breadcrumb styling */
+        .breadcrumb {
+            text-align: left;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: #8d6e63;
+        }
+        .breadcrumb a {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb span {
+            margin: 0 8px;
+            color: #edbb99;
+        }
+
+        h1 { color: #5d4037; margin-bottom: 5px; margin-top: 10px; } 
+        p { color: #a04000; margin-bottom: 30px; }
+
+        /* Grid-system til knapper i to kolonner */
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+            margin-bottom: 10px;
+        }
+
+        /* De nye Sunset knapper */
+        .menu-btn { 
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+            background: #e67e22; 
+            color: white; 
+            padding: 15px 10px; 
+            text-decoration: none; 
+            border-radius: 15px; 
+            font-size: 1rem; 
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 0 #d35400; 
+            min-height: 60px; 
+        }
+
+        .menu-btn:hover { 
+            background: #d35400; 
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #a04000;
+        }
+
+        .menu-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #a04000;
+        }
+
+        /* Mobil-visning */
+        @media (max-width: 400px) {
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="breadcrumb">
+        <a href="../../index.html">Hjem</a> <span>/</span> 
+        <a href="../du_1/mundtlig.html">DU 2 Modul 3-4</a> <span>/</span> Mundtlig
+    </div>
+
+    <h1>Flashcards</h1>
+    <p>Vælg et sæt og start din træning</p>
+
+    <div class="button-grid">
+        <a href="du_1/mundtlig/program_pd1.html" class="menu-btn">PD1 mundtlig</a>
+    </div>
+</div>
+
+</body>
+</html>
