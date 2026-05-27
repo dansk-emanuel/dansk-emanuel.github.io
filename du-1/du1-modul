@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DU-1 - Modul 3-5</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #fff9f5; 
+            margin: 0; padding: 20px; 
+            display: flex; align-items: center; justify-content: center; 
+            min-height: 100vh;
+        }
+
+        .main-card { 
+            width: 100%;
+            max-width: 450px; 
+            background: white; 
+            padding: 40px 20px; 
+            border-radius: 30px; 
+            box-shadow: 0 15px 35px rgba(93, 64, 55, 0.1); 
+            text-align: center;
+            border: 1px solid #edbb99;
+        }
+
+        .logo-area { font-size: 3rem; margin-bottom: 10px; }
+        h1 { color: #5d4037; font-size: 1.8rem; margin: 5px 0; }
+        .welcome-p { color: #8d6e63; margin-bottom: 30px; }
+
+        /* Knapper */
+        .start-btn { 
+            display: block; background: #e67e22; color: white; 
+            padding: 18px; margin: 12px 0; text-decoration: none; 
+            border-radius: 18px; font-size: 1.2rem; font-weight: bold;
+            box-shadow: 0 5px 0 #d35400; transition: all 0.2s ease;
+        }
+        .start-btn.alt { background: #8d6e63; box-shadow: 0 5px 0 #5d4037; }
+        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #a04000; }
+        .start-btn.alt:hover { box-shadow: 0 7px 0 #3e2723; }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            color: #8d6e63;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        .back-link:hover { color: #e67e22; }
+    </style>
+</head>
+<body>
+
+    <div class="main-card">
+        <div class="logo-area">🗣️</div>
+        <h1>DU-1 - Modul 3-5</h1>
+        <p class="welcome-p">Vælg et program nedenfor</p>
+
+        <a href="pd1-mundtlig.html" class="start-btn">Mundtlig</a>
+
+        <br>
+        <a href="../index.html" class="back-link">← Tilbage til forsiden</a>
+    </div>
+
+</body>
+</html>
