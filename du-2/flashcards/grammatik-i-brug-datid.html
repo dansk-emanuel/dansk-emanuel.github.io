@@ -1,1 +1,1054 @@
-h
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprog Flashcards</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 3D Flip Card klasser, som Tailwind ikke understøtter direkte ud af boksen */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .preserve-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- Hovedcontainer -->
+  <div id="app" class="flex-grow flex flex-col justify-between max-w-4xl w-full mx-auto p-4 sm:p-6 md:p-8">
+    
+    <!-- Header med sprogvalg -->
+    <header class="mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <span>📇</span> Sprog-Flashcards
+          </h1>
+          <span class="text-xs font-semibold bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full" id="lang-badge">
+            Dansk ➔ Engelsk
+          </span>
+        </div>
+        
+        <div>
+          <label for="language-select" class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Vælg målsprog:</label>
+          <select id="language-select" class="w-full bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 transition-colors">
+            <option value="eng">Engelsk (English)</option>
+            <option value="ben">Bengali (বাংলা)</option>
+            <option value="hin">Hindi (हिन्दी)</option>
+            <option value="urd">Urdu (اردو)</option>
+            <option value="ukr">Ukrainsk (Українська)</option>
+            <option value="rus">Russisk (Русский)</option>
+            <option value="per">Persisk (فارسی)</option>
+            <option value="tur">Tyrkisk (Türkçe)</option>
+            <option value="kur_kmr">Kurdisk Kurmanji (Kurmancî)</option>
+            <option value="kur_sd">Kurdisk Sorani (سۆرانی)</option>
+            <option value="nep">Nepalesisk (नेपाली)</option>
+            <option value="swa">Kiswahili</option>
+            <option value="fre">Fransk (Français)</option>
+            <option value="twi">Twi</option>
+            <option value="bos">Bosnisk (Bosanski)</option>
+            <option value="som">Somali (Soomaali)</option>
+            <option value="srp">Serbisk (Српски)</option>
+            <option value="tir">Tigrinya (ትግርኛ)</option>
+            <option value="chi">Mandarin Kinesisk (中文)</option>
+            <option value="tgk">Tadjikisk (Тоҷикӣ)</option>
+            <option value="spa">Spansk (Español)</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hovedindhold -->
+    <main class="flex-grow flex flex-col items-center justify-center py-4">
+      
+      <!-- Spilleskærm -->
+      <div id="game-screen" class="w-full max-w-md flex flex-col items-center">
+        <!-- Statuslinje -->
+        <div class="w-full flex justify-between items-center mb-4 px-2">
+          <span class="text-sm font-medium text-gray-600">
+            Kort tilbage: <span id="cards-left" class="font-bold text-gray-900">25</span>
+          </span>
+          <span id="progress-text" class="text-xs text-gray-500">
+            0% gennemført
+          </span>
+        </div>
+        
+        <!-- Status ProgressBar -->
+        <div class="w-full bg-gray-200 rounded-full h-1.5 mb-6 overflow-hidden">
+          <div id="progress-bar" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+
+        <!-- 3D Card Container -->
+        <div id="card-container" class="w-full aspect-[4/3] perspective-1000 cursor-pointer group mb-6">
+          <div id="card-inner" class="relative w-full h-full transition-transform duration-500 preserve-3d rounded-2xl shadow-lg border border-gray-200">
+            
+            <!-- FORSIDE (Dansk) - Hvid med sort skrift -->
+            <div class="absolute inset-0 w-full h-full rounded-2xl bg-white text-gray-900 flex flex-col items-center justify-center p-6 backface-hidden">
+              <div class="absolute top-4 left-4 text-xs font-semibold tracking-wider text-gray-400 uppercase">Dansk</div>
+              <div id="word-danish" class="text-2xl sm:text-3xl font-bold text-center px-4 leading-tight">
+                Mørk
+              </div>
+              <div class="absolute bottom-4 text-xs text-gray-400 animate-pulse">
+                Klik på kortet for at vende det
+              </div>
+            </div>
+
+            <!-- BAGSIDE (Målsprog) - Beige med sort skrift -->
+            <div class="absolute inset-0 w-full h-full rounded-2xl bg-[#F5F2EB] text-gray-900 flex flex-col items-center justify-center p-6 backface-hidden rotate-y-180">
+              <div id="back-lang-label" class="absolute top-4 left-4 text-xs font-semibold tracking-wider text-gray-500 uppercase">Oversættelse</div>
+              <div id="word-translation" class="text-2xl sm:text-3xl font-bold text-center px-4 leading-tight text-amber-950">
+                Dark
+              </div>
+              <div class="absolute bottom-4 text-xs text-gray-400">
+                Vurder dit svar nedenfor
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Knapper (Kun synlige når kortet er vendt) -->
+        <div id="action-buttons" class="w-full grid grid-cols-2 gap-4 opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2">
+          <button id="btn-incorrect" class="flex items-center justify-center gap-2 bg-rose-50 text-rose-700 hover:bg-rose-100 border-2 border-rose-200 font-bold py-3 px-4 rounded-xl shadow-sm transition-all transform active:scale-95">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            Forkert
+          </button>
+          <button id="btn-correct" class="flex items-center justify-center gap-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-2 border-emerald-200 font-bold py-3 px-4 rounded-xl shadow-sm transition-all transform active:scale-95">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            Rigtigt
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Færdigskærm (Skjult som udgangspunkt) -->
+      <div id="finished-screen" class="hidden w-full max-w-md bg-white p-8 rounded-2xl shadow-lg border border-gray-200 text-center flex flex-col items-center py-10">
+        <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+          <span class="text-4xl">🎉</span>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Flot klaret!</h2>
+        <p class="text-gray-600 mb-6" id="finished-message">
+          Du har lært alle 25 ord og vendinger på engelsk!
+        </p>
+        <button id="btn-restart" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition-all transform active:scale-95">
+          Start forfra
+        </button>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-8 text-center text-xs text-gray-400">
+      <p>Udviklet til nem sprogtræning uden login • Sprog-Flashcards &copy; 2026</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // Fuld ordbog med alle 25 ord og præcise oversættelser til alle 21 sprog
+    const dictionary = [
+      {
+        da: "Mørk",
+        translations: {
+          eng: "Dark",
+          ben: "অন্ধকার",
+          hin: "अंधेरा",
+          urd: "تاریک / اندھیرا",
+          ukr: "Темний",
+          rus: "Тёмный",
+          per: "تاریک",
+          tur: "Karanlık",
+          kur_kmr: "Tarî",
+          kur_sd: "تاریك",
+          nep: "अध्यारो",
+          swa: "Giza",
+          fre: "Sombre",
+          twi: "Esum",
+          bos: "Tamno / Mrak",
+          som: "Madow",
+          srp: "Тамно / Мрак",
+          tir: "ጸልማት",
+          chi: "黑暗",
+          tgk: "Торик",
+          spa: "Oscuro"
+        }
+      },
+      {
+        da: "Novembermorgen",
+        translations: {
+          eng: "November morning",
+          ben: "নভেম্বরের সকাল",
+          hin: "नवंबर की सुबह",
+          urd: "نومبر کی صبح",
+          ukr: "Листопадовий ранок",
+          rus: "Ноябрьское утро",
+          per: "صبح نوامبر",
+          tur: "Kasım sabahı",
+          kur_kmr: "Sibha mijdarê",
+          kur_sd: "بەیانی تشرینی دووەم",
+          nep: "नोभेम्बरको बिहान",
+          swa: "Asubuhi ya Novemba",
+          fre: "Matin de novembre",
+          twi: "Obubuo anopa",
+          bos: "Novembarsko jutro",
+          som: "Subax bisha November",
+          srp: "Новембарско јутро",
+          tir: "ናይ ሕዳር ንግሆ",
+          chi: "十一月的早晨",
+          tgk: "Субҳи ноябр",
+          spa: "Mañana de noviembre"
+        }
+      },
+      {
+        da: "At have travlt",
+        translations: {
+          eng: "To be busy / To be in a hurry",
+          ben: "ব্যস্ত থাকা",
+          hin: "जल्दी में होना / व्यस्त होना",
+          urd: "جلدی میں ہونا / مصروف ہونا",
+          ukr: "Поспішати",
+          rus: "Спешить / Быть занятым",
+          per: "عجله داشتن",
+          tur: "Acelesi olmak",
+          kur_kmr: "Lez kirin / Karê lez hebûn",
+          kur_sd: "پەلە بوون",
+          nep: "हतार हुनु",
+          swa: "Kuwa na haraka / Kuwa na shughuli nyingi",
+          fre: "Être pressé / Être occupé",
+          twi: "Ho pii",
+          bos: "Žuriti se",
+          som: "Mashquul ah / Degdegsan",
+          srp: "Журити се",
+          tir: "ህጹጽ ምዃን / ትሑዝ ምዃን",
+          chi: "忙碌 / 赶時間",
+          tgk: "Аҷала доштан",
+          spa: "Tener prisa / Estar ocupado"
+        }
+      },
+      {
+        da: "At smøre madpakker",
+        translations: {
+          eng: "To pack lunches / To butter lunchboxes",
+          ben: "টিফিন তৈরি করা",
+          hin: "लंच पैक करना",
+          urd: "لنچ پیک کرنا / کھانا تیار کرنا",
+          ukr: "Готувати ланч-бокси",
+          rus: "Готовить бутерброды / Собирать ланч-боксы",
+          per: "غذا برای بیرون درست کردن",
+          tur: "Kumanya hazırlamak",
+          kur_kmr: "Xwarina dibistanê amade kirin",
+          kur_sd: "دروستکردنی سەنبووسە بۆ قوتابخانە",
+          nep: "खाजा प्याक गर्नु",
+          swa: "Kuandaa chakula cha mchana",
+          fre: "Préparer des paniers-repas",
+          twi: "Siesie didibaka",
+          bos: "Mazati sendviče / Pakovati užinu",
+          som: "Diyaarinta cuntada dugsiga",
+          srp: "Мазати сендвиче / Паковати ужину",
+          tir: "ምሳሕ ምድላው / ምሳሕ ምስንዳው",
+          chi: "做便当 / 准备午餐",
+          tgk: "Хӯроки нисфирӯзиро омода кардан",
+          spa: "Preparar el almuerzo"
+        }
+      },
+      {
+        da: "Tvillinger",
+        translations: {
+          eng: "Twins",
+          ben: "যমজ",
+          hin: "जुड़वां",
+          urd: "جڑواں بچے",
+          ukr: "Близнюки",
+          rus: "Близнецы / Двойняшки",
+          per: "دوقلوها",
+          tur: "İkizler",
+          kur_kmr: "Cêwî",
+          kur_sd: "دووانەکان",
+          nep: "जुम्ल्याहा",
+          swa: "Mapacha",
+          fre: "Jumeaux",
+          twi: "Ntaafo",
+          bos: "Blizanci",
+          som: "Mataano",
+          srp: "Близанци",
+          tir: "ማንታ",
+          chi: "双胞胎",
+          tgk: "Дуқолоҳо / Дугоникҳо",
+          spa: "Gemelos / Mellizos"
+        }
+      },
+      {
+        da: "Et kys",
+        translations: {
+          eng: "A kiss",
+          ben: "একটি চুমু",
+          hin: "एक चुंबन",
+          urd: "ایک بوسہ",
+          ukr: "Поцілунок",
+          rus: "Поцелуй",
+          per: "بوسه",
+          tur: "Bir öpücük",
+          kur_kmr: "Rûmûsek / Ramûsanek",
+          kur_sd: "ماچێک",
+          nep: "एउटा म्वाइँ",
+          swa: "Busu",
+          fre: "Un baiser",
+          twi: "Mano fe",
+          bos: "Poljubac",
+          som: "Shumi",
+          srp: "Пољубац",
+          tir: "ስዕመት",
+          chi: "一个吻",
+          tgk: "Бӯса",
+          spa: "Un beso"
+        }
+      },
+      {
+        da: "Hun skal nå at køre tvillingerne",
+        translations: {
+          eng: "She has to manage to drive the twins",
+          ben: "তাকে যমজদের গাড়িতে করে নিয়ে যেতে হবে",
+          hin: "उसे जुड़वा बच्चों को गाड़ी से छोड़ना है",
+          urd: "اسے جڑواں بچوں کو چھوڑنے جانا ہے",
+          ukr: "Вона мусить встигнути відвезти близнюків",
+          rus: "Она должна успеть отвезти близнецов",
+          per: "او باید دوقلوها را با ماشین ببرد",
+          tur: "İkizleri arabayla bırakması gerekiyor",
+          kur_kmr: "Ew divê cêwiyan bibe",
+          kur_sd: "پێویستە فریا بکەوێت دووانەکان بە ئۆتۆمبێل ببات",
+          nep: "उनले जुम्ल्याहा बच्चाहरूलाई गाडीमा पुर्‍याउनुपर्छ",
+          swa: "Anapaswa kuwapeleka mapacha kwa gari",
+          fre: "Elle doit avoir le temps de conduire les jumeaux",
+          twi: "Ɛsɛ sɛ ɔde ntafo no kɔ",
+          bos: "Ona mora stići da odveze blizance",
+          som: "Waa inay gaarto inay kaxeyso mataanaha",
+          srp: "Она мора стићи да одвезе близанце",
+          tir: "ነቶም ማንታ ከይዳ ከተምጽኦም / ከተብጽሖም ኣለዋ",
+          chi: "她必须来得及开车送双胞胎",
+          tgk: "У бояд дугоникҳоро бо мошин барад",
+          spa: "Ella tiene que llegar a tiempo para llevar a los gemelos"
+        }
+      },
+      {
+        da: "Selv",
+        translations: {
+          eng: "Even / Self / Myself / Himself / Herself",
+          ben: "নিজেই / এমনকি",
+          hin: "खुद / स्वयं",
+          urd: "خود",
+          ukr: "Сам / Сама",
+          rus: "Сам / Сама / Даже",
+          per: "خود / حتی",
+          tur: "Kendi / Kendisi",
+          kur_kmr: "Bi xwe",
+          kur_sd: "خۆم / خۆی",
+          nep: "आफै",
+          swa: "Mwenyewe / Hata",
+          fre: "Même / Soi-même",
+          twi: "Ara",
+          bos: "Sam / Sama",
+          som: "Laftiisa / Xataa",
+          srp: "Сам / Сама",
+          tir: "ባዕላ / ባዕሉ",
+          chi: "自己 / 甚至",
+          tgk: "Худ",
+          spa: "Mismo / Incluso"
+        }
+      },
+      {
+        da: "3-årige datter",
+        translations: {
+          eng: "3-year-old daughter",
+          ben: "৩ বছর বয়সী মেয়ে",
+          hin: "३ साल की बेटी",
+          urd: "تین سال کی بیٹی",
+          ukr: "3-річна донька",
+          rus: "3-летняя дочь",
+          per: "دختر ۳ ساله",
+          tur: "3 yaşındaki kız çocuğu",
+          kur_kmr: "Keça sê salî",
+          kur_sd: "کچە سێ ساڵانەکە",
+          nep: "३ वर्षीया छोरी",
+          swa: "Binti wa miaka 3",
+          fre: "Fille de 3 ans",
+          twi: "Babaa mfe mmiensa",
+          bos: "Trogodišnja kćerka",
+          som: "Gabadh 3 jir ah",
+          srp: "Трогодишња ћерка",
+          tir: "ጓል ሰለስተ ዓመት",
+          chi: "三岁的女儿",
+          tgk: "Духтари сесола",
+          spa: "Hija de 3 años"
+        }
+      },
+      {
+        da: "Hun vil gerne lege gemmeleg",
+        translations: {
+          eng: "She wants to play hide and seek",
+          ben: "সে কানামাছি/লুকোচুরি খেলতে চায়",
+          hin: "वह लुका-छिपी खेलना चाहती है",
+          urd: "وہ آنکھ مچولی کھیلنا چاہتی ہے",
+          ukr: "Вона хоче пограти в хованки",
+          rus: "Она хочет поиграть в прятки",
+          per: "او می‌خواهد قایم‌باشک بازی کند",
+          tur: "Saklambaç oynamak istiyor",
+          kur_kmr: "Ew dixwaze lîstika veşartokê bileyize",
+          kur_sd: "دەیەوێت یاری شاروشارۆکێ بکات",
+          nep: "उनी लुकामारी खेल्न चाहन्छिन्",
+          swa: "Anataka kucheza mchezo wa kujificha",
+          fre: "Elle veut jouer à cache-cache",
+          twi: "Ɔpɛ sɛ ɔto tumpan",
+          bos: "Ona želi da se igra žmurke",
+          som: "Waxay rabtaa inay ciyaarto dhuumalaysi",
+          srp: "Она жели да се игра жмурке",
+          tir: "ሕብኢ ሕብኢ ክትጻወት ትደሊ",
+          chi: "她想玩捉迷藏",
+          tgk: "У мехоҳад бозии пинҳоншавак кунад",
+          spa: "Ella quiere jugar al escondite"
+        }
+      },
+      {
+        da: "Peter råber",
+        translations: {
+          eng: "Peter shouts",
+          ben: "পিটার চিৎকার করে ডাকছে",
+          hin: "पीटर चिल्लाता है",
+          urd: "پیٹر چلاتا ہے",
+          ukr: "Петер кричить",
+          rus: "Питер кричит",
+          per: "پیتر فریاد می‌زند",
+          tur: "Peter bağırıyor",
+          kur_kmr: "Peter diqîre",
+          kur_sd: "پیتەر هاوار دەکات",
+          nep: "पिटर कराउँछ",
+          swa: "Peter anapiga kelele",
+          fre: "Peter crie",
+          twi: "Peter teɛm",
+          bos: "Peter viče",
+          som: "Peter baa qaylinaya",
+          srp: "Петер виче",
+          tir: "ፒተር ይጭድር ኣሎ",
+          chi: "彼得大喊",
+          tgk: "Петер дод мезанад",
+          spa: "Peter grita"
+        }
+      },
+      {
+        da: "Hun ligger under sin varme dyne",
+        translations: {
+          eng: "She is lying under her warm duvet",
+          ben: "সে তার গরম লেপের নিচে শুয়ে আছে",
+          hin: "वह अपने गर्म कंबल के नीचे लेटी है",
+          urd: "وہ اپنے گرم لحاف کے نیچے لیٹی ہے",
+          ukr: "Вона лежить під своєю теплою ковдрою",
+          rus: "Она лежит под своим теплым одеялом",
+          per: "او زیر لحاف گرم خود دراز کشیده است",
+          tur: "Sıcak yorganının altında yatıyor",
+          kur_kmr: "Ew di bin betaniya xwe ya germ de ye",
+          kur_sd: "لەژێر لێفە گەرمەکەیدا پاڵکەوتووە",
+          nep: "उनी आफ्नो न्यानो सिरकमुनि सुतिरहेकी छिन्",
+          swa: "Amelala chini ya blanketi yake ya joto",
+          fre: "Elle est allongée sous sa couette chaude",
+          twi: "Ɔda ne kɛtɛ warm ase",
+          bos: "Ona leži ispod svog toplog jorgana",
+          som: "Waxay hoos jiiftaa busteeda diirran",
+          srp: "Она лежи испод свог топлог јоргана",
+          tir: "ኣብ ትሕቲ ምውቕ ኮበርታኣ ተደፊኣ ኣላ",
+          chi: "她躺在温暖的被子下面",
+          tgk: "У зери кӯрпаи гарми худ хобидааст",
+          spa: "Ella está acostada bajo su cálido edredón"
+        }
+      },
+      {
+        da: "Peter bærer hende hen til havregrøden",
+        translations: {
+          eng: "Peter carries her over to the oatmeal",
+          ben: "পিটার তাকে ওটমিলের কাছে নিয়ে যায়",
+          hin: "पीटर उसे दलिया के पास ले जाता है",
+          urd: "پیٹر اسے دلیے کے پاس لے جاتا ہے",
+          ukr: "Петер несе її до вівсянки",
+          rus: "Питер несёт её к овсяной каше",
+          per: "پیتر او را به سمت حلیم جو می‌برد",
+          tur: "Peter onu yulaf ezmesinin yanına taşıyor",
+          kur_kmr: "Peter wê dibe ser xwarina ceh",
+          kur_sd: "پیتەر دەیبات بۆ لای شۆفانەکە",
+          nep: "पिटरले उनलाई ओटमिल भएको ठाउँमा लैजान्छ",
+          swa: "Peter anampeleka kwenye uji wa shayiri",
+          fre: "Peter la porte jusqu'au porridge",
+          twi: "Peter kura no kɔ porridge hɔ",
+          bos: "Peter je nosi do zobene kaše",
+          som: "Peter wuxuu u xambaarayaa xaggii boorashka",
+          srp: "Петер је носи до зобене каше",
+          tir: "ፒተር ናብቲ ናይ ጣፍ/ዓተር ሓንጎል የብጽሓ ኣሎ",
+          chi: "彼得把她抱到燕麦粥旁",
+          tgk: "Петер ӯро ба назди кашаи сулӣ мебарад",
+          spa: "Peter la lleva en brazos hacia las gachas de avena"
+        }
+      },
+      {
+        da: "Marie er sur og skriger højt",
+        translations: {
+          eng: "Marie is angry and screams loudly",
+          ben: "মারি রাগান্বিত এবং জোরে চিৎকার করছে",
+          hin: "मैरी गुस्से में है और जोर से चिल्लाती है",
+          urd: "میری ناراض ہے اور اونچی آواز میں چلاتی ہے",
+          ukr: "Марі сердита і голосно кричить",
+          rus: "Мари сердится и громко кричит",
+          per: "ماری عصبانی است و با صدای بلند فریاد می‌زند",
+          tur: "Marie kızgın ve yüksek sesle çığlık atıyor",
+          kur_kmr: "Marie hêrs e û bi dengê bilind diqîre",
+          kur_sd: "ماری تووڕەیە و هاواری بەرز دەکات",
+          nep: "मारी रिसाएकी छिन् र ठूलो स्वरले कराउँछिन्",
+          swa: "Marie ana hasira and anapiga kelele kwa sauti",
+          fre: "Marie est fâchée et crie fort",
+          twi: "Marie anya abufuo na ɔteɛm pii",
+          bos: "Marie je ljuta i glasno vrišti",
+          som: "Marie waa ay caraysan tahay aadna ayay u qaylineysaa",
+          srp: "Мари је љута и гласно вришти",
+          tir: "ማርያም ሓሪቓ ዓው ኢላ ትጭድር ኣላ",
+          chi: "玛丽生气并大声尖叫",
+          tgk: "Мари хафа аст ва бо овози баланд дод мезанад",
+          spa: "Marie está enfadada y grita fuerte"
+        }
+      },
+      {
+        da: "Hun vil ikke have noget at spise",
+        translations: {
+          eng: "She does not want anything to eat",
+          ben: "সে কিছুই খেতে চায় না",
+          hin: "वह कुछ भी नहीं खाना चाहती",
+          urd: "وہ کچھ بھی کھانا نہیں چاہتی",
+          ukr: "Вона не хоче нічого їсти",
+          rus: "Она не хочет ничего есть",
+          per: "او نمی‌خواهد چیزی بخورد",
+          tur: "Hiçbir şey yemek istemiyor",
+          kur_kmr: "Ew naxwaze tiştekî bixwe",
+          kur_sd: "دەیەوێت هیچ نەخوات",
+          nep: "उनी केही पनि खान चाहन्नन्",
+          swa: "Hataki kula kitu chochote",
+          fre: "Elle ne veut rien manger",
+          twi: "Ɔmpɛ sɛ odi biribiara",
+          bos: "Ona ne želi ništa jesti",
+          som: "Ma rabto inay wax cunto",
+          srp: "Она не жели ништа јести",
+          tir: "ክትበልዕ ኣይትደልን እያ",
+          chi: "她不想吃任何东西",
+          tgk: "У намехоҳад чизе хурад",
+          spa: "Ella no quiere comer nada"
+        }
+      },
+      {
+        da: "Hun kaster sig ned på gulvet",
+        translations: {
+          eng: "She throws herself down on the floor",
+          ben: "সে মেঝেতে লুটিয়ে পড়ে",
+          hin: "वह खुद को फर्श पर गिरा लेती है",
+          urd: "وہ اپنے آپ کو فرش پر گرا دیتی ہے",
+          ukr: "Вона кидається на підлогу",
+          rus: "Она бросается на пол",
+          per: "او خودش را روی زمین می‌اندازد",
+          tur: "Kendini yere atıyor",
+          kur_kmr: "Ew xwe diavêje ser erdê",
+          kur_sd: "خۆی دەدات بە عەرزەکەدا",
+          nep: "उनी भुइँमा पछारिन्छिन्",
+          swa: "Anajitupa chini sakafuni",
+          fre: "Elle se jette par terre",
+          twi: "Ɔto ne ho gu fɛm",
+          bos: "Ona se baca na pod",
+          som: "Waxay isku tuuraysaa dhulka",
+          srp: "Она се баца на под",
+          tir: "ኣብ መሬት ትደፋእ ኣላ",
+          chi: "她摔倒在地上 / 她躺在地上耍赖",
+          tgk: "У худро ба рӯи фарш мепартояд",
+          spa: "Ella se tira al suelo"
+        }
+      },
+      {
+        da: "Peter kan ikke få hende til at spise noget",
+        translations: {
+          eng: "Peter cannot get her to eat anything",
+          ben: "পিটার তাকে দিয়ে কিছু খাওয়াতে পারছে না",
+          hin: "पीटर उससे कुछ भी नहीं खिलवा पा रहा है",
+          urd: "پیٹر اسے کچھ بھی نہیں کھلوا پا رہا",
+          ukr: "Петер не може змусити її щось з'їсти",
+          rus: "Питер не может заставить её что-то съесть",
+          per: "پیتر نمی‌تواند او را مجبور به خوردن چیزی کند",
+          tur: "Peter ona hiçbir şey yediremiyor",
+          kur_kmr: "Peter nikare wê bide xwarin",
+          kur_sd: "پیتەر ناتوانێت هیچ بکات بە دەمیەوە",
+          nep: "पिटरले उनलाई केही पनि खुवाउन सक्दैनन्",
+          swa: "Peter hawezi kumfanya ale kitu",
+          fre: "Peter ne peut pas la faire manger",
+          twi: "Peter ntumi mma no ndi biribiara",
+          bos: "Peter ne može da je natjera da bilo šta pojede",
+          som: "Peter ma ka dhigi karo inay wax cunto",
+          srp: "Петер не може да је натера да било шта поједе",
+          tir: "ፒተር ክተብልዓ ኣይከኣለን",
+          chi: "彼得无法让她吃下任何东西",
+          tgk: "Петер наметавонад ӯро маҷбур кунад, ки чизе хурад",
+          spa: "Peter no logra que ella coma nada"
+        }
+      },
+      {
+        da: "Derfor",
+        translations: {
+          eng: "Therefore / That is why",
+          ben: "তাই / অতএব",
+          hin: "इसलिए",
+          urd: "اس لیے",
+          ukr: "Тому",
+          rus: "Поэтому",
+          per: "بنابراین / به همین دلیل",
+          tur: "Bu yüzden",
+          kur_kmr: "Ji ber vê yekê",
+          kur_sd: "لەبەر ئەوە",
+          nep: "त्यसैले",
+          swa: "Kwa hivyo",
+          fre: "C'est pourquoi / Donc",
+          twi: "Enti",
+          bos: "Zato / Stoga",
+          som: "Sidaas darteed",
+          srp: "Зато / Стога",
+          tir: "ስለዚ",
+          chi: "因此",
+          tgk: "Бинобар ин",
+          spa: "Por lo tanto / Por eso"
+        }
+      },
+      {
+        da: "At prøve",
+        translations: {
+          eng: "To try / To attempt",
+          ben: "চেষ্টা করা",
+          hin: "कोशिश करना",
+          urd: "کوشش کرنا",
+          ukr: "Пробувати / Намагатися",
+          rus: "Пробовать / Пытаться",
+          per: "امتحان کردن / تلاش کردن",
+          tur: "Denemek",
+          kur_kmr: "Cereb kirin",
+          kur_sd: "تاقیکردنەوە",
+          nep: "प्रयास गर्नु",
+          swa: "Kujaribu",
+          fre: "Essayer / Tenter",
+          twi: "Sɔ hwɛ",
+          bos: "Probati",
+          som: "Isku dayid",
+          srp: "Пробати",
+          tir: "ምፍታን",
+          chi: "尝试",
+          tgk: "Кӯшиш кардан",
+          spa: "Intentar / Probar"
+        }
+      },
+      {
+        da: "At lokke",
+        translations: {
+          eng: "To coax / To tempt / To lure",
+          ben: "প্রলুব্ধ করা / ফুসলানো",
+          hin: "फुसलाना / बहलाना",
+          urd: "بہلانا / پھسلانا",
+          ukr: "Заманювати / Задобрювати",
+          rus: "Уговаривать / Заманивать",
+          per: "اغوا کردن / ترغیب کردن",
+          tur: "İkna etmeye çalışmak / Cazip gelmek",
+          kur_kmr: "X اغवा kirin / xapandin",
+          kur_sd: "ڕازی کردن بە قسەی خۆش",
+          nep: "फकाउनु",
+          swa: "Kushawishi / Kushawishi kwa hila",
+          fre: "Amadouer / Attirer",
+          twi: "Daadaa",
+          bos: "Nagovarati / Namamiti",
+          som: "Houldid / Soo jiidasho",
+          srp: "Наговарати / Намамити",
+          tir: "ምሕባራት / ምትላል",
+          chi: "哄骗 / 诱惑",
+          tgk: "Фирефтан / Озонидан",
+          spa: "Persuadir / Convencer (con dulzura)"
+        }
+      },
+      {
+        da: "Hun skynder sig",
+        translations: {
+          eng: "She hurries / She rushes",
+          ben: "সে তাড়াহুড়ো করছে",
+          hin: "वह जल्दी करती है",
+          urd: "وہ جلدی کرتی ہے",
+          ukr: "Вона поспішає",
+          rus: "Она торопится",
+          per: "او عجله می‌کند",
+          tur: "Acele ediyor",
+          kur_kmr: "Ew lez dike",
+          kur_sd: "پەلە دەکات",
+          nep: "उनी हतार गर्छिन्",
+          swa: "Anaharakisha",
+          fre: "Elle se dépêche",
+          twi: "Ɔyɛ ntɛm",
+          bos: "Ona žuri",
+          som: "Way degdegaysaa",
+          srp: "Она жури",
+          tir: "ትቕልጥፍ ኣላ",
+          chi: "她赶紧 / 她赶快",
+          tgk: "У шитоб мекунад",
+          spa: "Ella se da prisa"
+        }
+      },
+      {
+        da: "Småkage",
+        translations: {
+          eng: "Cookie / Biscuit",
+          ben: "বিস্কুট",
+          hin: "कुकी / बिस्कुट",
+          urd: "بسکٹ",
+          ukr: "Печиво",
+          rus: "Печенье",
+          per: "کلوچه / بیسکویت",
+          tur: "Kurabiye",
+          kur_kmr: "Kulik / Biskiwit",
+          kur_sd: "کێکی بچووک / بسکیت",
+          nep: "बिस्कुट",
+          swa: "Biskuti",
+          fre: "Biscuit / Cookie",
+          twi: "Krakas",
+          bos: "Keks",
+          som: "Busqut",
+          srp: "Кекс",
+          tir: "ቢስኮቲ",
+          chi: "饼干",
+          tgk: "Кулчақанд",
+          spa: "Galleta"
+        }
+      },
+      {
+        da: "Alt",
+        translations: {
+          eng: "Everything / All",
+          ben: "সবকিছু / সব",
+          hin: "सब कुछ",
+          urd: "سب کچھ",
+          ukr: "Все",
+          rus: "Всё",
+          per: "همه چیز",
+          tur: "Her şey / Hepsi",
+          kur_kmr: "Tevahî / Hemû",
+          kur_sd: "هەموو شتێک",
+          nep: "सबै",
+          swa: "Kila kitu / Vyote",
+          fre: "Tout",
+          twi: "Ne nyinaa",
+          bos: "Sve",
+          som: "Wax kasta / Dhammaan",
+          srp: "Све",
+          tir: "ኹሉ",
+          chi: "一切 / 所有",
+          tgk: "Ҳама чиз",
+          spa: "Todo"
+        }
+      },
+      {
+        da: "Et øjeblik efter",
+        translations: {
+          eng: "A moment later / A moment after",
+          ben: "কিছুক্ষণ পরে",
+          hin: "एक पल बाद",
+          urd: "ایک لمحے بعد",
+          ukr: "За мить / Трохи згодом",
+          rus: "Мгновение спустя / Через мгновение",
+          per: "لحظه‌ای بعد",
+          tur: "Bir an sonra / Az sonra",
+          kur_kmr: "Piştî bîskekê",
+          kur_sd: "کەمێک دواتر / تاوێک دواتر",
+          nep: "एक क्षण पछि",
+          swa: "Muda mfupi baadaye",
+          fre: "Un instant plus tard",
+          twi: "Meren siane",
+          bos: "Trenutak kasnije",
+          som: "Daqiiqad ka dib",
+          srp: "Тренутак касније",
+          tir: "ድሕሪ ቅሩብ ህንጻ",
+          chi: "片刻之后",
+          tgk: "Пас аз як лаҳза",
+          spa: "Un momento después"
+        }
+      },
+      {
+        da: "Hun gnasker på sin småkage",
+        translations: {
+          eng: "She munches on her cookie",
+          ben: "সে তার বিস্কুট চিবিয়ে খাচ্ছে",
+          hin: "वह अपनी कुकी कुतर रही है",
+          urd: "وہ اپنا بسکٹ چبا رہی ہے",
+          ukr: "Вона гризе своє печиво",
+          rus: "Она грызет свое печенье",
+          per: "او کلوچه‌اش را می‌جود",
+          tur: "Kurabiyesini kıtır kıtır yiyor",
+          kur_kmr: "Ew kulika xwe dixwe",
+          kur_sd: "گازی لە بسکیتەکەی دەگرێت",
+          nep: "उनी आफ्नो बिस्कुट चपाउँछिन्",
+          swa: "Anatafuna biskuti yake",
+          fre: "Elle grignote son biscuit",
+          twi: "Ɔwe ne bisikit no",
+          bos: "Ona gricka svoj keks",
+          som: "Waxay cunaysaa busqutkeeda",
+          srp: "Она грицка свој кекс",
+          tir: "ቢስኮቲኣ ትሕንቅቕ ኣላ",
+          chi: "她津津有味地啃着饼干",
+          tgk: "У кулчақандашро мехояд",
+          spa: "Ella muerde su galleta"
+        }
+      }
+    ];
+
+    // App State / Variabler
+    let currentLanguage = 'eng';
+    let currentDeck = [];
+    let currentCardIndex = 0;
+    let isFlipped = false;
+    let isTransitioning = false; // Sikrer timingen ved skift til næste kort
+
+    // DOM Elementer
+    const languageSelect = document.getElementById('language-select');
+    const langBadge = document.getElementById('lang-badge');
+    const cardsLeftEl = document.getElementById('cards-left');
+    const progressText = document.getElementById('progress-text');
+    const progressBar = document.getElementById('progress-bar');
+    
+    const cardContainer = document.getElementById('card-container');
+    const cardInner = document.getElementById('card-inner');
+    const wordDanish = document.getElementById('word-danish');
+    const wordTranslation = document.getElementById('word-translation');
+    const backLangLabel = document.getElementById('back-lang-label');
+    
+    const actionButtons = document.getElementById('action-buttons');
+    const btnCorrect = document.getElementById('btn-correct');
+    const btnIncorrect = document.getElementById('btn-incorrect');
+    
+    const gameScreen = document.getElementById('game-screen');
+    const finishedScreen = document.getElementById('finished-screen');
+    const finishedMessage = document.getElementById('finished-message');
+    const btnRestart = document.getElementById('btn-restart');
+
+    // Sprognavne til visning
+    const languageNames = {
+      eng: "Engelsk", ben: "Bengali", hin: "Hindi", urd: "Urdu", ukr: "Ukrainsk",
+      rus: "Russisk", per: "Persisk", tur: "Tyrkisk", kur_kmr: "Kurdisk Kurmanji",
+      kur_sd: "Kurdisk Sorani", nep: "Nepalesisk", swa: "Kiswahili", fre: "Fransk",
+      twi: "Twi", bos: "Bosnisk", som: "Somali", srp: "Serbisk", tir: "Tigrinya",
+      chi: "Mandarin Kinesisk", tgk: "Tadjikisk", spa: "Spansk"
+    };
+
+    // Funktion til at blande bunken (Fisher-Yates shuffle)
+    function shuffleDeck(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Start et nyt spil / Nulstil dækket
+    function startNewSession() {
+      // Opret en kopi af alle ord i ordbogen
+      currentDeck = dictionary.map((item, index) => ({
+        id: index,
+        da: item.da,
+        translation: item.translations[currentLanguage]
+      }));
+      
+      // Bland kortene tilfældigt
+      shuffleDeck(currentDeck);
+      
+      currentCardIndex = 0;
+      isFlipped = false;
+      isTransitioning = false;
+      
+      // Reset UI-klasser for kortet (vis forsiden)
+      cardInner.classList.remove('rotate-y-180');
+      hideButtons();
+      
+      // Vis spilleskærm, skjul færdigskærm
+      gameScreen.classList.remove('hidden');
+      finishedScreen.classList.add('hidden');
+      
+      updateUI();
+    }
+
+    // Opdater data og grafik på skærmen
+    function updateUI() {
+      if (currentDeck.length === 0) {
+        showFinishedScreen();
+        return;
+      }
+
+      // Sørg for at index ikke løber løbsk
+      if (currentCardIndex >= currentDeck.length) {
+        currentCardIndex = 0;
+      }
+
+      const activeCard = currentDeck[currentCardIndex];
+      
+      // Opdater ord
+      wordDanish.textContent = activeCard.da;
+      wordTranslation.textContent = activeCard.translation;
+      
+      // Opdater labels
+      const langName = languageNames[currentLanguage];
+      langBadge.textContent = `Dansk ➔ ${langName}`;
+      backLangLabel.textContent = `Oversættelse (${langName})`;
+      
+      // Status informationer
+      cardsLeftEl.textContent = currentDeck.length;
+      
+      // Fremskridtsberegning ud fra hvor mange kort der er fjernet af de 25 oprindelige
+      const learnedCount = dictionary.length - currentDeck.length;
+      const progressPercent = Math.round((learnedCount / dictionary.length) * 100);
+      progressBar.style.width = `${progressPercent}%`;
+      progressText.textContent = `${progressPercent}% gennemført`;
+    }
+
+    // Viser knapperne med en flydende animation
+    function showButtons() {
+      actionButtons.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+      actionButtons.classList.add('opacity-100', 'translate-y-0');
+      actionButtons.style.pointerEvents = 'auto';
+    }
+
+    // Skjuler knapperne med animation
+    function hideButtons() {
+      actionButtons.classList.remove('opacity-100', 'translate-y-0');
+      actionButtons.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+      actionButtons.style.pointerEvents = 'none';
+    }
+
+    // Vend kortet (Toggle flip)
+    function flipCard() {
+      if (isTransitioning) return; // Bloker interaktion under transition
+      
+      isFlipped = !isFlipped;
+      
+      if (isFlipped) {
+        cardInner.classList.add('rotate-y-180');
+        // Vis svarknapperne med det samme efter kortet er vendt
+        setTimeout(() => {
+          if (isFlipped) showButtons();
+        }, 150);
+      } else {
+        cardInner.classList.remove('rotate-y-180');
+        hideButtons();
+      }
+    }
+
+    // Håndter gæt og transition (Timing-logik)
+    function handleAnswer(isCorrect) {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      
+      // Gem svarknapperne med det samme
+      hideButtons();
+      
+      // 1. Vend kortet tilbage til forsiden (Dansk)
+      cardInner.classList.remove('rotate-y-180');
+      isFlipped = false;
+      
+      // Gem data midlertidigt så vi kan udføre logikken
+      const activeCard = currentDeck[currentCardIndex];
+      
+      // 2. Brug en setTimeout på 400ms for at vente på, at kortet har forsiden mod brugeren
+      setTimeout(() => {
+        if (isCorrect) {
+          // Fjern kortet fra bunken
+          currentDeck.splice(currentCardIndex, 1);
+          // Da vi fjerner elementet, skal vi ikke øge indexet, medmindre vi var på det sidste kort
+          if (currentCardIndex >= currentDeck.length) {
+            currentCardIndex = 0;
+          }
+        } else {
+          // Bliv i bunken, gå til næste kort (roter bunken for variation)
+          if (currentDeck.length > 1) {
+            currentCardIndex = (currentCardIndex + 1) % currentDeck.length;
+          }
+        }
+        
+        // Opdater teksten, nu hvor forsiden er synlig
+        updateUI();
+        
+        // Genaktiver kortinteraktion efter opdateringen er færdig
+        isTransitioning = false;
+      }, 400);
+    }
+
+    // Vis den afsluttende "Færdig"-skærm
+    function showFinishedScreen() {
+      gameScreen.classList.add('hidden');
+      finishedScreen.classList.remove('hidden');
+      finishedMessage.textContent = `Du har lært alle ${dictionary.length} ord og vendinger på ${languageNames[currentLanguage]}!`;
+    }
+
+    // --- EVENT LISTENERS ---
+
+    // Klik på selve kortet for at vende det
+    cardContainer.addEventListener('click', flipCard);
+
+    // Klik på Rigtigt
+    btnCorrect.addEventListener('click', (e) => {
+      e.stopPropagation(); // Undgå at klikket trigger "flipCard" på forældre-div'en
+      handleAnswer(true);
+    });
+
+    // Klik på Forkert
+    btnIncorrect.addEventListener('click', (e) => {
+      e.stopPropagation(); // Undgå at klikket trigger "flipCard" på forældre-div'en
+      handleAnswer(false);
+    });
+
+    // Sprogændring i dropdown
+    languageSelect.addEventListener('change', (e) => {
+      currentLanguage = e.target.value;
+      startNewSession();
+    });
+
+    // Knappen til at starte forfra
+    btnRestart.addEventListener('click', startNewSession);
+
+    // Support for piletaster og tastaturgenveje
+    document.addEventListener('keydown', (e) => {
+      // Hvis vi er på færdigskærmen, kan vi trykke Enter for at genstarte
+      if (currentDeck.length === 0 && e.key === 'Enter') {
+        startNewSession();
+        return;
+      }
+
+      if (currentDeck.length > 0 && !isTransitioning) {
+        if (e.key === ' ' || e.key === 'Enter') {
+          // Space eller Enter vender kortet
+          e.preventDefault();
+          flipCard();
+        } else if (isFlipped) {
+          // Pile-taster når kortet er vendt
+          if (e.key === 'ArrowRight' || e.key === 'r') {
+            // Rigtigt (højre pil eller 'r')
+            handleAnswer(true);
+          } else if (e.key === 'ArrowLeft' || e.key === 'f') {
+            // Forkert (venstre pil eller 'f')
+            handleAnswer(false);
+          }
+        }
+      }
+    });
+
+    // Initialiser spillet første gang siden loades
+    startNewSession();
+  </script>
+</body>
+</html>
