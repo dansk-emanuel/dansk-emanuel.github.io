@@ -1,1 +1,2173 @@
-f
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dansk Flashcards</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 3D Flip Card Styles */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .preserve-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 py-4 px-6">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">🇩🇰</span>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">Dansk Flashcards</h1>
+                    <p class="text-xs text-gray-500">Lær hverdagsord og boligudtryk</p>
+                </div>
+            </div>
+            <!-- Sprogvælger Bar -->
+            <div class="w-full md:w-auto">
+                <label for="langSelect" class="block text-xs font-semibold text-gray-600 mb-1">Vælg målsprog:</label>
+                <select id="langSelect" class="w-full md:w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 shadow-sm cursor-pointer transition-all">
+                    <!-- Sprogmuligheder fyldes dynamisk af JavaScript -->
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center items-center">
+        
+        <!-- Status & Stats -->
+        <div id="statsContainer" class="w-full max-w-md mb-4 flex flex-col gap-2">
+            <div class="flex justify-between items-center text-sm font-semibold text-gray-600">
+                <span id="cardCounter">Kort tilbage: 0</span>
+                <span id="percentLabel" class="text-blue-600">0% færdig</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Flashcard Container -->
+        <div id="flashcardArea" class="w-full max-w-md h-80 perspective-1000 cursor-pointer mb-6">
+            <div id="cardInner" class="relative w-full h-full preserve-3d transition-transform duration-500 rounded-2xl shadow-xl">
+                
+                <!-- Forside (Dansk) - Hvid med sort skrift -->
+                <div class="absolute inset-0 w-full h-full backface-hidden bg-white border border-gray-200 rounded-2xl flex flex-col p-6 justify-between select-none">
+                    <div class="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-gray-400">
+                        <span>Dansk 🇩🇰</span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded">Tryk for at vende</span>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center text-center px-4">
+                        <p id="danishText" class="text-2xl md:text-3xl font-bold text-gray-900 leading-snug"></p>
+                    </div>
+                    <div class="text-center text-xs text-gray-400 font-medium">
+                        Klik eller tryk på kortet for at se oversættelsen
+                    </div>
+                </div>
+
+                <!-- Bagside (Målsprog) - Beige med sort skrift -->
+                <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-[#f5f2eb] border border-[#e8dfcf] rounded-2xl flex flex-col p-6 justify-between select-none">
+                    <div class="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-amber-800">
+                        <span id="targetLangLabel">Målsprog</span>
+                        <span class="bg-amber-100 text-amber-800 px-2 py-1 rounded">Svar</span>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center text-center px-4">
+                        <p id="targetText" class="text-2xl md:text-3xl font-bold text-amber-950 leading-snug"></p>
+                    </div>
+                    <div class="text-center text-xs text-amber-700 font-medium">
+                        Vurder dit svar nedenfor
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Handlingsknapper (Vises kun når kortet er vendt) -->
+        <div id="controlsArea" class="w-full max-w-md flex gap-4 transition-all duration-300 opacity-0 pointer-events-none scale-95">
+            <button id="btnWrong" class="flex-1 py-4 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold rounded-xl shadow-lg transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <span>Forkert</span>
+            </button>
+            <button id="btnRight" class="flex-1 py-4 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-bold rounded-xl shadow-lg transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                <span>Rigtigt</span>
+            </button>
+        </div>
+
+        <!-- Færdig Skærm (Skjult som udgangspunkt) -->
+        <div id="finishScreen" class="hidden w-full max-w-md bg-white border border-gray-200 rounded-2xl p-8 shadow-xl text-center flex flex-col items-center justify-center">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 text-4xl">🎉</div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Flot klaret!</h2>
+            <p class="text-gray-600 mb-6">Du har lært alle ordene i denne runde.</p>
+            <button id="btnRestart" class="w-full py-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-xl shadow-lg transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 12H16M4 4h5v.581"></path></svg>
+                <span>Start forfra</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50 border-t border-gray-200 py-4 text-center text-xs text-gray-500">
+        <p>Udviklet til sprogundervisning • Fungerer offline og uden login</p>
+    </footer>
+
+    <!-- App Logic -->
+    <script>
+        // Sprogkonfiguration
+        const languages = {
+            eng: "Engelsk (English)",
+            ben: "Bengali (বাংলা)",
+            hin: "Hindi (हिन्दी)",
+            urd: "Urdu (اردو)",
+            ukr: "Ukrainsk (Українська)",
+            rus: "Russisk (Русский)",
+            fas: "Persisk (فارسی)",
+            tur: "Tyrkisk (Türkçe)",
+            nep: "Nepalesisk (नेपाली)",
+            swa: "Kiswahili (Kiswahili)",
+            fra: "Fransk (Français)",
+            twi: "Twi (Akan)",
+            bos: "Bosnisk (Bosanski)",
+            som: "Somali (Soomaali)",
+            srp: "Serbisk (Српски)",
+            tir: "Tigrinya (ትግርኛ)",
+            zho: "Mandarin Kinesisk (中文)",
+            tgk: "Tadjikisk (Тоҷикӣ)",
+            spa: "Spansk (Español)",
+            vie: "Vietnamesisk (Tiếng Việt)"
+        };
+
+        // Komplet ordliste med oversættelser for alle 72 ord til de 20 sprog
+        const wordDatabase = [
+            {
+                da: "Hvor bor du?",
+                translations: {
+                    eng: "Where do you live?",
+                    ben: "আপনি কোথায় থাকেন?",
+                    hin: "आप कहाँ रहते हैं?",
+                    urd: "آپ کہاں رہتے ہیں؟",
+                    ukr: "Де ви живете?",
+                    rus: "Где вы живете?",
+                    fas: "کجا زندگی می‌کنید؟",
+                    tur: "Nerede yaşıyorsunuz?",
+                    nep: "तपाईं कहाँ बस्नुहुन्छ?",
+                    swa: "Unakaa wapi? / Unaishi wapi?",
+                    fra: "Où habitez-vous?",
+                    twi: "Wo te he?",
+                    bos: "Gdje živite?",
+                    som: "Halkee baad degan tahay? / Halkee ku nooshahay?",
+                    srp: "Где живите?",
+                    tir: "ኣበይ ትነብር?",
+                    zho: "你住在哪里？",
+                    tgk: "Шумо дар куҷо зиндагӣ мекунед?",
+                    spa: "¿Dónde vives? / ¿Dónde vive usted?",
+                    vie: "Bạn sống ở đâu?"
+                }
+            },
+            {
+                da: "Hvordan bor du?",
+                translations: {
+                    eng: "How do you live? / What is your housing situation?",
+                    ben: "আপনি কেমন জায়গায় থাকেন? / আপনি কিভাবে থাকেন?",
+                    hin: "आप कैसे रहते हैं? / आपका निवास कैसा है?",
+                    urd: "آپ کیسے رہتے ہیں؟",
+                    ukr: "Як ви живете? / Яке у вас житло?",
+                    rus: "Как вы живете? / Каковы ваши жилищные условия?",
+                    fas: "چطور زندگی می‌کنید؟ / وضعیت مسکن شما چگونه است؟",
+                    tur: "Nasıl bir evde yaşıyorsunuz?",
+                    nep: "तपाईं कसरी बस्नुहुन्छ?",
+                    swa: "Unaishi vipi?",
+                    fra: "Comment habitez-vous?",
+                    twi: "Wo te sɛn?",
+                    bos: "Kako živite?",
+                    som: "Siduu yahay guriga aad ku nooshahay?",
+                    srp: "Како живите?",
+                    tir: "कመይ ጌርካ ትነብር?",
+                    zho: "你的居住条件怎么样？",
+                    tgk: "Шумо чӣ тавр зиндагӣ мекунед?",
+                    spa: "¿Cómo vives? / ¿Cómo es tu vivienda?",
+                    vie: "Bạn sống như thế nào? / Điều kiện chỗ ở của bạn thế nào?"
+                }
+            },
+            {
+                da: "Jeg bor i ____.",
+                translations: {
+                    eng: "I live in ____.",
+                    ben: "আমি ____ এ থাকি।",
+                    hin: "मैं ____ में रहता हूँ। / मैं ____ में रहती हूँ।",
+                    urd: "میں ____ میں رہتا ہوں۔ / میں ____ میں رہتی ہوں۔",
+                    ukr: "Я живу в ____.",
+                    rus: "Я живу в ____.",
+                    fas: "من در ____ زندگی می‌کنم.",
+                    tur: "____'da yaşıyorum. / ____'da oturuyorum.",
+                    nep: "म ____ मा बस्छु।",
+                    swa: "Ninaishi ____.",
+                    fra: "Je vis à ____. / J'habite à ____.",
+                    twi: "Mete ____.",
+                    bos: "Ja živim u ____.",
+                    som: "Waxaan ku noolahay ____.",
+                    srp: "Ја живим у ____.",
+                    tir: "ኣነ ኣብ ____ ይነብር።",
+                    zho: "我住在____。",
+                    tgk: "Ман дар ____ зиндагӣ мекунам.",
+                    spa: "Vivo en ____.",
+                    vie: "Tôi sống ở ____."
+                }
+            },
+            {
+                da: "Jeg bor i hus/lejlighed/rækkehus/containerhus",
+                translations: {
+                    eng: "I live in a house/apartment/townhouse/container home",
+                    ben: "আমি একটি বাড়ি/অ্যাপার্টমেন্ট/সারিবদ্ধ বাড়ি/কনটেইনার বাড়িতে থাকি",
+                    hin: "मैं एक घर/अपार्टमेंट/टाउनहाउस/कंटेनर घर में रहता हूँ",
+                    urd: "میں ایک گھر/اپارٹمنٹ/ٹاؤن ہاؤس/کنٹینر گھر میں رہتا ہوں",
+                    ukr: "Я живу в будинку/квартирі/таунхаусі/контейнерному будинку",
+                    rus: "Я живу в доме/квартире/таунхаусе/контейнерном доме",
+                    fas: "من در خانه/آپارتمان/خانه ردیفی/خانه کانتینری زندگی می‌کنم",
+                    tur: "Müstakil evde/dairede/sıra evde/konteyner evde yaşıyorum",
+                    nep: "म घर/फ्ल्याट/रो-हाउस/कन्टेनर घरमा बस्छु",
+                    swa: "Ninaishi kwenye nyumba/ghorofa/nyumba za safu/nyumba ya kontena",
+                    fra: "Je vis dans une maison/un appartement/une maison mitoyenne/une maison conteneur",
+                    twi: "Mete ofie/danmudeɛ/ɛdan a ɛtoatoa so/kɔnteena dan mu",
+                    bos: "Živim u kući/stanu/kući u nizu/kontejnerskoj kući",
+                    som: "Waxaan ku noolahay guri/guri dabaq ah/guri saf ah/guri konteener ah",
+                    srp: "Живим у кући/стану/кући у низу/контејнерској кући",
+                    tir: "ኣብ ገዛ/በዓል ደርቢ ገዛ/ተተሓሒዞም ዝተሰርሑ ገዛውቲ/ናይ ኮንተይነር ገዛ እየ ዝነብር",
+                    zho: "我住在独立洋房/公寓/联排别墅/集装箱房里",
+                    tgk: "Ман дар хона/хонаи истиқоматӣ (квартира)/хонаи якҷоясохташуда/хонаи контейнерӣ зиндагӣ мекунам",
+                    spa: "Vivo en una casa/un apartamento/una casa adosada/una casa contenedor",
+                    vie: "Tôi sống ở nhà riêng/căn hộ/nhà liền kề/nhà container"
+                }
+            },
+            {
+                da: "Hvor mange værelser er der?",
+                translations: {
+                    eng: "How many rooms are there?",
+                    ben: "সেখানে কয়টি ঘর আছে?",
+                    hin: "वहाँ कितने कमरे हैं?",
+                    urd: "وہاں کتنے کمرے ہیں؟",
+                    ukr: "Скільки там кімнат?",
+                    rus: "Сколько там комнат?",
+                    fas: "آنجا چند اتاق وجود دارد؟",
+                    tur: "Kaç oda var?",
+                    nep: "त्यहाँ कतिवटा कोठाहरू छन्?",
+                    swa: "Kuna vyumba vingapi?",
+                    fra: "Combien de pièces y a-t-il?",
+                    twi: "Asaso/adan dodoɔ sɛn na ɛwɔ hɔ?",
+                    bos: "Koliko soba ima?",
+                    som: "Meqo qol ayaa jira?",
+                    srp: "Колико соба има?",
+                    tir: "ክንደይ ክፍልታት ኣለዉ?",
+                    zho: "这里有几间房间？",
+                    tgk: "Дар он ҷо чанд хона (ҳуҷра) ҳаст?",
+                    spa: "¿Cuántas habitaciones hay?",
+                    vie: "Có bao nhiêu phòng?"
+                }
+            },
+            {
+                da: "Der er ______ værelser",
+                translations: {
+                    eng: "There are ______ rooms",
+                    ben: "সেখানে ______টি ঘর আছে",
+                    hin: "वहाँ ______ कमरे हैं",
+                    urd: "وہاں ______ کمرے ہیں",
+                    ukr: "Там є ______ кімнат(и)",
+                    rus: "Там ______ комнат(ы)",
+                    fas: "آنجا ______ اتاق وجود دارد",
+                    tur: "______ oda var",
+                    nep: "त्यहाँ ______ वटा कोठाहरू छन्",
+                    swa: "Kuna vyumba ______",
+                    fra: "Il y a ______ pièces",
+                    twi: "Abasaso ______ na ɛwɔ hɔ",
+                    bos: "Ima ______ soba",
+                    som: "Waxaa jira ______ qol",
+                    srp: "Има ______ соба",
+                    tir: "______ ክፍልታት ኣለዉ",
+                    zho: "有______间房间",
+                    tgk: "Дар он ҷо ______ ҳуҷра ҳаст",
+                    spa: "Hay ______ habitaciones",
+                    vie: "Có ______ phòng"
+                }
+            },
+            {
+                da: "Hvor mange kvadratmeter er din bolig?",
+                translations: {
+                    eng: "How many square meters is your home?",
+                    ben: "আপনার বাসা কত বর্গমিটার?",
+                    hin: "आपका घर कितने वर्ग मीटर का है?",
+                    urd: "آپ کا گھر کتنے مربع میٹر کا ہے؟",
+                    ukr: "Яка площа вашого житла в квадратних метрах?",
+                    rus: "Сколько квадратных метров ваше жилье?",
+                    fas: "خانه شما چند متر مربع است؟",
+                    tur: "Eviniz kaç metrekare?",
+                    nep: "तपाईंको घर कति वर्ग मिटर छ?",
+                    swa: "Nyumba yako ina ukubwa wa mita za mraba ngapi?",
+                    fra: "De combien de mètres carrés est votre logement?",
+                    twi: "Wo fie square meter dodoɔ sɛn?",
+                    bos: "Koliko kvadratnih metara ima vaš stan/kuća?",
+                    som: "Guryahaagu waa meqomitar oo labajibbaaran?",
+                    srp: "Колико квадратних метара има ваш стан/кућа?",
+                    tir: "እቲ ገዛኻ ክንደይ ትርብዒት ሜትሮ (square meters) እዩ?",
+                    zho: "你的房子有多少平方米？",
+                    tgk: "Хонаи шумо чанд метри мураббаъ аст?",
+                    spa: "¿Cuántos metros cuadrados tiene tu vivienda?",
+                    vie: "Nhà bạn rộng bao nhiêu mét vuông?"
+                }
+            },
+            {
+                da: "Den er ______ kvadratmeter",
+                translations: {
+                    eng: "It is ______ square meters",
+                    ben: "এটি ______ বর্গমিটার",
+                    hin: "यह ______ वर्ग मीटर का है",
+                    urd: "یہ ______ مربع میٹر کا ہے",
+                    ukr: "Воно має ______ квадратних метрів",
+                    rus: "Оно ______ квадратных метров",
+                    fas: "آن ______ متر مربع است",
+                    tur: "______ metrekare",
+                    nep: "यो ______ वर्ग मिटर छ",
+                    swa: "Ina mita za mraba ______",
+                    fra: "Il fait ______ mètres carrés",
+                    twi: "Ɛyɛ square meter ______",
+                    bos: "Ima ______ kvadratnih metara",
+                    som: "Waa ______ mitir oo labajibbaaran",
+                    srp: "Има ______ квадратних метара",
+                    tir: "______ ትርብዒት ሜትሮ (square meters) እዩ",
+                    zho: "面积是______平方米",
+                    tgk: "Он ______ метри мураббаъ аст",
+                    spa: "Tiene ______ metros cuadrados",
+                    vie: "Nó rộng ______ mét vuông"
+                }
+            },
+            {
+                da: "Et værelse",
+                translations: {
+                    eng: "A room",
+                    ben: "একটি ঘর / একটি কক্ষ",
+                    hin: "एक कमरा",
+                    urd: "ایک کمرہ",
+                    ukr: "Кімната",
+                    rus: "Комната",
+                    fas: "یک اتاق",
+                    tur: "Oda",
+                    nep: "एउटा कोठा",
+                    swa: "Chumba",
+                    fra: "Une pièce / Une chambre",
+                    twi: "Abasaso / Dan",
+                    bos: "Soba",
+                    som: "Qol",
+                    srp: "Соба",
+                    tir: "ሓደ ክፍሊ",
+                    zho: "一间房间",
+                    tgk: "Як ҳуҷра",
+                    spa: "Una habitación / Un cuarto",
+                    vie: "Một căn phòng"
+                }
+            },
+            {
+                da: "Et køkken",
+                translations: {
+                    eng: "A kitchen",
+                    ben: "একটি রান্নাঘর",
+                    hin: "एक रसोईघर",
+                    urd: "ایک باورچی خانہ",
+                    ukr: "Кухня",
+                    rus: "Кухня",
+                    fas: "یک آشپزخانه",
+                    tur: "Mutfak",
+                    nep: "एउटा भान्साकोठा",
+                    swa: "Jiko",
+                    fra: "Une cuisine",
+                    twi: "Muka / Gyaade",
+                    bos: "Kuhinja",
+                    som: "Kushiin",
+                    srp: "Кухиња",
+                    tir: "ክሽነ",
+                    zho: "厨房",
+                    tgk: "Ошхона",
+                    spa: "Una cocina",
+                    vie: "Một nhà bếp"
+                }
+            },
+            {
+                da: "Et toilet",
+                translations: {
+                    eng: "A toilet / A restroom",
+                    ben: "একটি টয়লেট",
+                    hin: "एक शौचालय",
+                    urd: "ایک بیت الخلا",
+                    ukr: "Туалет",
+                    rus: "Туалет",
+                    fas: "یک توالت / سرویس بهداشتی",
+                    tur: "Tuvalet",
+                    nep: "एउटा चर्पी / शौचालय",
+                    swa: "Choo",
+                    fra: "Un toilette / Un W.C.",
+                    twi: "Duaba / Tiafi",
+                    bos: "Toalet / WC",
+                    som: "Musqul / Guri yar",
+                    srp: "Тоалет / ВЦ",
+                    tir: "ሽቓቅ",
+                    zho: "厕所 / 洗手间",
+                    tgk: "Ҳоҷатхона",
+                    spa: "Un inodoro / Un aseo",
+                    vie: "Nhà vệ sinh"
+                }
+            },
+            {
+                da: "En terrasse",
+                translations: {
+                    eng: "A terrace / A patio",
+                    ben: "একটি ছাদ / একটি বারান্দা",
+                    hin: "एक छत / टेरेस",
+                    urd: "ٹیرس / چبوترہ",
+                    ukr: "Тераса",
+                    rus: "Терраса",
+                    fas: "یک تراس",
+                    tur: "Teras",
+                    nep: "एउटा कौसी / टेरेस",
+                    swa: "Ukumbi / Veranda",
+                    fra: "Une terrasse",
+                    twi: "Abrannaa",
+                    bos: "Terasa",
+                    som: "Baranda",
+                    srp: "Тераса",
+                    tir: "ተራስ",
+                    zho: "露台 / 平台",
+                    tgk: "Тайвон / Терраса",
+                    spa: "Una terraza",
+                    vie: "Một sân hiên / Sân thượng"
+                }
+            },
+            {
+                da: "En spisestue",
+                translations: {
+                    eng: "A dining room",
+                    ben: "একটি খাবার ঘর",
+                    hin: "भोजन कक्ष",
+                    urd: "کھانے کا کمرہ",
+                    ukr: "Їдальня",
+                    rus: "Столовая",
+                    fas: "یک اتاق غذاخوری",
+                    tur: "Yemek odası",
+                    nep: "खाना खाने कोठा",
+                    swa: "Chumba cha kulia chakula",
+                    fra: "Une salle à manger",
+                    twi: "Adidibea",
+                    bos: "Trpezarija",
+                    som: "Qolka cuntada",
+                    srp: "Трпезарија",
+                    tir: "ክፍሊ መግብ መብልዒ",
+                    zho: "餐厅 / 饭厅",
+                    tgk: "Ошхона / Меҳмонхонаи хӯрокхӯрӣ",
+                    spa: "Un comedor",
+                    vie: "Một phòng ăn"
+                }
+            },
+            {
+                da: "En blender",
+                translations: {
+                    eng: "A blender",
+                    ben: "একটি ব্লেন্ডার",
+                    hin: "एक मिक्सर / ब्लेंडर",
+                    urd: "ایک بلینڈر / مکسر",
+                    ukr: "Блендер",
+                    rus: "Блендер",
+                    fas: "یک مخلوط‌کن",
+                    tur: "Blender",
+                    nep: "एउटा ब्लेन्डर",
+                    swa: "Blenda",
+                    fra: "Un mixeur / Un blender",
+                    twi: "Blɛnda",
+                    bos: "Blender",
+                    som: "Mashiinka shiida cuntada",
+                    srp: "Блендер",
+                    tir: "ብለንደር",
+                    zho: "搅拌机 /榨汁机",
+                    tgk: "Блендер",
+                    spa: "Una licuadora / Una batidora",
+                    vie: "Một máy xay sinh tố"
+                }
+            },
+            {
+                da: "Et komfur",
+                translations: {
+                    eng: "A stove",
+                    ben: "একটি চুলা",
+                    hin: "एक चूल्हा / स्टोव",
+                    urd: "ایک چولہا",
+                    ukr: "Кухонна плита",
+                    rus: "Кухонная плита",
+                    fas: "یک اجاق گاز",
+                    tur: "Ocak / Fırınlı ocak",
+                    nep: "एउटा चुलो",
+                    swa: "Jiko la kupikia",
+                    fra: "Une cuisinière / Un réchaud",
+                    twi: "Gyaade / Fononoo",
+                    bos: "Šporet / Pećница",
+                    som: "Shoolad / Kudshad",
+                    srp: "Шпорет",
+                    tir: "ምድጃ / ፈርነሎ",
+                    zho: "炉灶 / 灶台",
+                    tgk: "Плитаи хӯрокпазӣ",
+                    spa: "Una cocina / Una estufa",
+                    vie: "Một cái bếp"
+                }
+            },
+            {
+                da: "Et køleskab",
+                translations: {
+                    eng: "A refrigerator / A fridge",
+                    ben: "একটি ফ্রিজ / রেফ্রিজারেটর",
+                    hin: "एक रेफ्रिजरेटर / फ्रिज",
+                    urd: "ایک فریج / ریفریجरेटर",
+                    ukr: "Холодильник",
+                    rus: "Холодильник",
+                    fas: "یک یخچال",
+                    tur: "Buzdolabı",
+                    nep: "एउटा फ्रिज",
+                    swa: "Friji",
+                    fra: "Un réfrigérateur / Un frigo",
+                    twi: "Afiri a ɛyɛ nneɛma nwunu / Frige",
+                    bos: "Frižider",
+                    som: "Talaagad / Firiji",
+                    srp: "Фрижидер",
+                    tir: "መዝሓሊ (ፍሪጅ)",
+                    zho: "冰箱",
+                    tgk: "Яхдон",
+                    spa: "Un refrigerador / Una nevera",
+                    vie: "Một cái tủ lạnh"
+                }
+            },
+            {
+                da: "En ovn",
+                translations: {
+                    eng: "An oven",
+                    ben: "একটি ওভেন",
+                    hin: "एक ओवन",
+                    urd: "ایک اوون",
+                    ukr: "Духовка / Духова шафа",
+                    rus: "Духовка / Духовой шкаф",
+                    fas: "یک فر / آون",
+                    tur: "Fırın",
+                    nep: "एउटा ओभन",
+                    swa: "Oven / Jiko la kuoka",
+                    fra: "Un four",
+                    twi: "Fononoo a yɛde noa nneɛma / Oven",
+                    bos: "Rerna / Pećnica",
+                    som: "Foorno",
+                    srp: "Рерна / Пећница",
+                    tir: "ፈርኖ",
+                    zho: "烤箱",
+                    tgk: "Танӯри барқӣ / Духовка",
+                    spa: "Un horno",
+                    vie: "Một cái lò nướng"
+                }
+            },
+            {
+                da: "Et spisebord",
+                translations: {
+                    eng: "A dining table",
+                    ben: "একটি খাবার টেবিল",
+                    hin: "खाने की मेज / डाइनिंग टेबल",
+                    urd: "کھانے کی میز",
+                    ukr: "Обідній стіл",
+                    rus: "Обеденный стол",
+                    fas: "یک میز غذاخوری",
+                    tur: "Yemek masası",
+                    nep: "खाना खाने टेबल",
+                    swa: "Meza ya kulia chakula",
+                    fra: "Une table à manger",
+                    twi: "Didiporɔw / Didipɔn",
+                    bos: "Trpezarijski stol",
+                    som: "Miiska cuntada",
+                    srp: "Трпезаријски сто",
+                    tir: "መኣዲ / መአዲ መግብ",
+                    zho: "餐桌",
+                    tgk: "Мизи хӯрокхӯрӣ",
+                    spa: "Una mesa de comedor",
+                    vie: "Một cái bàn ăn"
+                }
+            },
+            {
+                da: "En seng",
+                translations: {
+                    eng: "A bed",
+                    ben: "একটি বিছানা / একটি খাট",
+                    hin: "एक बिस्तर",
+                    urd: "ایک بستر",
+                    ukr: "Ліжко",
+                    rus: "Кровать",
+                    fas: "یک تخت‌خواب",
+                    tur: "Yatak",
+                    nep: "एउटा ओछ्यान / खाट",
+                    swa: "Kitanda",
+                    fra: "Un lit",
+                    twi: "Mpa / Kete",
+                    bos: "Krevet",
+                    som: "Sariir",
+                    srp: "Кревет",
+                    tir: "ዓራት",
+                    zho: "一张床",
+                    tgk: "Кат / Рахти хоб",
+                    spa: "Una cama",
+                    vie: "Một cái giường"
+                }
+            },
+            {
+                da: "En pude",
+                translations: {
+                    eng: "A pillow",
+                    ben: "একটি বালিশ",
+                    hin: "एक तकिया",
+                    urd: "ایک تکیہ",
+                    ukr: "Подушка",
+                    rus: "Подушка",
+                    fas: "یک بالش",
+                    tur: "Yastık",
+                    nep: "एउटा सिरानी",
+                    swa: "Mto",
+                    fra: "Un oreiller",
+                    twi: "Sumii / Sumiɛ",
+                    bos: "Jastuk",
+                    som: "Barkimo",
+                    srp: "Јастук",
+                    tir: "መተርኣስ (ተርኣስ)",
+                    zho: "枕头",
+                    tgk: "Болишт",
+                    spa: "Una almohada",
+                    vie: "Một cái gối"
+                }
+            },
+            {
+                da: "Et skab",
+                translations: {
+                    eng: "A closet / A cabinet / A cupboard",
+                    ben: "একটি আলমারি",
+                    hin: "एक अलमारी",
+                    urd: "ایک الماری",
+                    ukr: "Шафа",
+                    rus: "Шкаф",
+                    fas: "یک کمد",
+                    tur: "Dolap / Gardırop",
+                    nep: "एउटा दराज",
+                    swa: "Kabati",
+                    fra: "Une armoire / Un placard",
+                    twi: "Adaka / Adakapɔn",
+                    bos: "Ormar",
+                    som: "Armajo",
+                    srp: "Орман / Скак",
+                    tir: "ካብነት / ቁምሳጥን",
+                    zho: "柜子 / 衣柜",
+                    tgk: "Ҷевон / Шкаф",
+                    spa: "Un armario / Un clóset",
+                    vie: "Một cái tủ"
+                }
+            },
+            {
+                da: "En have",
+                translations: {
+                    eng: "A garden",
+                    ben: "একটি বাগান",
+                    hin: "एक बगीचा",
+                    urd: "ایک باغ / فرنٹ یارڈ",
+                    ukr: "Сад",
+                    rus: "Сад",
+                    fas: "یک باغچه",
+                    tur: "Bahçe",
+                    nep: "एउटा बगैँचा",
+                    swa: "Bustani",
+                    fra: "Un jardin",
+                    twi: "Turo / Afuo",
+                    bos: "Bašta / Vrt",
+                    som: "Beer yar / Beerta guriga",
+                    srp: "Башта / Врт",
+                    tir: "ጀርዲን / ስፍራ ኣታኽልቲ",
+                    zho: "花园 / 庭院",
+                    tgk: "Боғ / Бӯстон",
+                    spa: "Un jardín",
+                    vie: "Một khu vườn"
+                }
+            },
+            {
+                da: "En stue",
+                translations: {
+                    eng: "A living room",
+                    ben: "একটি বসার ঘর",
+                    hin: "बैठक कक्ष / लिविंग रूम",
+                    urd: "لیونگ روم / बैठक",
+                    ukr: "Вітальня",
+                    rus: "Гостиная",
+                    fas: "یک اتاق نشیمن / هال",
+                    tur: "Oturma odası / Salon",
+                    nep: "बैठक कोठा",
+                    swa: "Sebule",
+                    fra: "Un salon / Un séjour",
+                    twi: "Asaso / Baabi a yɛgye ahɔhoɔ",
+                    bos: "Dnevna soba",
+                    som: "Fadhiga / Qolka fadhiga",
+                    srp: "Дневна соба",
+                    tir: "ሳሎን",
+                    zho: "客厅 / 起居室",
+                    tgk: "Меҳмонхона / Толор",
+                    spa: "Un salón / Una sala de estar",
+                    vie: "Một phòng khách"
+                }
+            },
+            {
+                da: "Et børneværelse",
+                translations: {
+                    eng: "A children's room",
+                    ben: "বাচ্চাদের ঘর",
+                    hin: "बच्चों का कमरा",
+                    urd: "بچوں کا کمرہ",
+                    ukr: "Дитяча кімната",
+                    rus: "Детская комната",
+                    fas: "اتاق کودک",
+                    tur: "Çocuk odası",
+                    nep: "केटाकेटीको कोठा",
+                    swa: "Chumba cha watoto",
+                    fra: "Une chambre d'enfant",
+                    twi: "Mmofra dan / Mmofra basaso",
+                    bos: "Dječija soba",
+                    som: "Qolka carruurta",
+                    srp: "Дечија соба",
+                    tir: "ክፍሊ ቈልዑ",
+                    zho: "儿童房",
+                    tgk: "Хонаи кӯдакон",
+                    spa: "Una habitación infantil / Un cuarto de niños",
+                    vie: "Một phòng trẻ em"
+                }
+            },
+            {
+                da: "Et soveværelse",
+                translations: {
+                    eng: "A bedroom",
+                    ben: "একটি শোবার ঘর",
+                    hin: "शयनकक्ष / बेडरूम",
+                    urd: "बेडरूम / سونے کا کمرہ",
+                    ukr: "Спальня",
+                    rus: "Спальня",
+                    fas: "یک اتاق خواب",
+                    tur: "Yatak odası",
+                    nep: "सुत्ने कोठा",
+                    swa: "Chumba cha kulala",
+                    fra: "Une chambre à coucher",
+                    twi: "Mpadan / Dahobea",
+                    bos: "Spavaća soba",
+                    som: "Qolka hurdada",
+                    srp: "Спаваћа соба",
+                    tir: "ክፍሊ መደቀሲ",
+                    zho: "卧室 / 睡房",
+                    tgk: "Хонаи хоб",
+                    spa: "Un dormitorio / Una habitación",
+                    vie: "Một phòng ngủ"
+                }
+            },
+            {
+                da: "En altan",
+                translations: {
+                    eng: "A balcony",
+                    ben: "একটি বারান্দা",
+                    hin: "एक बालकनी",
+                    urd: "ایک بالکونی",
+                    ukr: "Балкон",
+                    rus: "Балкон",
+                    fas: "یک بالکن",
+                    tur: "Balkon",
+                    nep: "एउटा कौसी / बाल्कोनी",
+                    swa: "Balkoni",
+                    fra: "Un balcon",
+                    twi: "Abrannaa",
+                    bos: "Balkon",
+                    som: "Balakooni / Baranda sare",
+                    srp: "Балкон",
+                    tir: "ባblankን (ባርኮን)",
+                    zho: "阳台",
+                    tgk: "Балкон / Айвон",
+                    spa: "Un balcón",
+                    vie: "Một ban công"
+                }
+            },
+            {
+                da: "Et badeværelse",
+                translations: {
+                    eng: "A bathroom",
+                    ben: "একটি বাথরুম",
+                    hin: "एक स्नानघर / बाथरूम",
+                    urd: "غسل خانہ / غسل کا کمرہ",
+                    ukr: "Ванна кімната",
+                    rus: "Ванная комната",
+                    fas: "یک حمام",
+                    tur: "Banyo",
+                    nep: "एउटा नुहाउने कोठा / बाथरुम",
+                    swa: "Bafuni",
+                    fra: "Une salle de bain",
+                    twi: "Adiguaree / Guarebea",
+                    bos: "Kupatilo",
+                    som: "Musqusha lagu qubeysto",
+                    srp: "Купатило",
+                    tir: "ክፍሊ ሕጽቦ (ባኞ)",
+                    zho: "浴室 / 洗澡间",
+                    tgk: "Хаммом",
+                    spa: "Un cuarto de baño",
+                    vie: "Một phòng tắm"
+                }
+            },
+            {
+                da: "En gryde",
+                translations: {
+                    eng: "A pot / A cooking pot",
+                    ben: "একটি পাত্র / একটি সসপ্যান",
+                    hin: "एक बर्तन / पतीला",
+                    urd: "یک دیگچی / پتیلا",
+                    ukr: "Каструля",
+                    rus: "Кастрюля",
+                    fas: "یک قابلمه",
+                    tur: "Tencere",
+                    nep: "एउटा कसौंडी / भाँडो",
+                    swa: "Sufuria",
+                    fra: "Une casserole / Une marmite",
+                    twi: "Kuku / Sɛn",
+                    bos: "Šerpa / Lonac",
+                    som: "Digsi",
+                    srp: "Шерпа / Лонац",
+                    tir: "ጻሕሊ (ድስት)",
+                    zho: "锅 / 深锅",
+                    tgk: "Дег",
+                    spa: "Una olla / Una cacerola",
+                    vie: "Một cái xoong / Nồi"
+                }
+            },
+            {
+                da: "En airfryer",
+                translations: {
+                    eng: "An air fryer",
+                    ben: "একটি এয়ার ফ্রায়ার",
+                    hin: "एक एयर फ्रायर",
+                    urd: "ایئر فرائر",
+                    ukr: "Аерофритюрниця / Мультипіч",
+                    rus: "Аэрофритюрница / Мультипечь",
+                    fas: "یک سرخ‌کن بدون روغن (هواپز)",
+                    tur: "Fritöz / Airfryer",
+                    nep: "एउटा एयर फ्रायर",
+                    swa: "Kikaango cha hewa",
+                    fra: "Une friteuse à air",
+                    twi: "Airfryer",
+                    bos: "Friteza na vrući zrak",
+                    som: "Friteesada hawada / Airfryer",
+                    srp: "Фритеза на врућ ваздух",
+                    tir: "ኤር ፍራየር (ኣየር ፍራየር)",
+                    zho: "空气炸锅",
+                    tgk: "Аэрофритурница",
+                    spa: "Una freidora de aire",
+                    vie: "Một nồi chiên không dầu"
+                }
+            },
+            {
+                da: "En grill",
+                translations: {
+                    eng: "A grill",
+                    ben: "একটি গ্রিল",
+                    hin: "एक ग्रिल",
+                    urd: "گرل",
+                    ukr: "Гриль",
+                    rus: "Гриль",
+                    fas: "یک گریل / منقل",
+                    tur: "Izgara / Barbekü",
+                    nep: "एउटा ग्रिल",
+                    swa: "Grili",
+                    fra: "Un barbecue / Un gril",
+                    twi: "Kuku a yɛde kye nam / Grill",
+                    bos: "Roštilj",
+                    som: "Birta hilibka lagu dubo / Solay",
+                    srp: "Роштиљ",
+                    tir: "መጥበሲ ስጋ (ግሪል)",
+                    zho: "烤架 / 烧烤炉",
+                    tgk: "Мангал / Гриль",
+                    spa: "Una parrilla / Una barbacoa",
+                    vie: "Một cái vỉ nướng / Lò nướng"
+                }
+            },
+            {
+                da: "En pande",
+                translations: {
+                    eng: "A pan / A frying pan",
+                    ben: "একটি কড়াই / একটি ফ্রাইপ্যান",
+                    hin: "एक कड़ाही / फ्राइंग पैन",
+                    urd: "ایک فرائنگ پین",
+                    ukr: "Пательня / Сковорода",
+                    rus: "Сковорода",
+                    fas: "یک ماهیتابه",
+                    tur: "Tava",
+                    nep: "एउटा तावा / कराइ",
+                    swa: "Kikaango",
+                    fra: "Une poêle",
+                    twi: "Kyɛnsen",
+                    bos: "Tava / Tiganj",
+                    som: "Birta sfeera / Khamiir",
+                    srp: "Тигањ / Тава",
+                    tir: "መቝሎ (ማቕሎ)",
+                    zho: "平底锅",
+                    tgk: "Тоба / Сковорода",
+                    spa: "Una sartén",
+                    vie: "Một cái chảo"
+                }
+            },
+            {
+                da: "En spisestol",
+                translations: {
+                    eng: "A dining chair",
+                    ben: "একটি খাবার চেয়ার",
+                    hin: "डाइनिंग चेयर",
+                    urd: "کھانے کی کرسی",
+                    ukr: "Обідній стілець",
+                    rus: "Обеденный стул",
+                    fas: "یک صندلی غذاخوری",
+                    tur: "Yemek sandalyesi",
+                    nep: "खाना खाने कुर्सी",
+                    swa: "Kiti cha kulia chakula",
+                    fra: "Une chaise de salle à manger",
+                    twi: "Didiagua / Akongua",
+                    bos: "Trpezarijska stolica",
+                    som: "Kursiga cuntada",
+                    srp: "Трпезаријска столица",
+                    tir: "ወንበር መኣዲ",
+                    zho: "餐椅",
+                    tgk: "Курсии хӯрокхӯрӣ",
+                    spa: "Una silla de comedor",
+                    vie: "Một cái ghế ăn"
+                }
+            },
+            {
+                da: "En dyne",
+                translations: {
+                    eng: "A duvet / A comforter",
+                    ben: "একটি লেপ / একটি ডুভেট",
+                    hin: "एक रजाई / डुवेट",
+                    urd: "لحاف / ڈبل دوش",
+                    ukr: "Ковдра",
+                    rus: "Одеяло",
+                    fas: "یک لحاف",
+                    tur: "Yorgan",
+                    nep: "एउटा सिरक",
+                    swa: "Duve / Komfata",
+                    fra: "Une couette",
+                    twi: "Kuntu",
+                    bos: "Jorgan / Poplun",
+                    som: "Buste / Bustaha jiifka",
+                    srp: "Јорган / Поплун",
+                    tir: "ኮምፎርተር / ኮበርታ",
+                    zho: "被子 / 羽绒被",
+                    tgk: "Кӯрпа",
+                    spa: "Un edredón",
+                    vie: "Một cái chăn bông"
+                }
+            },
+            {
+                da: "Et sengebord",
+                translations: {
+                    eng: "A nightstand / A bedside table",
+                    ben: "একটি বিছানার পাশের টেবিল",
+                    hin: "एक बेडसाइड टेबल",
+                    urd: "بستر کے کنارے کی میز",
+                    ukr: "Приліжкова тумбочка",
+                    rus: "Прикроватная тумбочка",
+                    fas: "یک میز پاتختی",
+                    tur: "Komodin",
+                    nep: "बेडसाइड टेबल",
+                    swa: "Kameza ka kando ya kitanda",
+                    fra: "Une table de chevet / Une table de nuit",
+                    twi: "Mpa ho ɛpon",
+                    bos: "Noćni ormarić",
+                    som: "Miiska sariirta agteeda yaalla",
+                    srp: "Ноћни ор Excessiveмарић / Наткасна",
+                    tir: "ናይ ዓራት ኮሞդino",
+                    zho: "床头柜",
+                    tgk: "Тумбочкаи паҳлӯи кат",
+                    spa: "Una mesita de noche",
+                    vie: "Một cái bàn đầu giường"
+                }
+            },
+            {
+                da: "En hæk",
+                translations: {
+                    eng: "A hedge",
+                    ben: "ঝোপঝাড়ের বেড়া / হেজ",
+                    hin: "एक बाड़ / झाड़ी",
+                    urd: "باڑ (झाड़ी)",
+                    ukr: "Живопліт / Жива огорожа",
+                    rus: "Живая изгородь",
+                    fas: "ریشه دیوار گیاهی / پرچین",
+                    tur: "Çit (bitkilerden yapılan çit)",
+                    nep: "झाडीको बार",
+                    swa: "Uzio wa miti",
+                    fra: "Une haie",
+                    twi: "Hedge / Nnua a yɛde bɔ ban",
+                    bos: "Živa ograda / Živica",
+                    som: "Deedka dhirta ah / Xayndaab dhireed",
+                    srp: "Жива ограда",
+                    tir: "ሓጹር ተኽሊ",
+                    zho: "树篱 / 绿篱",
+                    tgk: "Девори сабз / Панҷараи сабз",
+                    spa: "Un seto",
+                    vie: "Một hàng rào cây xanh"
+                }
+            },
+            {
+                da: "En blomst",
+                translations: {
+                    eng: "A flower",
+                    ben: "একটি ফুল",
+                    hin: "एक फूल",
+                    urd: "ایک پھول",
+                    ukr: "Квітка",
+                    rus: "Цветок",
+                    fas: "یک گل",
+                    tur: "Çiçek",
+                    nep: "एउटा फूल",
+                    swa: "Maua",
+                    fra: "Une fleur",
+                    twi: "Nhwiren",
+                    bos: "Cvijet",
+                    som: "Ubax",
+                    srp: "Цвет",
+                    tir: "ዕምባባ",
+                    zho: "一朵花",
+                    tgk: "Гул",
+                    spa: "Una flor",
+                    vie: "Một bông hoa"
+                }
+            },
+            {
+                da: "Græs",
+                translations: {
+                    eng: "Grass",
+                    ben: "ঘাস",
+                    hin: "घास",
+                    urd: "گھاس",
+                    ukr: "Трава",
+                    rus: "Трава",
+                    fas: "چمن / علف",
+                    tur: "Çimen / Ot",
+                    nep: "घाँस",
+                    swa: "Nyasi",
+                    fra: "De l'herbe / Du gazon",
+                    twi: "Wura / Ɛmme",
+                    bos: "Trava",
+                    som: "Caws",
+                    srp: "Трава",
+                    tir: "ሳዕሪ",
+                    zho: "草 / 草地",
+                    tgk: "Алаф / Сабза",
+                    spa: "Hierba / Césped",
+                    vie: "Cỏ"
+                }
+            },
+            {
+                da: "Et træ",
+                translations: {
+                    eng: "A tree",
+                    ben: "একটি গাছ",
+                    hin: "एक पेड़",
+                    urd: "ایک درخت",
+                    ukr: "Дерево",
+                    rus: "Дерево",
+                    fas: "یک درخت",
+                    tur: "Ağaç",
+                    nep: "एउटा रुख",
+                    swa: "Mti",
+                    fra: "Un arbre",
+                    twi: "Dua",
+                    bos: "Drvo / Stablo",
+                    som: "Geed",
+                    srp: "Дрво",
+                    tir: "ኦም (እዋፍ / ተኽሊ)",
+                    zho: "一棵树",
+                    tgk: "Дарахт",
+                    spa: "Un árbol",
+                    vie: "Một cái cây"
+                }
+            },
+            {
+                da: "En græslåmaskine",
+                translations: {
+                    eng: "A lawnmower",
+                    ben: "একটি ঘাস কাটার মেশিন",
+                    hin: "लॉन घास काटने की मशीन",
+                    urd: "گھاس کاٹنے والی مشین",
+                    ukr: "Газонокосарка",
+                    rus: "Газонокосилка",
+                    fas: "یک چمن‌زن",
+                    tur: "Çim biçme makinesi",
+                    nep: "घाँस काट्ने मेसिन",
+                    swa: "Mashine ya kukata nyasi",
+                    fra: "Une tondeuse à gazon",
+                    twi: "Afiri a yɛde twitwa nwura",
+                    bos: "Kosilica za travu",
+                    som: "Mashiinka cawska laga jaro",
+                    srp: "Косилица за траву",
+                    tir: "መቍረጺ ሳዕሪ",
+                    zho: "割草机",
+                    tgk: "Алафдарав / Мошинаи алафдаравӣ",
+                    spa: "Un cortacésped",
+                    vie: "Một máy cắt cỏ"
+                }
+            },
+            {
+                da: "Cykelparkering",
+                translations: {
+                    eng: "Bicycle parking",
+                    ben: "সাইকেল পার্কিং",
+                    hin: "साइकिल पार्किंग",
+                    urd: "سائیکل پارکنگ",
+                    ukr: "Парковка для велосипедів",
+                    rus: "Велосипедная парковка",
+                    fas: "پارکینگ دوچرخه",
+                    tur: "Bisiklet park yeri",
+                    nep: "साइकल पार्किङ",
+                    swa: "Sehemu ya kuegesha baiskeli",
+                    fra: "Parking à vélos / Stationnement vélo",
+                    twi: "Sakre kwan",
+                    bos: "Parking za bicikle",
+                    som: "Goobta baaskiillada la dhigto",
+                    srp: "Паркинг за бицикле",
+                    tir: "መቐመጢ ብሽክለታታት (ፓርኪንግ)",
+                    zho: "自行车停放处",
+                    tgk: "Истгоҳи дучархаҳо",
+                    spa: "Aparcamiento para bicicletas",
+                    vie: "Chỗ đỗ xe đạp"
+                }
+            },
+            {
+                da: "Parkering",
+                translations: {
+                    eng: "Parking",
+                    ben: "পার্কিং",
+                    hin: "पार्किंग",
+                    urd: "پارکنگ",
+                    ukr: "Парковка / Стоянка",
+                    rus: "Парковка",
+                    fas: "پارکینگ",
+                    tur: "Otopark / Park etme",
+                    nep: "पार्किङ",
+                    swa: "Maegesho",
+                    fra: "Parking / Stationnement",
+                    twi: "Cargyinae",
+                    bos: "Parking",
+                    som: "Goobta gaadiidka la dhigto",
+                    srp: "Паркинг",
+                    tir: "ፓርኪንግ (መቐመጢ መካይን)",
+                    zho: "停车场 / 泊车",
+                    tgk: "Истгоҳи мошинҳо / Парковка",
+                    spa: "Aparcamiento / Estacionamiento",
+                    vie: "Chỗ đỗ xe"
+                }
+            },
+            {
+                da: "En kaffemaskine",
+                translations: {
+                    eng: "A coffee maker / A coffee machine",
+                    ben: "একটি কফি মেকার",
+                    hin: "कॉफी मेकर / कॉफी मशीन",
+                    urd: "کافی میکر",
+                    ukr: "Кавоварка / Кавомашина",
+                    rus: "Кофеварка / Кофемашина",
+                    fas: "یک قهوه‌ساز",
+                    tur: "Kahve makinesi",
+                    nep: "कफी बनाउने मेसिन",
+                    swa: "Mashine ya kahawa",
+                    fra: "Une cafetière / Une machine à café",
+                    twi: "Kofimaskine",
+                    bos: "Aparat za kafu",
+                    som: "Mashiinka bunka lagu sameeyo",
+                    srp: "Апарат за кафу",
+                    tir: "ናይ ቡን ማሽን",
+                    zho: "咖啡机",
+                    tgk: "Кофемашина",
+                    spa: "Una cafetera",
+                    vie: "Một máy pha cà phê"
+                }
+            },
+            {
+                da: "En vaskemaskine",
+                translations: {
+                    eng: "A washing machine",
+                    ben: "একটি ওয়াশিং মেশিন",
+                    hin: "कपड़े धोने की मशीन / वाशिंग मशीन",
+                    urd: "واشنگ مشین / کپڑے دھونے کی مشین",
+                    ukr: "Пральна машина",
+                    rus: "Стиральная машина",
+                    fas: "یک ماشین لباسشویی",
+                    tur: "Çamaşır makinesi",
+                    nep: "कपडा धुने मेसिन",
+                    swa: "Mashine ya kufulia nguo",
+                    fra: "Un lave-linge / Une machine à laver",
+                    twi: "Afiri a yɛde horo ntadeɛ",
+                    bos: "Mašina za veš",
+                    som: "Mashiinka dharka lagu dhaqo",
+                    srp: "Машина за прање веша",
+                    tir: "ናይ ክዳውንቲ ሕጽቦ ማሽን",
+                    zho: "洗衣机",
+                    tgk: "Мошинаи ҷомашӯӣ",
+                    spa: "Una lavadora",
+                    vie: "Một máy giặt"
+                }
+            },
+            {
+                da: "Et sofabord",
+                translations: {
+                    eng: "A coffee table",
+                    ben: "একটি সোফা টেবিল",
+                    hin: "एक छोटा सोफा मेज",
+                    urd: "صوفہ میز",
+                    ukr: "Журнальний столик",
+                    rus: "Журнальный столик",
+                    fas: "یک میز جلو مبلی",
+                    tur: "Sehpa / Orta sehpa",
+                    nep: "चिया टेबल / सोफा टेबल",
+                    swa: "Meza ndogo ya sebuleni / Meza ya kahawa",
+                    fra: "Une table basse",
+                    twi: "Sofaborɔw / Sofapɔn",
+                    bos: "Klupski stol / Stolčić za dnevnu sobu",
+                    som: "Miiska fadhiga",
+                    srp: "Столић за дневну собу",
+                    tir: "ናይ ሳሎን ጣውላ",
+                    zho: "茶几 / 咖啡桌",
+                    tgk: "Мизи меҳмонхона / Журналӣ",
+                    spa: "Una mesa de centro / Una mesa de café",
+                    vie: "Một cái bàn trà / Bàn sofa"
+                }
+            },
+            {
+                da: "En sofa",
+                translations: {
+                    eng: "A sofa / A couch",
+                    ben: "একটি সোফা",
+                    hin: "एक सोफा",
+                    urd: "ایک صوفہ",
+                    ukr: "Диван",
+                    rus: "Диван",
+                    fas: "یک مبل / کاناپه",
+                    tur: "Kanepe / Sofa",
+                    nep: "एउटा सोफा",
+                    swa: "Sofa",
+                    fra: "Un canapé / Un sofa",
+                    twi: "Sofa / Akonguatenten",
+                    bos: "Kauč / Sofa",
+                    som: "Sofo / Kursi dheer",
+                    srp: "Кауч / Софа",
+                    tir: "ሶፋ",
+                    zho: "沙发",
+                    tgk: "Диван / Софа",
+                    spa: "Un sofá",
+                    vie: "Một cái ghế sofa"
+                }
+            },
+            {
+                da: "Et TV/fjernsyn",
+                translations: {
+                    eng: "A TV / A television",
+                    ben: "একটি টিভি / টেলিভিশন",
+                    hin: "एक टीवी / टेलीविजन",
+                    urd: "ایک ٹی وی / ٹیلی ویژن",
+                    ukr: "Телевізор",
+                    rus: "Телевизор",
+                    fas: "یک تلویزیون",
+                    tur: "Televizyon / TV",
+                    nep: "एउटा टेलिभिजन / टिभी",
+                    swa: "Televisheni",
+                    fra: "Une télé / Une télévision",
+                    twi: "TV / Mfoninipɔn",
+                    bos: "Televizor / TV",
+                    som: "Telefishin / TV",
+                    srp: "Телевизор",
+                    tir: "ቲቪ / ቴሌቪዥን",
+                    zho: "一台电视机",
+                    tgk: "Телевизор",
+                    spa: "Un televisor / Una televisión",
+                    vie: "Một cái tivi"
+                }
+            },
+            {
+                da: "En radio",
+                translations: {
+                    eng: "A radio",
+                    ben: "একটি রেডিও",
+                    hin: "एक रेडियो",
+                    urd: "ایک ریڈیو",
+                    ukr: "Радіо",
+                    rus: "Радио",
+                    fas: "یک رادیو",
+                    tur: "Radyo",
+                    nep: "एउटा रेडियो",
+                    swa: "Redio",
+                    fra: "Une radio",
+                    twi: "Kasamfoni / Radio",
+                    bos: "Radio",
+                    som: "Raadiyow",
+                    srp: "Радио",
+                    tir: "ራድዮ",
+                    zho: "收音机",
+                    tgk: "Радио",
+                    spa: "Una radio",
+                    vie: "Một cái đài phát thanh / Radio"
+                }
+            },
+            {
+                da: "En lampe",
+                translations: {
+                    eng: "A lamp",
+                    ben: "একটি বাতি / ল্যাম্প",
+                    hin: "एक लैंप / बत्ती",
+                    urd: "ایک لیمپ",
+                    ukr: "Лампа",
+                    rus: "Лампа",
+                    fas: "یک چراغ / لامپ",
+                    tur: "Lamba",
+                    nep: "एउटा बत्ती / ल्याम्प",
+                    swa: "Taa",
+                    fra: "Une lampe",
+                    twi: "Kanea",
+                    bos: "Lampa",
+                    som: "Laambad / Nal",
+                    srp: "Лампа",
+                    tir: "ፋኑስ / መብራህቲ",
+                    zho: "灯 / 台灯",
+                    tgk: "Чароғ / Лампа",
+                    spa: "Una lámpara",
+                    vie: "Một cái đèn"
+                }
+            },
+            {
+                da: "Et tæppe",
+                translations: {
+                    eng: "A rug / A carpet / A blanket",
+                    ben: "একটি গালিচা / একটি কম্বল",
+                    hin: "एक कालीन / कंबल",
+                    urd: "ایک قالین / کمبل",
+                    ukr: "Килим / Ковдра",
+                    rus: "Ковер / Одеяло",
+                    fas: "یک فرش / پتو",
+                    tur: "Halı / Kilim / Battaniye",
+                    nep: "एउटा कार्पेट / कम्बल",
+                    swa: "Zulia / Blanketi",
+                    fra: "Un tapis / Une couverture",
+                    twi: "Twerɛpɔn / Kuntu",
+                    bos: "Tepih / Dekica",
+                    som: "Roog / Busti / Rug",
+                    srp: "Тепих / Ћебе",
+                    tir: "ምንጻፍ / ባblankት (ምንጻፍ)",
+                    zho: "地毯 / 毛毯",
+                    tgk: "Қолин / Кӯрпача",
+                    spa: "Una alfombra / Una manta",
+                    vie: "Một cái thảm / Chăn"
+                }
+            },
+            {
+                da: "Jeg slapper af",
+                translations: {
+                    eng: "I relax / I am relaxing",
+                    ben: "আমি বিশ্রাম নিচ্ছি",
+                    hin: "मैं आराम करता हूँ / मैं आराम कर रहा हूँ",
+                    urd: "میں آرام کرتا ہوں / میں آرام کر رہا ہوں",
+                    ukr: "Я відпочиваю",
+                    rus: "Я отдыхаю",
+                    fas: "من استراحت می‌کنم",
+                    tur: "Dinleniyorum",
+                    nep: "म आराम गर्छु।",
+                    swa: "Ninapumzika",
+                    fra: "Je me détends / Je me repose",
+                    twi: "Mehome",
+                    bos: "Ja se odmaram",
+                    som: "Waan nasanayaa",
+                    srp: "Ја се одмарам",
+                    tir: "ኣነ የዕርፍ ኣለኹ",
+                    zho: "我正在休息 / 我正在放松",
+                    tgk: "Ман истироҳат мекунам",
+                    spa: "Me relajo / Estoy descansando",
+                    vie: "Tôi đang thư giãn"
+                }
+            },
+            {
+                da: "Jeg laver mad",
+                translations: {
+                    eng: "I cook / I am making food",
+                    ben: "আমি রান্না করছি",
+                    hin: "मैं खाना बनाता हूँ / मैं खाना बना रहा हूँ",
+                    urd: "میں کھانا بنا رہا ہوں / میں کھانا پکاتا ہوں",
+                    ukr: "Я готую їжу",
+                    rus: "Я готовлю еду",
+                    fas: "من غذا درست می‌کنم / آشپزی می‌کنم",
+                    tur: "Yemek yapıyorum",
+                    nep: "म खाना पकाउँछु।",
+                    swa: "Ninapika chakula",
+                    fra: "Je cuisine / Je fais à manger",
+                    twi: "Menoa aduane",
+                    bos: "Ja kuham / Pravim hranu",
+                    som: "Cunto ayaan karsanayaa",
+                    srp: "Ја кувам",
+                    tir: "መግብ የዳል ኣለኹ",
+                    zho: "我在做饭",
+                    tgk: "Ман хӯрок мепазам",
+                    spa: "Cocino / Estoy cocinando",
+                    vie: "Tôi đang nấu ăn"
+                }
+            },
+            {
+                da: "Jeg går i seng",
+                translations: {
+                    eng: "I go to bed",
+                    ben: "আমি ঘুমাতে যাচ্ছি",
+                    hin: "मैं सोने जाता हूँ / मैं बिस्तर पर जा रहा हूँ",
+                    urd: "میں سونے جا رہا ہوں",
+                    ukr: "Я йду спати / лягаю в ліжко",
+                    rus: "Я иду спать / ложусь в постель",
+                    fas: "من به رختخواب می‌روم",
+                    tur: "Yatağa gidiyorum / Yatıyorum",
+                    nep: "म सुत्न जान्छु।",
+                    swa: "Nenda kulala",
+                    fra: "Je vais au lit / Je me couche",
+                    twi: "Merekɔ mpa so / Merekɔda",
+                    bos: "Idem у krevet",
+                    som: "Waan seexanayaa / Sariirta ayaan aadi lahaa",
+                    srp: "Идем у кревет",
+                    tir: "ናብ ዓራት ይኸይድ ኣለኹ (ክድቅስ ይኸይድ)",
+                    zho: "我去睡觉 / 我上床睡觉",
+                    tgk: "Ман ба хоб меравам",
+                    spa: "Voy a la cama / Me voy a dormir",
+                    vie: "Tôi đi ngủ"
+                }
+            },
+            {
+                da: "Jeg sover",
+                translations: {
+                    eng: "I sleep / I am sleeping",
+                    ben: "আমি ঘুমাচ্ছি",
+                    hin: "मैं सो रहा हूँ / मैं सोता हूँ",
+                    urd: "میں سو رہا ہوں",
+                    ukr: "Я сплю",
+                    rus: "Я сплю",
+                    fas: "من می‌خوابم / خواب هستم",
+                    tur: "Uyuyorum",
+                    nep: "म सुत्छु।",
+                    swa: "Ninalala",
+                    fra: "Je dors / Je suis en train de dormir",
+                    twi: "Meda",
+                    bos: "Ja spavam",
+                    som: "Waan hurdaa",
+                    srp: "Ја спавам",
+                    tir: "እድቅስ ኣለኹ",
+                    zho: "我在睡觉",
+                    tgk: "Ман хоб ҳастам",
+                    spa: "Duermo / Estoy durmiendo",
+                    vie: "Tôi đang ngủ"
+                }
+            },
+            {
+                da: "Jeg sidder i stuen",
+                translations: {
+                    eng: "I am sitting in the living room",
+                    ben: "আমি বসার ঘরে বসে আছি",
+                    hin: "मैं बैठक में बैठा हूँ / बैठी हूँ",
+                    urd: "میں لیونگ روم میں بیٹھا ہوں",
+                    ukr: "Я сиджу у вітальні",
+                    rus: "Я сижу в гостиной",
+                    fas: "من در اتاق نشیمن نشسته‌ام",
+                    tur: "Salonda oturuyorum",
+                    nep: "म बैठक कोठामा बसिरहेको छु।",
+                    swa: "Nimekaa sebuleni",
+                    fra: "Je suis assis dans le salon",
+                    twi: "Mete asaso mu",
+                    bos: "Sjedim u dnevnoj sobi",
+                    som: "Waan fadhiyaa qolka fadhiga",
+                    srp: "Седим у дневној соби",
+                    tir: "ኣብ ሳሎን ተቐሚጠ ኣለኹ",
+                    zho: "我坐在客厅里",
+                    tgk: "Ман дар меҳмонхона нишастаам",
+                    spa: "Estoy sentado en la sala de estar",
+                    vie: "Tôi đang ngồi ở phòng khách"
+                }
+            },
+            {
+                da: "Jeg ser TV",
+                translations: {
+                    eng: "I watch TV / I am watching television",
+                    ben: "আমি টিভি দেখছি",
+                    hin: "मैं टीवी देख रहा हूँ / देख रही हूँ",
+                    urd: "میں ٹی وی دیکھ رہا ہوں",
+                    ukr: "Я дивлюся телевізор",
+                    rus: "Я смотрю телевизор",
+                    fas: "من تلویزیون تماشا می‌کنم",
+                    tur: "Televizyon izliyorum",
+                    nep: "म टिभी हेर्छु।",
+                    swa: "Ninatazama runinga",
+                    fra: "Je regarde la télé",
+                    twi: "Mewɛn TV / Mehwɛ TV",
+                    bos: "Gledam TV",
+                    som: "Waan daawanayaa TV",
+                    srp: "Гледам ТВ",
+                    tir: "ቲቪ ይርኢ ኣለኹ",
+                    zho: "我在看电视",
+                    tgk: "Ман телевизор тамошо мекунам",
+                    spa: "Veo la televisión / Estoy viendo la tele",
+                    vie: "Tôi đang xem tivi"
+                }
+            },
+            {
+                da: "Jeg spiser mad",
+                translations: {
+                    eng: "I eat food / I am eating",
+                    ben: "আমি খাবার খাচ্ছি",
+                    hin: "मैं खाना खा रहा हूँ / खा रही हूँ",
+                    urd: "میں کھانا کھا رہا ہوں",
+                    ukr: "Я їм їжу",
+                    rus: "Я ем",
+                    fas: "من غذا می‌خورم",
+                    tur: "Yemek yiyorum",
+                    nep: "म खाना खान्छु।",
+                    swa: "Ninakula chakula",
+                    fra: "Je mange / Je prends un repas",
+                    twi: "Meredi aduane",
+                    bos: "Jedem hranu / Jedem",
+                    som: "Cunto ayaan cunayaa",
+                    srp: "Једем",
+                    tir: "መግብ ይበልዕ ኣለኹ",
+                    zho: "我在吃东西 / 我在吃饭",
+                    tgk: "Ман хӯрок мехӯрам",
+                    spa: "Como / Estoy comiendo",
+                    vie: "Tôi đang ăn cơm / ăn thức ăn"
+                }
+            },
+            {
+                da: "Jeg drikker kaffe/vand/juice",
+                translations: {
+                    eng: "I drink coffee/water/juice",
+                    ben: "আমি কফি/জল/জুস পান করছি",
+                    hin: "मैं कॉफी/पानी/जूस पीता हूँ",
+                    urd: "میں کافی/پانی/جوس پیتا ہوں",
+                    ukr: "Я п'ю каву/воду/сік",
+                    rus: "Я пью кофе/воду/сок",
+                    fas: "من قهوه/آب/آبمیوه می‌نوشم",
+                    tur: "Kahve/su/meyve suyu içiyorum",
+                    nep: "म कफी/पानी/जस पिउँछु।",
+                    swa: "Ninakunywa kahawa/maji/juisi",
+                    fra: "Je bois du café/de l'eau/du jus",
+                    twi: "Menom kofi/nsuo/juice",
+                    bos: "Pijem kafu/vodu/sok",
+                    som: "Waxaan cabbayaa bun/biyo/casiir",
+                    srp: "Пијем кафу/воду/сок",
+                    tir: "ቡን/ማይ/ጁስ ይሰቲ ኣለኹ",
+                    zho: "我喝咖啡/水/果汁",
+                    tgk: "Ман кофе/об/афшура менӯшам",
+                    spa: "Bebo café/agua/zumo (jugo)",
+                    vie: "Tôi uống cà phê/nước/nước trái cây"
+                }
+            },
+            {
+                da: "Jeg tager tøj på",
+                translations: {
+                    eng: "I get dressed / I am putting on clothes",
+                    ben: "আমি জামাকাপড় পরছি",
+                    hin: "मैं कपड़े पहन रहा हूँ / पहन रही हूँ",
+                    urd: "میں کپڑے پہن رہا ہوں",
+                    ukr: "Я одягаюся",
+                    rus: "Я одеваюсь",
+                    fas: "من لباس می‌پوشم",
+                    tur: "Üstümü giyiyorum / Giyiniyorum",
+                    nep: "म लुगा लगाउँछु।",
+                    swa: "Ninavaa nguo",
+                    fra: "Je m'habille / Je mets des vêtements",
+                    twi: "Mefyra ntadeɛ / Mehyɛ ntadeɛ",
+                    bos: "Oblačim se",
+                    som: "Dharka ayaan gashanayaa",
+                    srp: "Облачим се",
+                    tir: "ክዳውንቲ ይኽደን ኣለኹ",
+                    zho: "我在穿衣服",
+                    tgk: "Ман либос мепӯшам",
+                    spa: "Me visto / Estoy poniéndome la ropa",
+                    vie: "Tôi đang mặc quần áo"
+                }
+            },
+            {
+                da: "Jeg vasker mig/tager bad",
+                translations: {
+                    eng: "I wash myself / I take a shower (or bath)",
+                    ben: "আমি নিজেকে পরিষ্কার করছি / স্নান করছি",
+                    hin: "मैं नहा रहा हूँ / स्नान कर रहा हूँ",
+                    urd: "میں نہا رہا ہوں / غسل کر رہا ہوں",
+                    ukr: "Я миюся / приймаю душ",
+                    rus: "Я моюсь / принимаю душ",
+                    fas: "من خودم را می‌شورم / حمام می‌کنم",
+                    tur: "Yıkanıyorum / Duş alıyorum",
+                    nep: "म नुहाउँछु।",
+                    swa: "Ninaoga",
+                    fra: "Je me lave / Je prends une douche (un bain)",
+                    twi: "Meguare",
+                    bos: "Kupam se / Tuširam se",
+                    som: "Waan qubeysanayaa",
+                    srp: "Купам се / Туширам се",
+                    tir: "ይሕጸብ / ይሕጸብ ኣለኹ (ባኞ ይወስድ ኣለኹ)",
+                    zho: "我在洗澡 / 我在淋浴",
+                    tgk: "Ман худамро мешӯям / Оббозӣ мекунам",
+                    spa: "Me lavo / Me baño (me ducho)",
+                    vie: "Tôi tắm / Tôi rửa mặt mũi"
+                }
+            },
+            {
+                da: "Jeg lytter til radio",
+                translations: {
+                    eng: "I listen to the radio",
+                    ben: "আমি রেডিও শুনছি",
+                    hin: "मैं रेडियो सुन रहा हूँ / सुन रही हूँ",
+                    urd: "میں ریڈیو سن رہا ہوں",
+                    ukr: "Я слухаю радіо",
+                    rus: "Я слушаю радио",
+                    fas: "من به رادیو گوش می‌دهم",
+                    tur: "Radyo dinliyorum",
+                    nep: "म रेडियो सुन्छु।",
+                    swa: "Ninasikiliza redio",
+                    fra: "J'écoute la radio",
+                    twi: "Metie radio / Metie kasamfoni",
+                    bos: "Slušam radio",
+                    som: "Waan dhageysanayaa raadiyowga",
+                    srp: "Слушам радио",
+                    tir: "ራድዮ ይሰምዕ ኣለኹ",
+                    zho: "我在听收音机",
+                    tgk: "Ман радио гӯш мекунам",
+                    spa: "Escucho la radio / Estoy escuchando la radio",
+                    vie: "Tôi đang nghe đài / nghe radio"
+                }
+            },
+            {
+                da: "Jeg slukker for lyset",
+                translations: {
+                    eng: "I turn off the light",
+                    ben: "আমি লাইট বন্ধ করছি",
+                    hin: "मैं लाइट बंद करता हूँ / कर रहा हूँ",
+                    urd: "میں لائٹ بند کرتا ہوں",
+                    ukr: "Я вимикаю світло",
+                    rus: "Я выключаю свет",
+                    fas: "من چراغ را خاموش می‌کنم",
+                    tur: "Işığı kapatıyorum",
+                    nep: "म बत्ती निभाउँछु।",
+                    swa: "Ninasima taa / Nimezima taa",
+                    fra: "J'éteins la lumière",
+                    twi: "Medum kanea no",
+                    bos: "Gasim svjetlo",
+                    som: "Nalka ayaan daminayaa",
+                    srp: "Гасим светло",
+                    tir: "ነቲ መብራህቲ የጥፍኦ ኣለኹ",
+                    zho: "我关灯",
+                    tgk: "Ман чароғро хомӯш мекунам",
+                    spa: "Apago la luz",
+                    vie: "Tôi tắt đèn"
+                }
+            },
+            {
+                da: "Jeg tænder for lyset",
+                translations: {
+                    eng: "I turn on the light",
+                    ben: "আমি লাইট জ্বালাচ্ছি",
+                    hin: "मैं लाइट चालू करता हूँ / कर रहा हूँ",
+                    urd: "میں لائٹ جلاتا ہوں",
+                    ukr: "Я вмикаю світло",
+                    rus: "Я включаю свет",
+                    fas: "من چراغ را روشن می‌کنم",
+                    tur: "Işığı açıyorum",
+                    nep: "म बत्ती बाल्छु।",
+                    swa: "Ninawasha taa",
+                    fra: "J'allume la lumière",
+                    twi: "Mesɔ kanea no",
+                    bos: "Palim svjetlo",
+                    som: "Nalka ayaan shidayaa",
+                    srp: "Палим светло",
+                    tir: "ነቲ መብራህቲ የእብርኦ ኣለኹ",
+                    zho: "我开灯",
+                    tgk: "Ман чароғро фурӯзон мекунам",
+                    spa: "Enciendo la luz",
+                    vie: "Tôi bật đèn"
+                }
+            },
+            {
+                da: "Jeg vasker tøj",
+                translations: {
+                    eng: "I wash clothes / I do the laundry",
+                    ben: "আমি জামাকাপড় ধুচ্ছি",
+                    hin: "मैं कपड़े धोता हूँ / धो रहा हूँ",
+                    urd: "میں کپڑے دھو رہا ہوں",
+                    ukr: "Я перу одяг",
+                    rus: "Я стираю белье",
+                    fas: "من لباس می‌شورم",
+                    tur: "Çamaşır yıkıyorum",
+                    nep: "म कपडा धुन्छु।",
+                    swa: "Ninafua nguo",
+                    fra: "Je lave les vêtements / Je fais la lessive",
+                    twi: "Mehoro ntadeɛ",
+                    bos: "Perem veš / Perem odjeću",
+                    som: "Dharka ayaan dhaqayaa",
+                    srp: "Перем веш / Перем одећу",
+                    tir: "ክዳውንቲ ሓጽብ ኣለኹ",
+                    zho: "我在洗衣服",
+                    tgk: "Ман либос мешӯям",
+                    spa: "Lavo la ropa / Hago la colada",
+                    vie: "Tôi giặt quần áo"
+                }
+            },
+            {
+                da: "Jeg gør rent/støvsuger",
+                translations: {
+                    eng: "I clean / I vacuum",
+                    ben: "আমি পরিষ্কার করছি / ভ্যাকুয়াম করছি",
+                    hin: "मैं सफाई करता हूँ / वैक्यूम कर रहा हूँ",
+                    urd: "میں صفائی کر رہا ہوں / ویکیوم کر رہا ہوں",
+                    ukr: "Я прибираю / пилосошу",
+                    rus: "Я убираюсь / пылесошу",
+                    fas: "من تمیز می‌کنم / جاروبرقی می‌کشم",
+                    tur: "Temizlik yapıyorum / Süpürüyorum",
+                    nep: "म सफा गर्छु / भ्याकुम गर्छु।",
+                    swa: "Ninasafisha / Ninapiga deki au fagio",
+                    fra: "Je nettoie / Je passe l'aspirateur",
+                    twi: "Meprepra / Mepra dan mu",
+                    bos: "Čistim / Usisavam",
+                    som: "Waan nadiifinayaa / Waan xaaqayaa",
+                    srp: "Чистим / Усисавам",
+                    tir: "እጸርግ / ይስዕብ ኣለኹ (ቫክዩም ይገብር ኣለኹ)",
+                    zho: "我在打扫 / 我在吸尘",
+                    tgk: "Ман тоза мекунам / Чангкашак мекунам",
+                    spa: "Limpio / Estoy pasando la aspiradora",
+                    vie: "Tôi dọn dẹp vệ sinh / hút bụi"
+                }
+            },
+            {
+                da: "Jeg plukker blomster i haven",
+                translations: {
+                    eng: "I pick flowers in the garden",
+                    ben: "আমি বাগান থেকে ফুল তুলছি",
+                    hin: "मैं बगीचे में फूल तोड़ रहा हूँ / तोड़ रही हूँ",
+                    urd: "میں باغ سے پھول توڑ رہا ہوں",
+                    ukr: "Я рву квіти в саду",
+                    rus: "Я рву цветы в саду",
+                    fas: "من در باغچه گل می‌چینم",
+                    tur: "Bahçeden çiçek topluyorum",
+                    nep: "म बगैँचामा फूल टिप्छु।",
+                    swa: "Ninachuma maua bustanini",
+                    fra: "Je cueille des fleurs dans le jardin",
+                    twi: "Metetɛ nhwiren wɔ turo mu",
+                    bos: "Berem cvijeće u bašti",
+                    som: "Waxaan ubax ka guranayaa beerta",
+                    srp: "Берем цвеће у башти",
+                    tir: "ኣብ ጀርዲን ዕምባባ ይቕጥፍ ኣለኹ",
+                    zho: "我在花园里摘花",
+                    tgk: "Ман дар боғ гул мечинам",
+                    spa: "Recojo flores en el jardín",
+                    vie: "Tôi hái hoa trong vườn"
+                }
+            },
+            {
+                da: "Jeg vander blomster i haven",
+                translations: {
+                    eng: "I water flowers in the garden",
+                    ben: "আমি বাগানে গাছে জল দিচ্ছি",
+                    hin: "मैं बगीचे में फूलों को पानी दे रहा हूँ",
+                    urd: "میں باغ میں پھولوں کو پانی دے رہا ہوں",
+                    ukr: "Я поливаю квіти в саду",
+                    rus: "Я поливаю цветы в саду",
+                    fas: "من در باغچه به گل‌ها آب می‌دهم",
+                    tur: "Bahçedeki çiçekleri suluyorum",
+                    nep: "म बगैँचाको फूलमा पानी हाल्छु।",
+                    swa: "Ninamwagilia maji maua bustanini",
+                    fra: "J'arrose les fleurs dans le jardin",
+                    twi: "Megu nsuo gu nhwiren ho wɔ turo mu",
+                    bos: "Zalijevam cvijeće u bašti",
+                    som: "Waxaan waraabinayaa ubaxa beerta",
+                    srp: "Заливам цвеће у башти",
+                    tir: "ኣብ ጀርዲን ንዕምባባታት ማይ የስትይ ኣለኹ",
+                    zho: "我在花园里给花浇水",
+                    tgk: "Ман ба гулҳои боғ об медиҳам",
+                    spa: "Riego las flores en el jardín",
+                    vie: "Tôi tưới hoa trong vườn"
+                }
+            },
+            {
+                da: "Stor/lille",
+                translations: {
+                    eng: "Big/small",
+                    ben: "বড় / ছোট",
+                    hin: "बड़ा / छोटा",
+                    urd: "بڑا / چھوٹا",
+                    ukr: "Великий / малий",
+                    rus: "Большой / маленький",
+                    fas: "بزرگ / کوچک",
+                    tur: "Büyük / küçük",
+                    nep: "ठूलो / सानो",
+                    swa: "Kubwa / ndogo",
+                    fra: "Grand/petit",
+                    twi: "Kɛseɛ / Ketewa",
+                    bos: "Veliko / malo",
+                    som: "Weun / yar",
+                    srp: "Велико / мало",
+                    tir: "ዓብዪ / ንእሽቶ",
+                    zho: "大 / 小",
+                    tgk: "Калон / Хурд",
+                    spa: "Grande/pequeño",
+                    vie: "To/nhỏ"
+                }
+            },
+            {
+                da: "Lav/høj",
+                translations: {
+                    eng: "Low/high (or Short/tall)",
+                    ben: "নিচু / উঁচু",
+                    hin: "नीचा / ऊँचा (या छोटा / लंबा)",
+                    urd: "نیچا / اونچا (یا کم قد / لمبا)",
+                    ukr: "Низький / високий",
+                    rus: "Низкий / высокий",
+                    fas: "کوتاه / بلند",
+                    tur: "Alçak / yüksek (veya Kısa / uzun)",
+                    nep: "होचो / अग्लो",
+                    swa: "Chini / juu",
+                    fra: "Bas/haut (ou Court/grand)",
+                    twi: "Tia / Tenten",
+                    bos: "Nisko / visoko (Kratko / visoko)",
+                    som: "Gaab / dheer",
+                    srp: "Ниско / високо (Низак / висок)",
+                    tir: "ሓጺር / ነዊሕ",
+                    zho: "矮 / 高",
+                    tgk: "Паст / Баланд",
+                    spa: "Bajo/alto",
+                    vie: "Thấp/cao"
+                }
+            },
+            {
+                da: "God/dårlig",
+                translations: {
+                    eng: "Good/bad",
+                    ben: "ভালো / খারাপ",
+                    hin: "अच्छा / बुरा",
+                    urd: "اچھا / برا",
+                    ukr: "Добрий / поганий",
+                    rus: "Хороший / плохой",
+                    fas: "خوب / بد",
+                    tur: "İyi / kötü",
+                    nep: "राम्रो / नराम्रो",
+                    swa: "Nzuri / mbaya",
+                    fra: "Bon/mauvais",
+                    twi: "Papa / Bɔne",
+                    bos: "Dobar / loš",
+                    som: "Fiican / xun",
+                    srp: "Добар / лош",
+                    tir: "ጽቡቕ / ሕማቕ",
+                    zho: "好 / 坏",
+                    tgk: "Хуб / Бад",
+                    spa: "Bueno/malo",
+                    vie: "Tốt/xấu"
+                }
+            },
+            {
+                da: "Kold/varm",
+                translations: {
+                    eng: "Cold/warm (or hot)",
+                    ben: "ঠান্ডা / গরম",
+                    hin: "ठंडा / गर्म",
+                    urd: "ٹھنڈا / گرم",
+                    ukr: "Холодний / теплий (гарячий)",
+                    rus: "Холодный / теплый (горячий)",
+                    fas: "سرد / گرم",
+                    tur: "Soğuk / sıcak (ılık)",
+                    nep: "चिसो / तातो",
+                    swa: "Baridi / moto",
+                    fra: "Froid/chaud",
+                    twi: "Nnwunu / Hyee",
+                    bos: "Hladno / toplo",
+                    som: "Qabow / kulul",
+                    srp: "Хладно / топло",
+                    tir: "ዝሑል / ውዑይ",
+                    zho: "冷 / 热 (暖)",
+                    tgk: "Хнук / Гарм",
+                    spa: "Frío/caliente (cálido)",
+                    vie: "Lạnh/ấm (nóng)"
+                }
+            },
+            {
+                da: "Smuk/grim",
+                translations: {
+                    eng: "Beautiful/ugly",
+                    ben: "সুন্দর / কুৎসিত",
+                    hin: "सुंदर / बदसूरत",
+                    urd: "خوبصورت / بدصورت",
+                    ukr: "Красивий / потворний (негарний)",
+                    rus: "Красивый / некрасивый (уродливый)",
+                    fas: "زیبا / زشت",
+                    tur: "Güzel / çirkin",
+                    nep: "सुन्दर / नराम्रो",
+                    swa: "Mrembo / mbaya",
+                    fra: "Beau (belle)/laid (vilain)",
+                    twi: "Fɛ / Tantanne",
+                    bos: "Lijep / ružan",
+                    som: "Quuri / foolxun",
+                    srp: "Леп / ружан",
+                    tir: "ጽቡቕ / መልክዕ ዘይብሉ (ሕማቕ)",
+                    zho: "美 / 丑",
+                    tgk: "Зебо / Хунӯк (зишт)",
+                    spa: "Hermoso (bonito)/feo",
+                    vie: "Đẹp/xấu xí"
+                }
+            },
+            {
+                da: "Lang/kort",
+                translations: {
+                    eng: "Long/short",
+                    ben: "লম্বা / ছোট",
+                    hin: "लंबा / छोटा",
+                    urd: "لمبا / چھوٹا",
+                    ukr: "Довгий / короткий",
+                    rus: "Длинный / короткий",
+                    fas: "بلند / کوتاه",
+                    tur: "Uzun / kısa",
+                    nep: "लामो / छोटो",
+                    swa: "Ndefu / fupi",
+                    fra: "Long/court",
+                    twi: "Tenten / Tia",
+                    bos: "Dug / kratak",
+                    som: "Dheer / gaab",
+                    srp: "Дуг / кратак",
+                    tir: "ነዊሕ / ሓጺር",
+                    zho: "长 / 短",
+                    tgk: "Дароз / Кӯтоҳ",
+                    spa: "Largo/corto",
+                    vie: "Dài/ngắn"
+                }
+            }
+        ];
+
+        // Applikationstilstand (State)
+        let activeDeck = [];
+        let currentCardIndex = 0;
+        let selectedLang = "eng";
+        let isFlipped = false;
+        let isTransitioning = false;
+        let totalInitialCards = 0;
+
+        // DOM Elementer
+        const langSelect = document.getElementById("langSelect");
+        const flashcardArea = document.getElementById("flashcardArea");
+        const cardInner = document.getElementById("cardInner");
+        const danishText = document.getElementById("danishText");
+        const targetText = document.getElementById("targetText");
+        const targetLangLabel = document.getElementById("targetLangLabel");
+        const cardCounter = document.getElementById("cardCounter");
+        const percentLabel = document.getElementById("percentLabel");
+        const progressBar = document.getElementById("progressBar");
+        const controlsArea = document.getElementById("controlsArea");
+        const finishScreen = document.getElementById("finishScreen");
+        const btnRight = document.getElementById("btnRight");
+        const btnWrong = document.getElementById("btnWrong");
+        const btnRestart = document.getElementById("btnRestart");
+
+        // Initialiser sprogmenu
+        function buildLanguageSelector() {
+            langSelect.innerHTML = "";
+            for (const [code, name] of Object.entries(languages)) {
+                const option = document.createElement("option");
+                option.value = code;
+                option.textContent = name;
+                if (code === selectedLang) option.selected = true;
+                langSelect.appendChild(option);
+            }
+        }
+
+        // Bland kortene (Fisher-Yates Shuffle)
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Start et nyt spil
+        function startNewSession() {
+            // Generer deck baseret på ordlisten
+            activeDeck = wordDatabase.map((item, index) => ({
+                id: index,
+                da: item.da,
+                translation: item.translations[selectedLang] || "Oversættelse mangler"
+            }));
+            
+            shuffle(activeDeck);
+            totalInitialCards = activeDeck.length;
+            currentCardIndex = 0;
+            isFlipped = false;
+            isTransitioning = false;
+
+            // Nulstil UI klasser
+            cardInner.classList.remove("rotate-y-180");
+            hideControls();
+            
+            // Vis kortområde, skjul færdigskærm
+            flashcardArea.style.display = "block";
+            document.getElementById("statsContainer").style.display = "flex";
+            finishScreen.classList.add("hidden");
+
+            updateCardContent();
+            updateStats();
+        }
+
+        // Opdater teksten på kortet
+        function updateCardContent() {
+            if (activeDeck.length === 0) {
+                showFinishScreen();
+                return;
+            }
+            const currentCard = activeDeck[currentCardIndex];
+            danishText.textContent = currentCard.da;
+            targetText.textContent = currentCard.translation;
+            targetLangLabel.textContent = languages[selectedLang];
+        }
+
+        // Opdater fremskridt og statuslinje
+        function updateStats() {
+            const remainingCount = activeDeck.length;
+            cardCounter.textContent = `Kort tilbage: ${remainingCount}`;
+            
+            // Beregn fremskridtsprocent
+            const cardsLearnt = totalInitialCards - remainingCount;
+            const percentage = totalInitialCards > 0 ? Math.round((cardsLearnt / totalInitialCards) * 100) : 0;
+            percentLabel.textContent = `${percentage}% færdig`;
+            progressBar.style.width = `${percentage}%`;
+        }
+
+        // Vis svarknapperne
+        function showControls() {
+            controlsArea.classList.remove("opacity-0", "pointer-events-none", "scale-95");
+            controlsArea.classList.add("opacity-100", "scale-100");
+        }
+
+        // Skjul svarknapperne
+        function hideControls() {
+            controlsArea.classList.add("opacity-0", "pointer-events-none", "scale-95");
+            controlsArea.classList.remove("opacity-100", "scale-100");
+        }
+
+        // Flip kort (klik på selve kortet)
+        function handleCardClick() {
+            if (isTransitioning || activeDeck.length === 0) return;
+
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                cardInner.classList.add("rotate-y-180");
+                showControls();
+            } else {
+                cardInner.classList.remove("rotate-y-180");
+                hideControls();
+            }
+        }
+
+        // Vigtig UX-detalje (Timing logik ved valg)
+        function handleFeedback(isCorrect) {
+            if (isTransitioning || activeDeck.length === 0) return;
+
+            isTransitioning = true;
+            
+            // 1. Flip altid kortet tilbage til forsiden først
+            isFlipped = false;
+            cardInner.classList.remove("rotate-y-180");
+            hideControls();
+
+            // 2. Vent 400ms på at flip-transitionen er færdig, før dataen opdateres
+            setTimeout(() => {
+                if (isCorrect) {
+                    // Fjern kortet fra bunken
+                    activeDeck.splice(currentCardIndex, 1);
+                    // Hvis vi slettede det sidste element, hop tilbage til starten
+                    if (currentCardIndex >= activeDeck.length) {
+                        currentCardIndex = 0;
+                    }
+                } else {
+                    // Behold kortet i bunken, men ryk det til sidst eller længere tilbage
+                    const currentCard = activeDeck.splice(currentCardIndex, 1)[0];
+                    activeDeck.push(currentCard); // Læg bagerst i bunken
+                    // Da vi fjerner og tilføjer i samme ombæring, vil det næste kort automatisk ligge på currentCardIndex
+                }
+
+                // Opdater indholdet mens forsiden vender mod brugeren
+                updateCardContent();
+                updateStats();
+                
+                isTransitioning = false;
+            }, 400); // Passer til CSS transitionshastigheden på 500ms (400ms er det optimale øjeblik for tekstskift)
+        }
+
+        // Vis færdig skærm
+        function showFinishScreen() {
+            flashcardArea.style.display = "none";
+            document.getElementById("statsContainer").style.display = "none";
+            hideControls();
+            finishScreen.classList.remove("hidden");
+        }
+
+        // Event Listeners
+        flashcardArea.addEventListener("click", handleCardClick);
+        
+        btnRight.addEventListener("click", (e) => {
+            e.stopPropagation(); // Undgå uønsket flip ved klik på knap
+            handleFeedback(true);
+        });
+
+        btnWrong.addEventListener("click", (e) => {
+            e.stopPropagation(); // Undgå uønsket flip ved klik på knap
+            handleFeedback(false);
+        });
+
+        btnRestart.addEventListener("click", () => {
+            startNewSession();
+        });
+
+        langSelect.addEventListener("change", (e) => {
+            selectedLang = e.target.value;
+            // Genstart sessionen med det nye målsprog
+            startNewSession();
+        });
+
+        // Tastaturgenveje for bedre tilgængelighed
+        document.addEventListener("keydown", (e) => {
+            if (activeDeck.length === 0 || isTransitioning) return;
+            
+            if (e.code === "Space" || e.code === "Enter") {
+                e.preventDefault();
+                handleCardClick();
+            } else if (e.code === "ArrowLeft" || e.code === "KeyF") {
+                // Svarer til 'Forkert'
+                if (isFlipped) {
+                    handleFeedback(false);
+                }
+            } else if (e.code === "ArrowRight" || e.code === "KeyR") {
+                // Svarer til 'Rigtigt'
+                if (isFlipped) {
+                    handleFeedback(true);
+                }
+            }
+        });
+
+        // App-start
+        window.addEventListener("DOMContentLoaded", () => {
+            buildLanguageSelector();
+            startNewSession();
+        });
+    </script>
+</body>
+</html>
