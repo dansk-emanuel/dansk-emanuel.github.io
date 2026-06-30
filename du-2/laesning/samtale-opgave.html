@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Samtale-træner DU2 Modul 4</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Blød overgang til feedback */
         .fade-in {
@@ -135,7 +135,7 @@
                 options: [
                     { text: "Ja tak, gerne. Kan det lade sig gøre på torsdag i næste uge?", correct: true, feedback: "Perfekt! Du bruger tidsudtrykket 'på torsdag i næste uge' helt korrekt og høfligt." },
                     { text: "Ja, jeg kommer i morgen klokken alt.", correct: false, feedback: "'Klokken alt' giver ikke mening. Man skal foreslå eller spørge om et specifikt tidspunkt." },
-                    { text: "Lægen skal kigge på min arm nu.", correct: false, feedback: "Lidt for kontant. I Danmark bestiller man normalt en tid høfligt, medmindre der er tale om et akut uheld." }
+                    { text: "Lægen skal kigge på min arm nu.", correct: false, feedback: "Lidt for kontant. I Danmark bestiller man normalt eine tid høfligt, medmindre der er tale om et akut uheld." }
                 ]
             },
             {
@@ -232,4 +232,58 @@
                 feedbackContainer.className = "mt-6 p-4 rounded-2xl border bg-green-50 border-green-200 text-green-900 font-medium fade-in";
                 feedbackText.innerText = `Rigtigt! ${option.feedback}`;
             } else {
-                selectedButton.classList.remove("bg-gray-50", "
+                selectedButton.classList.remove("bg-gray-50", "border-gray-200");
+                selectedButton.classList.add("bg-red-50", "border-red-500", "text-red-900", "font-bold");
+                selectedButton.innerHTML += " <span>❌</span>";
+
+                feedbackContainer.className = "mt-6 p-4 rounded-2xl border bg-red-50 border-red-200 text-red-900 font-medium fade-in";
+                feedbackText.innerText = `Ikke helt ved siden af, men... ${option.feedback}`;
+            }
+
+            // Opdater score-tæller med det samme
+            document.getElementById("score-counter").innerText = `Point: ${score}`;
+            feedbackContainer.classList.remove("hidden");
+        }
+
+        // Gå til næste spørgsmål eller afslut
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // Vis resultatskærm
+        function showResult() {
+            document.getElementById("quiz-screen").classList.add("hidden");
+            document.getElementById("quiz-screen").classList.remove("flex");
+            document.getElementById("result-screen").classList.remove("hidden");
+            document.getElementById("result-screen").classList.add("flex");
+            
+            document.getElementById("final-score").innerText = `${score} / ${questions.length} point`;
+            
+            const resultIcon = document.getElementById("result-icon");
+            const resultMessage = document.getElementById("result-message");
+            
+            if (score >= 4) {
+                resultIcon.innerText = "🎉";
+                resultMessage.innerText = "Fantastisk! Du har styr på de hverdagsagtige samtaler til Modul 4.";
+            } else {
+                resultIcon.innerText = "💪";
+                resultMessage.innerText = "Udemærket forsøg! Tag testen igen for at øve dig endnu mere.";
+            }
+        }
+
+        // Genstart quizzen
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById("result-screen").classList.add("hidden");
+            document.getElementById("result-screen").classList.remove("flex");
+            document.getElementById("start-screen").classList.remove("hidden");
+        }
+    </script>
+</body>
+</html>
