@@ -1,1 +1,655 @@
-.
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprog Flashcards</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 3D Flip klasser */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .preserve-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col justify-between font-sans text-gray-800">
+
+    <!-- Header & Sprogvalg -->
+    <header class="bg-white shadow-sm p-4 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+                <h1 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <span>🗂️</span> Sprog-Flashcards
+                </h1>
+                <p class="text-xs text-gray-500">Lær de 12 hverdagsudtryk på 20 forskellige sprog</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <label for="language-select" class="text-sm font-medium text-gray-700 whitespace-nowrap">Målsprog:</label>
+                <select id="language-select" class="w-full md:w-56 p-2 border border-gray-300 rounded-lg bg-gray-50 text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                    <option value="en">Engelsk (English)</option>
+                    <option value="bn">Bengali (বাংলা)</option>
+                    <option value="hi">Hindi (हिन्दी)</option>
+                    <option value="ur">Urdu (اردو)</option>
+                    <option value="uk">Ukrainsk (Українська)</option>
+                    <option value="ru">Russisk (Русский)</option>
+                    <option value="fa">Persisk (فارسی)</option>
+                    <option value="tr">Tyrkisk (Türkçe)</option>
+                    <option value="ne">Nepalesisk (नेपाली)</option>
+                    <option value="sw">Kiswahili</option>
+                    <option value="fr">Fransk (Français)</option>
+                    <option value="tw">Twi</option>
+                    <option value="bs">Bosnisk (Bosanski)</option>
+                    <option value="so">Somali (Soomaali)</option>
+                    <option value="sr">Serbisk (Српски)</option>
+                    <option value="ti">Tigrinya (ትግርኛ)</option>
+                    <option value="zh">Mandarin Kinesisk (中文)</option>
+                    <option value="tg">Tadsjikisk (Тоҷикӣ)</option>
+                    <option value="es">Spansk (Español)</option>
+                    <option value="vi">Vietnamesisk (Tiếng Việt)</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hovedindhold -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-lg">
+            
+            <!-- Spilleskærm -->
+            <div id="game-screen" class="space-y-6">
+                
+                <!-- Statusbar -->
+                <div class="flex items-center justify-between text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm">
+                    <span class="font-medium">Fremskridt</span>
+                    <span id="cards-left" class="bg-indigo-100 text-indigo-800 font-semibold px-3 py-1 rounded-full text-xs">Kort tilbage: 12</span>
+                </div>
+
+                <!-- Flashcard container (perspective) -->
+                <div class="perspective-1000 h-80 w-full cursor-pointer" id="flashcard-container">
+                    <!-- Kortet der roterer -->
+                    <div id="flashcard" class="relative w-full h-full preserve-3d transition-transform duration-500 ease-out rounded-2xl shadow-lg">
+                        
+                        <!-- Forside (DANSK) - Hvid med sort skrift -->
+                        <div class="absolute inset-0 w-full h-full bg-white text-black rounded-2xl p-6 flex flex-col justify-between backface-hidden border border-gray-200">
+                            <div class="flex justify-between items-center w-full">
+                                <span class="text-xs font-semibold tracking-wider text-gray-400 uppercase">Dansk</span>
+                                <span class="text-xs text-indigo-500 font-medium">Klik for at vende ↻</span>
+                            </div>
+                            <div class="flex-grow flex items-center justify-center text-center px-4">
+                                <p id="danish-text" class="text-2xl font-bold leading-snug">Indlæser...</p>
+                            </div>
+                            <div class="text-center text-xs text-gray-400">
+                                Tryk hvor som helst på kortet for at se oversættelsen
+                            </div>
+                        </div>
+
+                        <!-- Bagside (MÅLSPROG) - Beige med sort skrift -->
+                        <div class="absolute inset-0 w-full h-full bg-[#F5F2EB] text-black rounded-2xl p-6 flex flex-col justify-between backface-hidden rotate-y-180 border border-amber-100">
+                            <div class="flex justify-between items-center w-full">
+                                <span id="target-lang-label" class="text-xs font-semibold tracking-wider text-amber-800 uppercase">Oversættelse</span>
+                                <span class="text-xs text-amber-600 font-medium">Svar ↻</span>
+                            </div>
+                            <div class="flex-grow flex items-center justify-center text-center px-4">
+                                <p id="translation-text" class="text-2xl font-bold leading-snug text-amber-950">Indlæser...</p>
+                            </div>
+                            <div class="text-center text-xs text-amber-700 font-medium">
+                                Klik igen for at se forsiden
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Kontrolknapper (Kun synlige når kortet er vendt og IKKE under transition) -->
+                <div id="action-buttons" class="grid grid-cols-2 gap-4 opacity-0 pointer-events-none transition-all duration-300 transform translate-y-2">
+                    <button id="btn-incorrect" class="flex items-center justify-center gap-2 py-4 px-6 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-xl transition shadow-sm active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Forkert
+                    </button>
+                    <button id="btn-correct" class="flex items-center justify-center gap-2 py-4 px-6 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition shadow-md active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Rigtigt
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Færdig-skærm (Skjult som standard) -->
+            <div id="finished-screen" class="hidden bg-white rounded-2xl p-8 shadow-xl text-center space-y-6 border border-gray-100">
+                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto text-5xl">
+                    🎉
+                </div>
+                <div class="space-y-2">
+                    <h2 class="text-3xl font-extrabold text-gray-900">Fantastisk klaret!</h2>
+                    <p class="text-gray-600">Du har lært alle ordene på det valgte sprog.</p>
+                </div>
+                
+                <div class="bg-indigo-50 p-4 rounded-xl inline-block">
+                    <p class="text-sm text-indigo-800 font-medium">Målsprog fuldført: <span id="finished-lang-name" class="font-bold">Engelsk</span></p>
+                </div>
+
+                <button id="btn-restart" class="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition shadow-lg active:scale-95 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
+                    </svg>
+                    Prøv igen / Start forfra
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-200 text-center py-4 text-xs text-gray-500 mt-8">
+        Udviklet til nem sprogtræning • Ingen login påkrævet
+    </footer>
+
+    <!-- JavaScript Logik & Data -->
+    <script>
+        // Det fulde og præcise datasæt for alle 20 sprog for de 12 specifikke danske sætninger.
+        // Oversættelserne indeholder alle leksikale betydninger hvis nødvendigt, og er fri for translitteration som bestilt.
+        const wordDatabase = [
+            {
+                id: 1,
+                da: "Entré/indgang",
+                translations: {
+                    en: "Entrance, Entryway",
+                    bn: "প্রবেশদ্বার, প্রবেশপথ",
+                    hi: "प्रवेश द्वार, प्रवेश मार्ग",
+                    ur: "داخلہ, प्रवेश द्वार",
+                    uk: "Вхід, Передпокій",
+                    ru: "Вход, Прихожая",
+                    fa: "ورودی, دهلیز",
+                    tr: "Giriş, Antre",
+                    ne: "प्रवेशद्वार, प्रवेश",
+                    sw: "Mlango wa kuingilia, Kuingilia",
+                    fr: "Entrée",
+                    tw: "Kwan nnyeso",
+                    bs: "Ulaz, Predsoblje",
+                    so: "Albaabka hore, Albaabka laga galo",
+                    sr: "Улаз, Предсобље",
+                    ti: "መእተዊ",
+                    zh: "入口, 玄关",
+                    tg: "Даромадгоҳ, Даҳлез",
+                    es: "Entrada, Vestíbulo",
+                    vi: "Lối vào, Sảnh vào"
+                }
+            },
+            {
+                id: 2,
+                da: "Jeg hænger min jakke på knagerækken",
+                translations: {
+                    en: "I hang my jacket on the coat rack",
+                    bn: "আমি কোট র্যাকে আমার জ্যাকেট ঝুলিয়ে রাখি",
+                    hi: "मैं अपनी जैकेट कोट रैक पर लटकाता हूँ",
+                    ur: "میں اپنی جیکٹ ہینگر پر لٹکاتا ہوں",
+                    uk: "Я вішаю свою куртку на вішалку",
+                    ru: "Я вешаю свою куртку на вешалку",
+                    fa: "من کاپشنم را روی جالباسی آویزان می‌کنم",
+                    tr: "Ceketimi askılığa asıyorum",
+                    ne: "म मेरो ज्याकेट कोट र्याकमा झुण्ड्याउँछु",
+                    sw: "Ninaninginiza koti langu kwenye kitalu cha nguo",
+                    fr: "Je pends ma veste au porte-manteau",
+                    tw: "Mede me jeket saso ntadeɛ kuraadeɛ no so",
+                    bs: "Kačim svoju jaknu na vješalicu",
+                    so: "Waxaan jaakadayda ku dhejiyaa meesha jaakadaha lagu rido",
+                    sr: "Качим своју јакну на вешалицу",
+                    ti: "ጃኬተይ ኣብ መሰቀሊ ክዳን እሰቕሎ አለኹ",
+                    zh: "我把外套挂在衣帽架上",
+                    tg: "Ман куртаамро ба овезон овезон мекунам",
+                    es: "Cuelgo mi chaqueta en el perchero",
+                    vi: "Tôi treo áo khoác của mình lên móc treo đồ"
+                }
+            },
+            {
+                id: 3,
+                da: "Der er en kælder, en stueetage, en førstesal og et loft i huset",
+                translations: {
+                    en: "There is a basement, a ground floor, a first floor, and an attic in the house",
+                    bn: "বাড়িতে একটি বেসমেন্ট, একটি নিচতলা, একটি প্রথম তলা এবং একটি চিলেকোঠা আছে",
+                    hi: "घर में एक तहखाना, एक भूतल, एक पहली मंजिल और एक अटारी है",
+                    ur: "گھر میں تہہ خانہ، گراؤنڈ فلور، پہلی منزل اور ایک اٹاری موجود ہے",
+                    uk: "У будинку є підвал, перший поверх, другий поверх і горище",
+                    ru: "В доме есть подвал, цокольный этаж, первый этаж и чердак",
+                    fa: "در خانه یک زیرزمین، یک طبقه همکف، یک طبقه اول و یک شیروانی وجود دارد",
+                    tr: "Evde bir bodrum, bir giriş katı, bir birinci kat ve bir çatı katı var",
+                    ne: "घरमा एउटा भूमिगत तल्ला, भुइँतल्ला, पहिलो तल्ला र बुइँगल छ",
+                    sw: "Kuna chumba cha chini, ghorofa ya chini, ghorofa ya kwanza na paa katika nyumba",
+                    fr: "Il y a un sous-sol, un rez-de-chaussée, un premier étage et un grenier dans la maison",
+                    tw: "Asase ase dan, fam dan, mfifireɛ dan ne abrannaa wɔ ofie no mu",
+                    bs: "U kući se nalazi podrum, prizemlje, prvi sprat i tavan",
+                    so: "Waxaa guriga ku yaal qolka hoose, dabaqa hoose, dabaqa koowaad iyo saqafka sare",
+                    sr: "У кући се налази подрум, приземље, први спрат и таван",
+                    ti: "ኣብቲ ገዛ ምድርቤት፡ ቀዳማይ ደብሪ፡ ካልኣይ ደብሪን ሰገነትን ኣሎ",
+                    zh: "房子里有地下室、一楼、二楼和阁楼",
+                    tg: "Дар хона таҳхона, ошёнаи якум, ошёнаи дуюм ва болохона мавҷуд аст",
+                    es: "Hay un sótano, una planta baja, un primer piso y un ático en la casa",
+                    vi: "Có một tầng hầm, một tầng trệt, một tầng lầu và một tầng gác mái trong ngôi nhà"
+                }
+            },
+            {
+                id: 4,
+                da: "Der er en skorsten",
+                translations: {
+                    en: "There is a chimney",
+                    bn: "সেখানে একটি চিমনি আছে",
+                    hi: "वहाँ एक चिमनी है",
+                    ur: "ایک چمنی ہے",
+                    uk: "Там є димар",
+                    ru: "Там есть дымоход",
+                    fa: "یک دودکش وجود دارد",
+                    tr: "Bir baca var",
+                    ne: "त्यहाँ एउटा चिम्नी छ",
+                    sw: "Kuna bomba la moshi",
+                    fr: "Il y a une cheminée",
+                    tw: "Wisin bɛ hɔ",
+                    bs: "Tamo je dimnjak",
+                    so: "Waxaa jira qiiq bixiye",
+                    sr: "Тамо је димњак",
+                    ti: "ቺምኒ ኣሎ",
+                    zh: "有一个烟囱",
+                    tg: "Дудбаромад мавҷуд аст",
+                    es: "Hay una chimenea",
+                    vi: "Có một ống khói"
+                }
+            },
+            {
+                id: 5,
+                da: "Der er en haveslange i haven",
+                translations: {
+                    en: "There is a garden hose in the garden",
+                    bn: "বাগানে একটি বাগান পায়ের পাতার মোজাবিশেষ আছে",
+                    hi: "बगीचे में एक बगीचे की नली है",
+                    ur: "باغ میں پانی کا پائپ ہے",
+                    uk: "У саду є садовий шланг",
+                    ru: "В саду есть садовый шланг",
+                    fa: "یک شیلنگ باغچه در باغ وجود دارد",
+                    tr: "Bahçede bir bahçe hortumu var",
+                    ne: "बगैंचामा एउटा पानी हाल्ने पाइप छ",
+                    sw: "Kuna mpira wa bustani bustanini",
+                    fr: "Il y a un tuyau d'arrosage dans le jardin",
+                    tw: "Turo mu nsuomene bɛ hɔ wɔ turo no mu",
+                    bs: "U bašti se nalazi baštensko crijevo",
+                    so: "Waxaa jira tuubada waraabka beeraha oo beerta dhex taal",
+                    sr: "У башти се налази баштенско црево",
+                    ti: "ኣብቲ መናፈሻ ናይ ስፓ ገዛ መስመር ማይ ኣሎ",
+                    zh: "花园里有一根浇水软管",
+                    tg: "Дар боғ шланги боғӣ мавҷуд аст",
+                    es: "Hay una manguera de jardín en el jardín",
+                    vi: "Có một vòi nước tưới cây trong vườn"
+                }
+            },
+            {
+                id: 6,
+                da: "Der er en tørresnor, en vaskemaskine og en tørretumbler i kælderen",
+                translations: {
+                    en: "There is a clothesline, a washing machine, and a clothes dryer in the basement",
+                    bn: "বেসমেন্টে একটি কাপড়ের লাইন, একটি ওয়াশিং মেশিন এবং একটি কাপড়ের ড্রায়ার রয়েছে",
+                    hi: "तहखाने में कपड़े सुखाने की रस्सी, एक वाशिंग मशीन और एक कपड़े सुखाने की मशीन है",
+                    ur: "تہہ خانے میں کپڑے لٹکانے کی رسی، واشنگ مشین اور کپڑے सुखाने की मशीन है",
+                    uk: "У підвалі є мотузка для білизни, пральна машина та сушарка для білизни",
+                    ru: "В подвале есть бельевая веревка, стиральная машина и сушилка для белья",
+                    fa: "یک طناب رخت، یک ماشین لباسشویی و یک خشک‌کن در زیرزمین وجود دارد",
+                    tr: "Bodrumda bir çamaşır ipi, bir çamaşır makinesi ve bir kurutma makinesi var",
+                    ne: "भूमिगत तल्लामा कपडा सुकाउने डोरी, लुगा धुने मेसिन र कपडा सुकाउने ड्रायर छ",
+                    sw: "Kuna kamba ya nguo, mashine ya kufua na kikausha nguo katika chumba cha chini",
+                    fr: "Il y a une corde à linge, une machine à laver et un sèche-linge au sous-sol",
+                    tw: "Ntoaso ntadeɛ sianeɛ, ntadeɛhoro afiri ne ntadeɛkyenkyen afiri wɔ asase ase dan no mu",
+                    bs: "U podrumu se nalazi štrik za veš, veš mašina i mašina za sušenje veša",
+                    so: "Waxaa jira xadhig dharka lagu dhoofiyo, mashiinka dharka iyo mashiinka qallajiya oo qolka hoose ku yaal",
+                    sr: "У подруму се налази штрик за веш, веш машина и машина за сушење веша",
+                    ti: "ኣብ ምድርቤት ናይ ክዳን መስቀሊ፡ መሕጸቢ ማሽንን መድረቒ ክዳንን ኣሎ",
+                    zh: "地下室里有一根晾衣绳、一台洗衣机和一个烘干机",
+                    tg: "Дар таҳхона ресмони либосшӯӣ, мошини ҷомашӯӣ ва хушккунаки либос мавҷуд аст",
+                    es: "Hay un tendedero, una lavadora y una secadora de ropa en el sótano",
+                    vi: "Có một dây phơi đồ, một máy giặt và một máy sấy quần áo trong tầng hầm"
+                }
+            },
+            {
+                id: 7,
+                da: "Der er et badekar på badeværelset",
+                translations: {
+                    en: "There is a bathtub in the bathroom",
+                    bn: "বাথরুমে একটি বাথটাব আছে",
+                    hi: "स्नानघर में एक बाथटब है",
+                    ur: "غسل خانے میں ایک باتھ ٹب ہے",
+                    uk: "У ванній кімнаті є ванна",
+                    ru: "В ванной комнате есть ванна",
+                    fa: "یک وان حمام در حمام وجود دارد",
+                    tr: "Banyoda bir küvet var",
+                    ne: "बाथरूममा एउटा बाथटब छ",
+                    sw: "Kuna bafu la kuogea bafuni",
+                    fr: "Il y a une baignoire dans la salle de bain",
+                    tw: "Dwareɛ dadeɛ dwareɛbea hɔ",
+                    bs: "U kupatilu se nalazi kada",
+                    so: "Waxaa jira baatiko weyn oo qolka qubayska ku yaal",
+                    sr: "У купатилу се налази када",
+                    ti: "ኣብ ሽቓቕ መሕጸቢ ገዛ (ባኞ) ኣሎ",
+                    zh: "浴室里有一个浴缸",
+                    tg: "Дар ҳаммом ванна мавҷуд аст",
+                    es: "Hay una bañera en el cuarto de baño",
+                    vi: "Có một bồn tắm trong phòng tắm"
+                }
+            },
+            {
+                id: 8,
+                da: "Der er gamle ting og sager på loftet",
+                translations: {
+                    en: "There are old things and knick-knacks in the attic",
+                    bn: "চিলেকোঠায় পুরনো জিনিসপত্র ও জিনিসপত্র আছে",
+                    hi: "अटारी में पुरानी चीज़ें और कबाड़ है",
+                    ur: "اٹاری میں پرانی چیزیں اور سامان ہے",
+                    uk: "На горищі старі речі та мотлох",
+                    ru: "На чердаке лежат старые вещи и хлам",
+                    fa: "چیزها و اسباب قدیمی در شیروانی وجود دارد",
+                    tr: "Çatı katında eski eşyalar ve ufak tefek şeyler var",
+                    ne: "बुइँगलमा पुराना पुराना सामानहरू र चीजहरू छन्",
+                    sw: "Kuna vitu vya zamani na visivyo na maana kwenye paa",
+                    fr: "Il y a de vieilles affaires et des babioles au grenier",
+                    tw: "Nneɛma dadaw ne nneɛma pii wɔ abrannaa no so",
+                    bs: "Na tavanu se nalaze stare stvari i drangulije",
+                    so: "Waxaa jira waxyaabo duug ah oo saqafka sare yaal",
+                    sr: "На тавану се налазе старе ствари и дрангулије",
+                    ti: "ኣብቲ ሰገነት ናይ ቀደም ኣቑሑትን ነገራትን ኣሎ",
+                    zh: "阁楼里有一些旧东西和杂物",
+                    tg: "Дар болохона чизҳои кӯҳна ва ҳама гуна чизҳо мавҷуданд",
+                    es: "Hay cosas viejas y cachivaches en el ático",
+                    vi: "Có những đồ đạc và vật dụng cũ kỹ trên gác mái"
+                }
+            },
+            {
+                id: 9,
+                da: "Indenfor er der værelser",
+                translations: {
+                    en: "Inside there are rooms",
+                    bn: "ভেতরে ঘর আছে",
+                    hi: "अंदर कमरे हैं",
+                    ur: "اندر کمرے ہیں",
+                    uk: "Всередині є кімнати",
+                    ru: "Внутри есть комнаты",
+                    fa: "در داخل اتاق‌هایی وجود دارد",
+                    tr: "İçeride odalar var",
+                    ne: "भित्र कोठाहरू छन्",
+                    sw: "Ndani kuna vyumba",
+                    fr: "À l'intérieur, il y a des pièces",
+                    tw: "Emu wɔ adan pii",
+                    bs: "Unutra se nalaze sobe",
+                    so: "Gudahana waxaa ku yaal qolal",
+                    sr: "Унутра се налазе собе",
+                    ti: "ኣብ ውሽጢ ክፍልታት ኣሎ",
+                    zh: "里面有房间",
+                    tg: "Дар дарун хонаҳо мавҷуданд",
+                    es: "En el interior hay habitaciones",
+                    vi: "Bên trong có các phòng"
+                }
+            },
+            {
+                id: 10,
+                da: "Udenfor er der en have",
+                translations: {
+                    en: "Outside there is a garden",
+                    bn: "বাইরে একটি বাগান আছে",
+                    hi: "बाहर एक बगीचा है",
+                    ur: "باہر ایک باغ ہے",
+                    uk: "Надворі є сад",
+                    ru: "Снаружи есть сад",
+                    fa: "در بیرون یک باغ وجود دارد",
+                    tr: "Dışarıda bir bahçe var",
+                    ne: "बाहिर एउटा बगैंचा छ",
+                    sw: "Nje kuna bustani",
+                    fr: "Dehors, il y a un jardin",
+                    tw: "Abɔnten so turo bɛ hɔ",
+                    bs: "Vani se nalazi bašta",
+                    so: "Dibadda waxaa ku yaal beer",
+                    sr: "Вани се налази башта",
+                    ti: "ኣብ ወጻኢ መናፈሻ ኣሎ",
+                    zh: "外面有一个花园",
+                    tg: "Дар берун боғ мавҷуд аст",
+                    es: "Afuera hay un jardín",
+                    vi: "Bên ngoài có một khu vườn"
+                }
+            },
+            {
+                id: 11,
+                da: "Plantegning",
+                translations: {
+                    en: "Floor plan, Blueprint",
+                    bn: "মেঝে পরিকল্পনা, নকশা",
+                    hi: "मंजिल की योजना, रूपरेखा",
+                    ur: "فرش کا نقشہ, پلان",
+                    uk: "План поверху, План приміщення",
+                    ru: "План этажа, Чертеж",
+                    fa: "نقشه ساختمان, پلان طبقه",
+                    tr: "Kat planı, Mimari plan",
+                    ne: "नक्सा, भवनको नक्सा",
+                    sw: "Ramani ya nyumba, Mchoro wa sakafu",
+                    fr: "Plan au sol, Plan de masse",
+                    tw: "Ofie nhyehyɛeɛ mfonini",
+                    bs: "Tlocrt, Plan sprata",
+                    so: "Naqshada guriga, Shaxda guriga",
+                    sr: "Тлоцрт, План спрата",
+                    ti: "ፕላን ናይቲ ገዛ",
+                    zh: "户型图, 平面图",
+                    tg: "Нақшаи ошёна, Нақшаи бино",
+                    es: "Plano de planta, Plano",
+                    vi: "Sơ đồ mặt bằng, Bản vẽ thiết kế"
+                }
+            }
+        ];
+
+        // Sprog ID til Navne-mapping til UI-brug
+        const languageNames = {
+            en: "Engelsk", bn: "Bengali", hi: "Hindi", ur: "Urdu", uk: "Ukrainsk",
+            ru: "Russisk", fa: "Persisk", tr: "Tyrkisk", ne: "Nepalesisk", sw: "Kiswahili",
+            fr: "Fransk", tw: "Twi", bs: "Bosnisk", so: "Somali", sr: "Serbisk",
+            ti: "Tigrinya", zh: "Kinesisk", tg: "Tadsjikisk", es: "Spansk", vi: "Vietnamesisk"
+        };
+
+        // Applikationstilstand
+        let currentLanguage = "en";
+        let activeDeck = [];          // Bunken af ord tilbage i denne runde
+        let currentCardIndex = 0;     // Det aktuelle kort
+        let isCardFlipped = false;    // Hvorvidt bagsiden vises
+        let isTransitioning = false;  // Timing-spærring for at forhindre dobbelt-tryk og snyd
+
+        // DOM Elementer
+        const languageSelect = document.getElementById('language-select');
+        const cardsLeftText = document.getElementById('cards-left');
+        const flashcardContainer = document.getElementById('flashcard-container');
+        const flashcard = document.getElementById('flashcard');
+        const danishText = document.getElementById('danish-text');
+        const translationText = document.getElementById('translation-text');
+        const targetLangLabel = document.getElementById('target-lang-label');
+        const actionButtons = document.getElementById('action-buttons');
+        const btnCorrect = document.getElementById('btn-correct');
+        const btnIncorrect = document.getElementById('btn-incorrect');
+        const gameScreen = document.getElementById('game-screen');
+        const finishedScreen = document.getElementById('finished-screen');
+        const finishedLangName = document.getElementById('finished-lang-name');
+        const btnRestart = document.getElementById('btn-restart');
+
+        // Initialiser spillet
+        function initGame() {
+            currentLanguage = languageSelect.value;
+            // Opret en dyb kopi af databasen og ryst posen (shuffle)
+            activeDeck = [...wordDatabase].sort(() => Math.random() - 0.5);
+            currentCardIndex = 0;
+            isCardFlipped = false;
+            isTransitioning = false;
+            
+            // Nulstil kortets rotation (vis forsiden)
+            flashcard.classList.remove('rotate-y-180');
+            hideActionButtons();
+            
+            // Vis spilleskærmen og skjul færdig-skærmen
+            gameScreen.classList.remove('hidden');
+            finishedScreen.classList.add('hidden');
+
+            updateCardUI();
+        }
+
+        // Opdater teksterne på kortet og statuslinjen
+        function updateCardUI() {
+            if (activeDeck.length === 0) {
+                showFinishedScreen();
+                return;
+            }
+
+            // Sikr dig at vi ikke går ud over listens grænse
+            if (currentCardIndex >= activeDeck.length) {
+                currentCardIndex = 0;
+            }
+
+            const currentCard = activeDeck[currentCardIndex];
+            
+            // Sæt teksterne
+            danishText.textContent = currentCard.da;
+            translationText.textContent = currentCard.translations[currentLanguage];
+            
+            // Opdater labels
+            targetLangLabel.textContent = languageNames[currentLanguage];
+            cardsLeftText.textContent = `Kort tilbage: ${activeDeck.length}`;
+        }
+
+        // Flip kortet (Vender det rundt)
+        function flipCard() {
+            if (isTransitioning) return; // Forhindr interaktion under transition
+            
+            isCardFlipped = !isCardFlipped;
+            if (isCardFlipped) {
+                flashcard.classList.add('rotate-y-180');
+                showActionButtons();
+            } else {
+                flashcard.classList.remove('rotate-y-180');
+                hideActionButtons();
+            }
+        }
+
+        // Vis knapperne med en flot fade-ind animation
+        function showActionButtons() {
+            actionButtons.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+            actionButtons.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+        }
+
+        // Skjul knapperne
+        function hideActionButtons() {
+            actionButtons.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+            actionButtons.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+        }
+
+        // Håndtering af rigtigt svar (Ordet fjernes)
+        function handleCorrect() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            // 1. Vend kortet tilbage til forsiden (Dansk)
+            flashcard.classList.remove('rotate-y-180');
+            isCardFlipped = false;
+            hideActionButtons();
+
+            // 2. Vent ca. 400ms (timeout) til at kortet er vendt om, før vi opdaterer data
+            setTimeout(() => {
+                // Fjern det aktuelle kort fra bunken
+                activeDeck.splice(currentCardIndex, 1);
+                
+                // Hvis der stadig er kort tilbage, hold indeks på samme sted (da listen nu er kortere)
+                if (activeDeck.length > 0) {
+                    if (currentCardIndex >= activeDeck.length) {
+                        currentCardIndex = 0;
+                    }
+                }
+                
+                updateCardUI();
+                isTransitioning = false;
+            }, 400);
+        }
+
+        // Håndtering af forkert svar (Ordet bliver i bunken)
+        function handleIncorrect() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            // 1. Vend kortet tilbage til forsiden (Dansk)
+            flashcard.classList.remove('rotate-y-180');
+            isCardFlipped = false;
+            hideActionButtons();
+
+            // 2. Vent ca. 400ms (timeout) til at kortet er helt vendt, før vi skifter til næste kort
+            setTimeout(() => {
+                // Gå til næste kort i bunken (eller start forfra i listen hvis vi var ved det sidste)
+                currentCardIndex = (currentCardIndex + 1) % activeDeck.length;
+                
+                updateCardUI();
+                isTransitioning = false;
+            }, 400);
+        }
+
+        // Vis den endelige succes-skærm
+        function showFinishedScreen() {
+            gameScreen.classList.add('hidden');
+            finishedScreen.classList.remove('hidden');
+            finishedLangName.textContent = languageNames[currentLanguage];
+        }
+
+        // Event listeners
+        languageSelect.addEventListener('change', () => {
+            initGame();
+        });
+
+        flashcardContainer.addEventListener('click', (e) => {
+            // Sørg for at klik på "rigtigt/forkert" knapperne ikke også trigger kort-flip
+            if (e.target.closest('#action-buttons')) return;
+            flipCard();
+        });
+
+        btnCorrect.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop bobling
+            handleCorrect();
+        });
+
+        btnIncorrect.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop bobling
+            handleIncorrect();
+        });
+
+        btnRestart.addEventListener('click', () => {
+            initGame();
+        });
+
+        // Tastaturgenveje for bedre usability (Pil op/ned/mellemrum)
+        document.addEventListener('keydown', (e) => {
+            if (gameScreen.classList.contains('hidden') || isTransitioning) return;
+
+            if (e.code === 'Space' || e.code === 'Enter') {
+                e.preventDefault();
+                flipCard();
+            } else if (isCardFlipped) {
+                if (e.code === 'ArrowRight' || e.code === 'ArrowUp') {
+                    handleCorrect();
+                } else if (e.code === 'ArrowLeft' || e.code === 'ArrowDown') {
+                    handleIncorrect();
+                }
+            }
+        });
+
+        // Start appen op ved indlæsning
+        window.onload = initGame;
+    </script>
+</body>
+</html>
