@@ -135,7 +135,7 @@
                                 <p class="font-medium text-slate-800">Tip:</p>
                                 <p>Hold det kort og positivt. Det giver arbejdsgiveren et billede af det hele menneske bag ansøgningen, men behøver ikke at fylde meget.</p>
                                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-150 font-mono text-xs text-slate-700">
-                                    <span class="font-semibold text-indigo-600">Eksempel:</span> "Jeg er 32 år, bor i Aarhus sammen med min kæreste og vores to børn på 3 og 6 år."
+                                    <span class="font-semibold text-indigo-600">Eksempel:</span> "Privat er jeg 32 år, bor i Aarhus sammen med min kæreste og vores to børn på 3 og 6 år."
                                 </div>
                             </div>
                         </div>
@@ -299,6 +299,13 @@
 
                 <!-- Action Buttons & Preview Toggle -->
                 <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col gap-3">
+                    <button onclick="correctDanishText()" id="btn-correct" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors shadow-md text-sm flex items-center justify-center gap-2">
+                        <span id="btn-correct-spinner" class="hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        <svg id="btn-correct-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 113.536 0V21h2v-2.172a5 5 0 01-.002-3.828z"></path>
+                        </svg>
+                        <span>Ret stavning & sprog (AI)</span>
+                    </button>
                     <button onclick="openPreviewModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-sm text-sm flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                         Se live forhåndsvisning
@@ -332,18 +339,18 @@
                             Butiksassistent søges...
                         </h2>
                         
-                        <!-- Main Body Letter Content -->
-                        <div class="space-y-4 text-sm sm:text-base leading-relaxed text-slate-700">
+                        <!-- Main Body Letter Content in correct sequential order -->
+                        <div class="space-y-6 text-sm sm:text-base leading-relaxed text-slate-700">
                             <p id="prev-indledning" class="whitespace-pre-line font-medium text-slate-900">[Indledning kommer her...]</p>
+                            <p id="prev-personlig" class="whitespace-pre-line text-slate-600 italic">[Personlig information kommer her...]</p>
                             <p id="prev-erfaring" class="whitespace-pre-line">[Erfaring kommer her...]</p>
                             <p id="prev-kompetencer" class="whitespace-pre-line">[Kompetencer kommer her...]</p>
-                            <p id="prev-personlig" class="whitespace-pre-line text-slate-500 italic text-xs pt-4 border-t border-slate-100">[Personlig information kommer her...]</p>
                         </div>
                     </div>
 
                     <!-- Sign-off & Footer of Letter -->
-                    <div class="mt-8 pt-6 border-t border-slate-100">
-                        <p id="prev-afslutning" class="text-sm text-slate-600 mb-4">[Afslutning...]</p>
+                    <div class="mt-8 pt-6 border-t border-slate-100 space-y-4">
+                        <p id="prev-afslutning" class="text-sm text-slate-600">[Afslutning...]</p>
                         <p id="prev-hilsen" class="font-bold text-slate-900">[Hilsen...]</p>
                     </div>
                 </div>
@@ -357,6 +364,41 @@
                 <button onclick="copyToClipboardFromModal()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
                     Kopier tekst
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CORRECTIONS MODAL (Feedback to student) -->
+    <div id="corrections-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl transform scale-95 transition-transform duration-300">
+            <!-- Modal Header -->
+            <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="bg-indigo-50 text-indigo-600 p-2 rounded-xl">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 113.536 0V21h2v-2.172a5 5 0 01-.002-3.828z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Sproglig Feedback & Forslag</h3>
+                        <p class="text-xs text-slate-500 font-medium">Gennemse de fundne fejl og ret dem selv i din skabelon</p>
+                    </div>
+                </div>
+                <button onclick="closeCorrectionsModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-50">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Suggestions List) -->
+            <div class="p-6 overflow-y-auto flex-grow space-y-4" id="corrections-container">
+                <!-- Dynamically filled by Javascript -->
+            </div>
+
+            <!-- Modal Footer Buttons -->
+            <div class="px-6 py-4 border-t border-slate-100 flex justify-end bg-slate-50/30">
+                <button onclick="closeCorrectionsModal()" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition-colors">
+                    Forstået, jeg retter det!
                 </button>
             </div>
         </div>
@@ -413,17 +455,201 @@
             document.getElementById('prev-hilsen').innerText = hilsen;
         }
 
-        // Build Plain Text Application
+        // Build Plain Text Application in strictly correct chronological order (1-7)
         function buildFullText() {
             const overskrift = document.getElementById('input-overskrift').value || "Ansøgning";
             const indledning = document.getElementById('input-indledning').value || "";
+            const personlig = document.getElementById('input-personlig').value || "";
             const erfaring = document.getElementById('input-erfaring').value || "";
             const kompetencer = document.getElementById('input-kompetencer').value || "";
-            const personlig = document.getElementById('input-personlig').value || "";
             const afslutning = document.getElementById('input-afslutning').value || "";
             const hilsen = document.getElementById('input-hilsen').value || "Med venlig hilsen";
 
-            return `${overskrift}\n\n${indledning}\n\n${erfaring}\n\n${kompetencer}\n\n${personlig}\n\n${afslutning}\n\n${hilsen}`;
+            return `${overskrift}\n\n${indledning}\n\n${personlig}\n\n${erfaring}\n\n${kompetencer}\n\n${afslutning}\n\n${hilsen}`;
+        }
+
+        // Correct Danish text using Gemini AI (providing educational feedback instead of auto-correcting)
+        async function correctDanishText() {
+            const btn = document.getElementById('btn-correct');
+            const spinner = document.getElementById('btn-correct-spinner');
+            const icon = document.getElementById('btn-correct-icon');
+            const label = btn.querySelector('span:not(#btn-correct-spinner)');
+
+            // Gather inputs
+            const overskrift = document.getElementById('input-overskrift').value;
+            const indledning = document.getElementById('input-indledning').value;
+            const personlig = document.getElementById('input-personlig').value;
+            const erfaring = document.getElementById('input-erfaring').value;
+            const kompetencer = document.getElementById('input-kompetencer').value;
+            const afslutning = document.getElementById('input-afslutning').value;
+            const hilsen = document.getElementById('input-hilsen').value;
+
+            // Simple validation: check if anything has been written
+            if (!overskrift && !indledning && !personlig && !erfaring && !kompetencer && !afslutning && !hilsen) {
+                showToast("Indtast venligst noget tekst, før du kører tjekket!");
+                return;
+            }
+
+            // Enter loading state
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            spinner.classList.remove('hidden');
+            icon.classList.add('hidden');
+            const originalLabel = label.innerText;
+            label.innerText = "Tjekker tekst...";
+
+            // Create instructions for the corrector API
+            const promptText = `Du er en pædagogisk dansk sprogkonsulent. 
+Din opgave er KUN at finde reelle stavefejl, grammatikfejl, tegnsætningsfejl eller meget forkerte formuleringer på dansk i de tilsendte felter.
+Du må IKKE lave om på stilen eller teksten, hvis den er sprogligt korrekt, blot fordi du ville have formuleret det anderledes. 
+Du skal returnere en liste over de fundne fejl, hvad der er forkert, hvad det rigtige er, og en kort forklaring på reglen, så kursisten selv kan rette det.
+
+Her er felterne:
+- overskrift: "${overskrift}"
+- indledning: "${indledning}"
+- personlig: "${personlig}"
+- erfaring: "${erfaring}"
+- kompetencer: "${kompetencer}"
+- afslutning: "${afslutning}"
+- hilsen: "${hilsen}"`;
+
+            // Prepare API payload with structured JSON schema to fetch errors
+            const payload = {
+                contents: [{ parts: [{ text: promptText }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "hasErrors": { "type": "BOOLEAN" },
+                            "corrections": {
+                                "type": "ARRAY",
+                                "items": {
+                                    "type": "OBJECT",
+                                    "properties": {
+                                        "felt": { "type": "STRING", "description": "Navnet på det felt fejlen blev fundet i, f.eks. 'Overskrift', 'Indledning', 'Erfaring' osv." },
+                                        "original": { "type": "STRING", "description": "Sætningen eller ordet med fejlen præcis som kursisten har skrevet det" },
+                                        "rettet": { "type": "STRING", "description": "Hvordan sætningen eller ordet skrives helt korrekt" },
+                                        "forklaring": { "type": "STRING", "description": "Pædagogisk og kort forklaring af fejlen eller reglen på dansk" }
+                                    },
+                                    "required": ["felt", "original", "rettet", "forklaring"]
+                                }
+                            }
+                        },
+                        "required": ["hasErrors", "corrections"]
+                    }
+                }
+            };
+
+            const apiKey = ""; // Left blank, Canvas handles runtime authorization dynamically
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            let attempts = 3;
+            let delay = 1000;
+            let success = false;
+            let resultJson = null;
+
+            // Call API with robust exponential backoff handling
+            while (attempts > 0 && !success) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error("HTTP status " + response.status);
+                    }
+
+                    const result = await response.json();
+                    const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (jsonText) {
+                        resultJson = JSON.parse(jsonText);
+                        success = true;
+                    } else {
+                        throw new Error("Fejl i API-respons");
+                    }
+                } catch (err) {
+                    attempts--;
+                    if (attempts > 0) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    }
+                }
+            }
+
+            // Reset loading state
+            btn.disabled = false;
+            btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            spinner.classList.add('hidden');
+            icon.classList.remove('hidden');
+            label.innerText = originalLabel;
+
+            if (success && resultJson) {
+                if (resultJson.hasErrors && resultJson.corrections && resultJson.corrections.length > 0) {
+                    displayCorrections(resultJson.corrections);
+                } else {
+                    showToast("Super flot! Der blev ikke fundet nogen sproglige fejl i din tekst. ✨");
+                }
+            } else {
+                showToast("Det lykkedes ikke at kontakte sprogrettelsen. Tjek din forbindelse og prøv igen.");
+            }
+        }
+
+        // Render correction cards dynamically in the feedback modal
+        function displayCorrections(corrections) {
+            const container = document.getElementById('corrections-container');
+            container.innerHTML = ""; // Clear old corrections
+
+            corrections.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3";
+                
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                            Felt: ${item.felt}
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        <div class="bg-rose-50/50 border border-rose-100 rounded-xl p-3">
+                            <span class="text-xs font-bold text-rose-700 block mb-1">Hvad du skrev:</span>
+                            <p class="text-slate-800 line-through decoration-rose-300 font-medium">${item.original}</p>
+                        </div>
+                        <div class="bg-emerald-50/50 border border-emerald-100 rounded-xl p-3">
+                            <span class="text-xs font-bold text-emerald-700 block mb-1">Forslag til rettelse:</span>
+                            <p class="text-slate-900 font-semibold">${item.rettet}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-xl p-3 text-xs text-slate-600">
+                        <span class="font-bold text-slate-700 block mb-0.5">Hvorfor:</span>
+                        <p class="leading-relaxed">${item.forklaring}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            openCorrectionsModal();
+        }
+
+        // Modal Controls for Corrections Feedback
+        function openCorrectionsModal() {
+            const modal = document.getElementById('corrections-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 50);
+        }
+
+        function closeCorrectionsModal() {
+            const modal = document.getElementById('corrections-modal');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
         }
 
         // Copy Clipboard Alternative (safe from iframe restrictions)
