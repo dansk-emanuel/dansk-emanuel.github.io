@@ -1,12 +1,505 @@
-Her finder du en vejledning til at skrive en jobansøgning. 
-En jobansøgning indeholder følgende punkter: 
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide: Skriv den perfekte jobansøgning</title>
+    <!-- Tailwind CSS for modern and premium styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom smooth transition */
+        .transition-all-300 {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
 
+    <!-- Navigation / Header Banner -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-md shadow-indigo-100">
+                    <!-- Document SVG Icon -->
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">Jobansøgning</h1>
+                    <p class="text-xs text-slate-500 font-medium">Interaktiv guide og skabelon-bygger</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>
+                    Klar til brug
+                </span>
+            </div>
+        </div>
+    </header>
 
-- Overskrift
+    <!-- Main Content Grid -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Intro Hero Section -->
+        <div class="bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-10 mb-8 shadow-xl relative overflow-hidden">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent_50%)]"></div>
+            <div class="relative z-10 max-w-3xl">
+                <span class="text-xs font-semibold tracking-wider text-indigo-300 uppercase bg-indigo-500/10 px-3 py-1.5 rounded-full border border-indigo-400/20">Vejledning</span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold mt-4 tracking-tight leading-tight">
+                    Hvordan skriver man en god jobansøgning?
+                </h2>
+                <p class="text-slate-300 text-sm sm:text-base mt-3 leading-relaxed">
+                    En jobansøgning er din personlige billet til en jobsamtale. Den skal vække arbejdsgiverens interesse på få sekunder. Følg denne strukturerede vejledning for at sikre, at du får alle de vigtigste elementer med.
+                </p>
+            </div>
+        </div>
 
-  - Indledning
-  - Personlig information: f.eks. køn, alder, om du er gift, om du har børn
-  - Erfaring: hvad har du arbejdet med før og hvordan kan det hjælpe dig i dit nye job?
-  - Personlige kompetencer: f.eks. "Jeg er mødestabil og altid i godt humør."
-  - Afslutning
-  - Hilsen: f.eks. "Med venlig hilsen Emanuel."
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- LEFT COLUMN: The Interactive Guide (7 Cols on large screens) -->
+            <section class="lg:col-span-7 space-y-4">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-lg font-bold text-slate-900">De 7 vigtige punkter</h3>
+                    <span class="text-xs text-slate-500">Klik på punkterne for at læse mere</span>
+                </div>
+
+                <!-- 1. Overskrift -->
+                <div class="bg-white border border-slate-200/80 rounded-2xl p-5 hover:border-indigo-300 transition-all-300 shadow-sm hover:shadow-md cursor-pointer group" onclick="toggleDetails('detail-1')">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-indigo-50 text-indigo-600 font-bold w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all-300">
+                            1
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-base font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">Overskrift</h4>
+                                <svg id="icon-1" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                            <p class="text-sm text-slate-500 mt-1">Gør din overskrift fængende, præcis og direkte rettet mod jobbet.</p>
+                            
+                            <div id="detail-1" class="hidden mt-4 pt-4 border-t border-slate-100 text-sm text-slate-600 space-y-2">
+                                <p class="font-medium text-slate-800">Tip:</p>
+                                <p>Undgå kedelige overskrifter som bare "Ansøgning". Skriv i stedet noget, der viser, hvad du bringer til rollen.</p>
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-150 font-mono text-xs text-slate-700">
+                                    <span class="font-semibold text-indigo-600">Eksempel:</span> "Erfaren butiksmedarbejder med højt humør søger stillingen hos [Virksomhed]"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Indledning -->
+                <div class="bg-white border border-slate-200/80 rounded-2xl p-5 hover:border-indigo-300 transition-all-300 shadow-sm hover:shadow-md cursor-pointer group" onclick="toggleDetails('detail-2')">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-indigo-50 text-indigo-600 font-bold w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all-300">
+                            2
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-base font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">Indledning</h4>
+                                <svg id="icon-2" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                            <p class="text-sm text-slate-500 mt-1">Fang læseren med det samme og forklar, hvorfor du søger jobbet.</p>
+                            
+                            <div id="detail-2" class="hidden mt-4 pt-4 border-t border-slate-100 text-sm text-slate-600 space-y-2">
+                                <p class="font-medium text-slate-800">Tip:</p>
+                                <p>Gå direkte til sagen. Fortæl hvorfor du brænder for lige præcis denne stilling og denne virksomhed.</p>
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-150 font-mono text-xs text-slate-700">
+                                    <span class="font-semibold text-indigo-600">Eksempel:</span> "Jeg skriver til jer, da jeg med stor interesse så jeres opslag. Min passion for god kundeservice og min baggrund gør mig til den ideelle kandidat..."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Personlig information -->
+                <div class="bg-white border border-slate-200/80 rounded-2xl p-5 hover:border-indigo-300 transition-all-300 shadow-sm hover:shadow-md cursor-pointer group" onclick="toggleDetails('detail-3')">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-indigo-50 text-indigo-600 font-bold w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all-300">
+                            3
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-base font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">Personlig information</h4>
+                                <svg id="icon-3" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                            <p class="text-sm text-slate-500 mt-1">Fortæl kort hvem du er privat (f.eks. køn, alder, om du har børn/partner).</p>
+                            
+                            <div id="detail-3" class="hidden mt-4 pt-4 border-t border-slate-100 text-sm text-slate-600 space-y-2">
+                                <p class="font-medium text-slate-800">Tip:</p>
+                                <p>Hold det kort og positivt. Det giver arbejdsgiveren et billede af det hele menneske bag ansøgningen, men behøver ikke at fylde meget.</p>
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-150 font-mono text-xs text-slate-700">
+                                    <span class="font-semibold text-indigo-600">Eksempel:</span> "Privat er jeg 32 år, bor i Aarhus sammen med min kæreste og vores to børn på 3 og 6 år."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Erfaring -->
+                <div class="bg-white border border-slate-200/80 rounded-2xl p-5 hover:border-indigo-300 transition-all-300 shadow-sm hover:shadow-md cursor-pointer group" onclick="toggleDetails('detail-4')">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-indigo-50 text-indigo-600 font-bold w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all-300">
+                            4
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-base font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">Erfaring</h4>
+                                <svg id="icon-4" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                            <p class="text-sm text-slate-500 mt-1">Hvad har du arbejdet med før, og hvordan hjælper det dig her?</p>
+                            
+                            <div id="detail-4" class="hidden mt-4 pt-4 border-t border-slate-100 text-sm text-slate-600 space-y-2">
+                                <p class="font-medium text-slate-800">Tip:</p>
+                                <p>Sæt din tidligere erfaring i spil i forhold til det nye job. Lad være med bare at liste dine opgaver op, men fortæl, hvad du lærte, og hvordan det gør dig dygtig i dag.</p>
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-150 font-mono text-xs text-slate-700">
+                                    <span class="font-semibold text-indigo-600">Eksempel:</span> "I min tidligere stilling som [Jobtitel] lærte jeg at håndtere travle perioder med et smil, hvilket jeg vil trække på i jeres reception."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Personlige kompetencer -->
+                <div class="bg-white border border-slate-200/80 rounded-2xl p-5 hover:border-indigo-300 transition-all-300 shadow-sm hover:shadow-md cursor-pointer group" onclick="toggleDetails('detail-5')">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-indigo-50 text-indigo-600 font-bold w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all-300">
+                            5
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-base font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">Personlige kompetencer</h4>
+                                <svg id="icon-5" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                            <p class="text-sm text-slate-500 mt-1">Hvem er du som kollega og person i dagligdagen?</p>
+                            
+                            <div id="detail-5" class="hidden mt-4 pt-4 border-t border-slate-100 text-sm text-slate-600 space-y-2">
+                                <p class="font-medium text-slate-800">Tip:</p>
+                                <p>Brug positive, handlingsorienterede ord og underbyg dem gerne med et konkret eksempel.</p>
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-150 font-mono text-xs text-slate-700">
+                                    <span class="font-semibold text-indigo-600">Eksempel:</span> "Som person er jeg mødestabil og altid i godt humør. Jeg bidrager positivt til det sociale fællesskab på arbejdspladsen."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Afslutning -->
+                <div class="bg-white border border-slate-200/80 rounded-2xl p-5 hover:border-indigo-300 transition-all-300 shadow-sm hover:shadow-md cursor-pointer group" onclick="toggleDetails('detail-6')">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-indigo-50 text-indigo-600 font-bold w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all-300">
+                            6
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-base font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">Afslutning</h4>
+                                <svg id="icon-6" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                            <p class="text-sm text-slate-500 mt-1">Rund ansøgningen pænt af og læg op til et personligt møde.</p>
+                            
+                            <div id="detail-6" class="hidden mt-4 pt-4 border-t border-slate-100 text-sm text-slate-600 space-y-2">
+                                <p class="font-medium text-slate-800">Tip:</p>
+                                <p>Udtryk glæde og forventning om at møde dem ansigt til ansigt. Vær selvsikker men ydmyg.</p>
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-150 font-mono text-xs text-slate-700">
+                                    <span class="font-semibold text-indigo-600">Eksempel:</span> "Jeg håber, at min ansøgning har vakt jeres interesse, og jeg ser frem til at uddybe mine kompetencer ved en personlig samtale."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Hilsen -->
+                <div class="bg-white border border-slate-200/80 rounded-2xl p-5 hover:border-indigo-300 transition-all-300 shadow-sm hover:shadow-md cursor-pointer group" onclick="toggleDetails('detail-7')">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-indigo-50 text-indigo-600 font-bold w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all-300">
+                            7
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-base font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">Hilsen</h4>
+                                <svg id="icon-7" class="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                            <p class="text-sm text-slate-500 mt-1">Afslut professionelt med dit navn.</p>
+                            
+                            <div id="detail-7" class="hidden mt-4 pt-4 border-t border-slate-100 text-sm text-slate-600 space-y-2">
+                                <p class="font-medium text-slate-800">Tip:</p>
+                                <p>Hold det klassisk og høfligt. Det er det sidste indtryk, du efterlader.</p>
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-150 font-mono text-xs text-slate-700">
+                                    <span class="font-semibold text-indigo-600">Eksempel:</span> "Med venlig hilsen, [Dit Navn]"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT COLUMN: Interactive Draft Builder (5 Cols on large screens) -->
+            <section class="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm sticky top-24">
+                <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Skabelon Builder</h3>
+                        <p class="text-xs text-slate-500">Skriv dit udkast her og se det live</p>
+                    </div>
+                    <button onclick="resetTemplate()" class="text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100/80 px-2.5 py-1.5 rounded-lg transition-colors">
+                        Nulstil
+                    </button>
+                </div>
+
+                <!-- Form Inputs / Stepper -->
+                <div class="space-y-4 max-h-[450px] overflow-y-auto pr-2 custom-scrollbar">
+                    
+                    <!-- Input 1 -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">1. Overskrift</label>
+                        <input type="text" id="input-overskrift" oninput="updatePreview()" placeholder="F.eks. Energisk salgsassistent klar til nye udfordringer" class="w-full text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all duration-200">
+                    </div>
+
+                    <!-- Input 2 -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">2. Indledning</label>
+                        <textarea id="input-indledning" oninput="updatePreview()" rows="3" placeholder="Jeg søger stillingen fordi..." class="w-full text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all duration-200 resize-none"></textarea>
+                    </div>
+
+                    <!-- Input 3 -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">3. Personlig info</label>
+                        <input type="text" id="input-personlig" oninput="updatePreview()" placeholder="F.eks. Jeg er 28 år, gift og far til to piger." class="w-full text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all duration-200">
+                    </div>
+
+                    <!-- Input 4 -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">4. Erfaring</label>
+                        <textarea id="input-erfaring" oninput="updatePreview()" rows="3" placeholder="Tidligere har jeg arbejdet med... hvilket har givet mig..." class="w-full text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all duration-200 resize-none"></textarea>
+                    </div>
+
+                    <!-- Input 5 -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">5. Personlige kompetencer</label>
+                        <textarea id="input-kompetencer" oninput="updatePreview()" rows="2" placeholder="Jeg er altid mødestabil og i godt humør..." class="w-full text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all duration-200 resize-none"></textarea>
+                    </div>
+
+                    <!-- Input 6 -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">6. Afslutning</label>
+                        <input type="text" id="input-afslutning" oninput="updatePreview()" placeholder="F.eks. Jeg glæder mig meget til at høre fra jer." class="w-full text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all duration-200">
+                    </div>
+
+                    <!-- Input 7 -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">7. Hilsen</label>
+                        <input type="text" id="input-hilsen" oninput="updatePreview()" placeholder="F.eks. Med venlig hilsen Emanuel" class="w-full text-sm px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all duration-200">
+                    </div>
+                </div>
+
+                <!-- Action Buttons & Preview Toggle -->
+                <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col gap-3">
+                    <button onclick="openPreviewModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-sm text-sm flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        Se live forhåndsvisning
+                    </button>
+                    <button onclick="copyToClipboard()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-indigo-150 text-sm flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        Kopier min ansøgning
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- PREVIEW MODAL -->
+    <div id="preview-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl transform scale-95 transition-transform duration-300">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="text-lg font-bold text-slate-900">Din Jobansøgning (Live)</h3>
+                <button onclick="closePreviewModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-50">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Letter Layout) -->
+            <div class="p-8 overflow-y-auto bg-slate-50/50 flex-grow" id="printable-area">
+                <div class="bg-white border border-slate-200/60 rounded-2xl p-6 sm:p-10 shadow-sm max-w-xl mx-auto min-h-[400px] flex flex-col justify-between">
+                    <div>
+                        <!-- Title -->
+                        <h2 id="prev-overskrift" class="text-xl sm:text-2xl font-extrabold text-slate-900 mb-6 border-b border-slate-100 pb-4">
+                            Butiksassistent søges...
+                        </h2>
+                        
+                        <!-- Main Body Letter Content -->
+                        <div class="space-y-4 text-sm sm:text-base leading-relaxed text-slate-700">
+                            <p id="prev-indledning" class="whitespace-pre-line font-medium text-slate-900">[Indledning kommer her...]</p>
+                            <p id="prev-erfaring" class="whitespace-pre-line">[Erfaring kommer her...]</p>
+                            <p id="prev-kompetencer" class="whitespace-pre-line">[Kompetencer kommer her...]</p>
+                            <p id="prev-personlig" class="whitespace-pre-line text-slate-500 italic text-xs pt-4 border-t border-slate-100">[Personlig information kommer her...]</p>
+                        </div>
+                    </div>
+
+                    <!-- Sign-off & Footer of Letter -->
+                    <div class="mt-8 pt-6 border-t border-slate-100">
+                        <p id="prev-afslutning" class="text-sm text-slate-600 mb-4">[Afslutning...]</p>
+                        <p id="prev-hilsen" class="font-bold text-slate-900">[Hilsen...]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer Buttons -->
+            <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 bg-white">
+                <button onclick="closePreviewModal()" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-sm transition-colors">
+                    Luk
+                </button>
+                <button onclick="copyToClipboardFromModal()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                    Kopier tekst
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <span class="bg-emerald-500 text-white rounded-full p-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7"></path></svg>
+        </span>
+        <span id="toast-message" class="text-sm font-semibold">Udkast kopieret!</span>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-400">
+        <p>© 2026 • Designet til optimal jobsøgning • Lavet med kærlighed og struktur</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Toggle Accordion Details
+        function toggleDetails(id) {
+            const detailElement = document.getElementById(id);
+            const iconIndex = id.split('-')[1];
+            const icon = document.getElementById(`icon-${iconIndex}`);
+            
+            if (detailElement.classList.contains('hidden')) {
+                detailElement.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                detailElement.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Live Preview Syncer
+        function updatePreview() {
+            // Inputs
+            const overskrift = document.getElementById('input-overskrift').value || "Overskrift på din ansøgning";
+            const indledning = document.getElementById('input-indledning').value || "Her skriver du din motiverede indledning. Start stærkt!";
+            const personlig = document.getElementById('input-personlig').value || "Personlige detaljer (alder, bopæl, fritid)...";
+            const erfaring = document.getElementById('input-erfaring').value || "Din tidligere erfaring og hvordan den skaber værdi i dette nye job...";
+            const kompetencer = document.getElementById('input-kompetencer').value || "Dine personlige kompetencer, f.eks. 'Jeg er mødestabil og i godt humør'...";
+            const afslutning = document.getElementById('input-afslutning').value || "Her runder du ansøgningen af...";
+            const hilsen = document.getElementById('input-hilsen').value || "Med venlig hilsen\nDit Navn";
+
+            // Preview Selectors
+            document.getElementById('prev-overskrift').innerText = overskrift;
+            document.getElementById('prev-indledning').innerText = indledning;
+            document.getElementById('prev-personlig').innerText = personlig;
+            document.getElementById('prev-erfaring').innerText = erfaring;
+            document.getElementById('prev-kompetencer').innerText = kompetencer;
+            document.getElementById('prev-afslutning').innerText = afslutning;
+            document.getElementById('prev-hilsen').innerText = hilsen;
+        }
+
+        // Build Plain Text Application
+        function buildFullText() {
+            const overskrift = document.getElementById('input-overskrift').value || "Ansøgning";
+            const indledning = document.getElementById('input-indledning').value || "";
+            const erfaring = document.getElementById('input-erfaring').value || "";
+            const kompetencer = document.getElementById('input-kompetencer').value || "";
+            const personlig = document.getElementById('input-personlig').value || "";
+            const afslutning = document.getElementById('input-afslutning').value || "";
+            const hilsen = document.getElementById('input-hilsen').value || "Med venlig hilsen";
+
+            return `${overskrift}\n\n${indledning}\n\n${erfaring}\n\n${kompetencer}\n\n${personlig}\n\n${afslutning}\n\n${hilsen}`;
+        }
+
+        // Copy Clipboard Alternative (safe from iframe restrictions)
+        function copyToClipboard() {
+            const fullText = buildFullText();
+            
+            // Fallback copy execution
+            const dummyTextArea = document.createElement("textarea");
+            document.body.appendChild(dummyTextArea);
+            dummyTextArea.value = fullText;
+            dummyTextArea.select();
+            
+            try {
+                document.execCommand("copy");
+                showToast("Udkast kopieret til udklipsholderen!");
+            } catch (err) {
+                showToast("Kunne ikke kopiere automatisk. Åbn 'Live forhåndsvisning' og kopier derfra.");
+            }
+            
+            document.body.removeChild(dummyTextArea);
+        }
+
+        function copyToClipboardFromModal() {
+            copyToClipboard();
+            closePreviewModal();
+        }
+
+        // Reset inputs
+        function resetTemplate() {
+            const inputs = ['input-overskrift', 'input-indledning', 'input-personlig', 'input-erfaring', 'input-kompetencer', 'input-afslutning', 'input-hilsen'];
+            inputs.forEach(id => {
+                document.getElementById(id).value = "";
+            });
+            updatePreview();
+            showToast("Skabelonen er nulstillet.");
+        }
+
+        // Modal Helpers
+        function openPreviewModal() {
+            updatePreview();
+            const modal = document.getElementById('preview-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 50);
+        }
+
+        function closePreviewModal() {
+            const modal = document.getElementById('preview-modal');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // Toast Notification System
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Initialize Live Preview with defaults on window load
+        window.onload = function() {
+            updatePreview();
+        };
+    </script>
+</body>
+</html>
