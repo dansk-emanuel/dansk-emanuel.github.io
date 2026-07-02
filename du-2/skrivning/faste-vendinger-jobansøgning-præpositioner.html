@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Præpositionsquiz: Job og Uddannelse</title>
+    <!-- Tailwind CSS til moderne, hurtig styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for flot typografi -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 py-4 px-6 sticky top-0 z-10 shadow-sm">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 text-white p-2 rounded-lg font-bold text-lg shadow-md shadow-blue-200">
+                    ✍️
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-900 leading-tight">Dansk Præpositionsquiz</h1>
+                    <p class="text-xs text-slate-500">Job, uddannelse & personlige kompetencer</p>
+                </div>
+            </div>
+            <div id="progress-text" class="text-sm font-semibold text-slate-500">
+                Spørgsmål 1 af 12
+            </div>
+        </div>
+    </header>
+
+    <!-- Hovedindhold -->
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-8 flex flex-col justify-center">
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 rounded-full h-2 mb-8 overflow-hidden">
+            <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 8.33%"></div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div class="bg-white rounded-2xl shadow-xl shadow-slate-100 border border-slate-100 p-6 md:p-8 transition-all duration-300">
+            
+            <!-- Spørgsmålsområde -->
+            <div id="question-area">
+                <div class="inline-block bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4">
+                    Vælg den rigtige præposition
+                </div>
+                
+                <h2 id="sentence-box" class="text-xl md:text-2xl font-bold text-slate-900 mb-6 leading-relaxed">
+                    <!-- Sætningen indsættes dynamisk her -->
+                </h2>
+
+                <!-- Muligheder (Buttons) -->
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <!-- Knapper indsættes dynamisk her -->
+                </div>
+
+                <!-- Feedback (Gemt som standard) -->
+                <div id="feedback-box" class="hidden rounded-xl p-4 mb-6 flex items-start space-x-3 transition-all duration-200">
+                    <span id="feedback-icon" class="text-xl"></span>
+                    <div>
+                        <h4 id="feedback-title" class="font-bold text-sm"></h4>
+                        <p id="feedback-desc" class="text-sm mt-1"></p>
+                    </div>
+                </div>
+
+                <!-- Handlingsknap -->
+                <div class="flex justify-end">
+                    <button id="next-btn" class="hidden bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 px-6 rounded-xl transition duration-150 shadow-md flex items-center space-x-2">
+                        <span>Næste spørgsmål</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Resultatområde (Gemt som standard) -->
+            <div id="result-area" class="hidden text-center py-6">
+                <div class="text-6xl mb-4">🏆</div>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2">Flot klaret!</h2>
+                <p class="text-slate-500 mb-6">Du har gennemført præpositionsquizzen.</p>
+                
+                <!-- Score visning -->
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 inline-block mb-8 min-w-[200px]">
+                    <span class="block text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">Din score</span>
+                    <span id="score-text" class="text-4xl md:text-5xl font-black text-blue-600">0 / 12</span>
+                    <span id="score-percentage" class="block text-sm text-slate-500 mt-1">0% rigtige</span>
+                </div>
+
+                <!-- Feedback baseret på score -->
+                <p id="score-feedback" class="text-slate-700 max-w-md mx-auto mb-8 font-medium"></p>
+
+                <!-- Handlingsknapper -->
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button id="retry-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-8 rounded-xl transition shadow-lg shadow-blue-100">
+                        Prøv igen
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-100 py-4 text-center text-xs text-slate-400">
+        <div class="max-w-4xl mx-auto px-4">
+            Udviklet som læringsværktøj til det danske sprog.
+        </div>
+    </footer>
+
+    <script>
+        // Spørgsmålsdataene baseret på dine 12 sætninger
+        const quizData = [
+            {
+                original: "Jeg er interesseret i jobbet",
+                sentence: "Jeg er interesseret ______ jobbet.",
+                options: ["i", "til", "for", "med"],
+                correct: "i",
+                explanation: "Man er altid 'interesseret i' noget eller nogen på dansk."
+            },
+            {
+                original: "Jeg er god til at samarbejde",
+                sentence: "Jeg er god ______ at samarbejde.",
+                options: ["til", "i", "for", "med"],
+                correct: "til",
+                explanation: "Man er 'god til' at gøre noget (en handling/et verbum) eller 'god til' et fag."
+            },
+            {
+                original: "Jeg er glad for samarbejde",
+                sentence: "Jeg er glad ______ samarbejde.",
+                options: ["for", "ved", "til", "i"],
+                correct: "for",
+                explanation: "Man er 'glad for' en ting, en person eller en situation."
+            },
+            {
+                original: "Jeg trives med skiftende arbejdstider",
+                sentence: "Jeg trives ______ skiftende arbejdstider.",
+                options: ["med", "i", "ved", "under"],
+                correct: "med",
+                explanation: "At 'trives med' betyder, at man har det godt med en bestemt omstændighed eller ramme."
+            },
+            {
+                original: "Jeg er vant til at arbejde med børn",
+                sentence: "Jeg er vant ______ at arbejde med børn.",
+                options: ["til", "ved", "med", "for"],
+                correct: "til",
+                explanation: "Man er 'vant til' noget – det vil sige, at det er en fast rutine eller erfaring, man har."
+            },
+            {
+                original: "Jeg er færdig med min uddannelse",
+                sentence: "Jeg er færdig ______ min uddannelse.",
+                options: ["med", "af", "fra", "i"],
+                correct: "med",
+                explanation: "At være 'færdig med' betyder, at man har afsluttet en opgave eller et forløb."
+            },
+            {
+                original: "Jeg tænker på at tage en uddannelse",
+                sentence: "Jeg tænker ______ at tage en uddannelse.",
+                options: ["på", "i", "over", "om"],
+                correct: "på",
+                explanation: "Man 'tænker på' at gøre noget, når man overvejer en fremtidig handling."
+            },
+            {
+                original: "Jeg har planer om at tage en uddannelse",
+                sentence: "Jeg har planer ______ at tage en uddannelse.",
+                options: ["om", "på", "til", "for"],
+                correct: "om",
+                explanation: "Man har 'planer om' noget (en idé eller hensigt, man vil udføre)."
+            },
+            {
+                original: "Jeg har mulighed for at arbejde om aftenen",
+                sentence: "Jeg har mulighed ______ at arbejde om aftenen.",
+                options: ["for", "til", "med", "i"],
+                correct: "for",
+                explanation: "Man har 'mulighed for' at gøre noget, når omstændighederne tillader det."
+            },
+            {
+                original: "Jeg har erfaring med at køre gaffeltruck",
+                sentence: "Jeg har erfaring ______ at køre gaffeltruck.",
+                options: ["med", "i", "fra", "til"],
+                correct: "med",
+                explanation: "Man har 'erfaring med' en bestemt aktivitet eller arbejdsopgave."
+            },
+            {
+                original: "Jeg glæder mig til at høre fra jer",
+                sentence: "Jeg glæder mig ______ at høre fra jer.",
+                options: ["til", "med", "over", "for"],
+                correct: "til",
+                explanation: "At 'glæde sig til' bruges altid, når man ser frem til en positiv begivenhed i fremtiden."
+            },
+            {
+                original: "Jeg ser frem til at høre fra jer",
+                sentence: "Jeg ser frem ______ at høre fra jer.",
+                options: ["til", "imod", "på", "for"],
+                correct: "til",
+                explanation: "At 'se frem til' er en formel og meget brugt vending i slutningen af en ansøgning."
+            }
+        ];
+
+        // Tilstand (State)
+        let currentQuestionIdx = 0;
+        let score = 0;
+        let hasAnswered = false;
+
+        // DOM-elementer
+        const sentenceBox = document.getElementById('sentence-box');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackIcon = document.getElementById('feedback-icon');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackDesc = document.getElementById('feedback-desc');
+        const nextBtn = document.getElementById('next-btn');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const questionArea = document.getElementById('question-area');
+        const resultArea = document.getElementById('result-area');
+        const scoreText = document.getElementById('score-text');
+        const scorePercentage = document.getElementById('score-percentage');
+        const scoreFeedback = document.getElementById('score-feedback');
+        const retryBtn = document.getElementById('retry-btn');
+
+        // Initialisering af quizzen
+        function loadQuestion() {
+            hasAnswered = false;
+            nextBtn.classList.add('hidden');
+            feedbackBox.className = 'hidden rounded-xl p-4 mb-6 flex items-start space-x-3 transition-all duration-200';
+            
+            const currentData = quizData[currentQuestionIdx];
+            
+            // Opdater tekst og progress
+            progressText.innerText = `Spørgsmål ${currentQuestionIdx + 1} af ${quizData.length}`;
+            const percentage = ((currentQuestionIdx + 1) / quizData.length) * 100;
+            progressBar.style.width = `${percentage}%`;
+
+            // Formater sætningen så "______" er fremhævet visuelt
+            sentenceBox.innerHTML = currentData.sentence.replace("______", `<span class="text-blue-600 border-b-2 border-dashed border-blue-400 px-2 font-extrabold">_______</span>`);
+
+            // Generer svarknapper
+            optionsContainer.innerHTML = '';
+            currentData.options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'w-full text-left p-4 rounded-xl border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 font-semibold transition-all duration-150 flex justify-between items-center';
+                button.innerHTML = `
+                    <span>${option}</span>
+                    <span class="status-icon w-5 h-5 rounded-full flex items-center justify-center text-xs"></span>
+                `;
+                button.addEventListener('click', () => selectOption(button, option));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // Håndtering af svarvalg
+        function selectOption(selectedButton, chosenValue) {
+            if (hasAnswered) return; // Forhindr flere klik på samme spørgsmål
+            hasAnswered = true;
+
+            const currentData = quizData[currentQuestionIdx];
+            const isCorrect = chosenValue === currentData.correct;
+
+            // Deaktiver og farvelæg alle knapper
+            const buttons = optionsContainer.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.disabled = true;
+                const optionText = button.querySelector('span').innerText;
+                const statusIcon = button.querySelector('.status-icon');
+
+                if (optionText === currentData.correct) {
+                    // Det rigtige svar markeres grønt
+                    button.className = 'w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold transition-all duration-150 flex justify-between items-center';
+                    statusIcon.innerHTML = '✓';
+                    statusIcon.className = 'status-icon w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs';
+                } else if (button === selectedButton && !isCorrect) {
+                    // Hvis brugeren valgte forkert, markeres den rød
+                    button.className = 'w-full text-left p-4 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-semibold transition-all duration-150 flex justify-between items-center';
+                    statusIcon.innerHTML = '✗';
+                    statusIcon.className = 'status-icon w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs';
+                } else {
+                    // Andre forkerte svarmuligheder tones ned
+                    button.className = 'w-full text-left p-4 rounded-xl border-2 border-slate-100 bg-slate-50 text-slate-400 font-semibold transition-all duration-150 flex justify-between items-center opacity-60';
+                }
+            });
+
+            // Vis feedback-boks
+            feedbackBox.classList.remove('hidden');
+            if (isCorrect) {
+                score++;
+                feedbackBox.classList.add('bg-emerald-50', 'border', 'border-emerald-200', 'text-emerald-900');
+                feedbackIcon.innerText = '🎉';
+                feedbackTitle.innerText = 'Helt rigtigt!';
+            } else {
+                feedbackBox.classList.add('bg-rose-50', 'border', 'border-rose-200', 'text-rose-900');
+                feedbackIcon.innerText = '💡';
+                feedbackTitle.innerText = `Ikke helt rigtigt... Det rigtige ord er "${currentData.correct}"`;
+            }
+            feedbackDesc.innerText = `${currentData.explanation} Sætningen lyder: "${currentData.original}".`;
+
+            // Vis næste-knap eller se resultater-knap
+            if (currentQuestionIdx === quizData.length - 1) {
+                nextBtn.querySelector('span').innerText = 'Se resultater';
+            } else {
+                nextBtn.querySelector('span').innerText = 'Næste spørgsmål';
+            }
+            nextBtn.classList.remove('hidden');
+        }
+
+        // Håndtering af næste-knap
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIdx < quizData.length - 1) {
+                currentQuestionIdx++;
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        // Vis resultater til slut
+        function showResults() {
+            questionArea.classList.add('hidden');
+            resultArea.classList.remove('hidden');
+            progressBar.style.width = '100%';
+            progressText.innerText = 'Udført!';
+
+            scoreText.innerText = `${score} / ${quizData.length}`;
+            const percentage = Math.round((score / quizData.length) * 100);
+            scorePercentage.innerText = `${percentage}% rigtige`;
+
+            // Tilpasset feedback baseret på score
+            if (score === quizData.length) {
+                scoreFeedback.innerText = "Fantastisk! Du har fuldstændig styr på de danske præpositionsforbindelser. Dine jobansøgninger kommer til at sidde lige i skabet! 🚀";
+            } else if (score >= 9) {
+                scoreFeedback.innerText = "Rigtig godt gået! Du har et stærkt kendskab til sprogets faste vendinger. Bare lige et par småfejl, du nemt kan rette op på. 👍";
+            } else if (score >= 6) {
+                scoreFeedback.innerText = "Fint resultat! Du har fat i mange af de vigtigste regler, men prøv gerne igen for at få de sidste detaljer helt på plads. 🙂";
+            } else {
+                scoreFeedback.innerText = "Du er godt på vej, men de danske præpositioner kan være drilske. Tag testen en gang til for at styrke dine færdigheder! 💪";
+            }
+        }
+
+        // Genstart quizzen
+        retryBtn.addEventListener('click', () => {
+            currentQuestionIdx = 0;
+            score = 0;
+            resultArea.classList.add('hidden');
+            questionArea.classList.remove('hidden');
+            loadQuestion();
+        });
+
+        // Start spillet ved indlæsning
+        window.onload = function() {
+            loadQuestion();
+        };
+    </script>
+</body>
+</html>
