@@ -152,7 +152,7 @@
                 </button>
             </div>
 
-        </main>
+         </main>
 
         <!-- Footer -->
         <footer class="text-center mt-6 py-4 border-t border-gray-200 text-xs text-gray-400">
@@ -165,6 +165,7 @@
         // Målsprog konfiguration
         const targetLanguages = {
             "engelsk": "Engelsk",
+            "arabisk": "Arabisk",
             "bengali": "Bengali",
             "hindi": "Hindi",
             "urdu": "Urdu",
@@ -187,12 +188,13 @@
             "spansk": "Spansk"
         };
 
-        // De 11 præcise danske sætninger med dertilhørende oversættelser (uden translitteration, men med alle leksikale betydninger)
+        // De 11 præcise danske sætninger med dertilhørende oversættelser
         const flashcardsData = [
             {
                 danish: "Jeg er interesseret i jobbet",
                 translations: {
                     "engelsk": "I am interested in the job",
+                    "arabisk": "أنا مهتم بالوظيفة / أنا مهتمة بالوظيفة",
                     "bengali": "আমি এই কাজটিতে আগ্রহী / আমি চাকরিতে আগ্রহী",
                     "hindi": "मैं इस नौकरी में रुचि रखता हूँ / मैं इस नौकरी में रुचि रखती हूँ",
                     "urdu": "میں اس نوکری میں دلچسپی رکھتا ہوں / میں اس نوکری میں دلچسپی رکھتی ہوں",
@@ -219,6 +221,7 @@
                 danish: "Jeg er god til at samarbejde",
                 translations: {
                     "engelsk": "I am good at collaborating / I am good at working with others",
+                    "arabisk": "أنا جيد في التعاون / أنا جيدة في العمل الجماعي",
                     "bengali": "আমি সহযোগিতা করতে পারদর্শী / আমি দলগত কাজে ভালো",
                     "hindi": "मैं सहयोग करने में अच्छा हूँ / मैं दूसरों के साथ मिलकर काम करने में अच्छी हूँ",
                     "urdu": "میں تعاون کرنے میں اچھا ہوں / میں مل کر کام کرنے میں اچھی ہوں",
@@ -245,10 +248,11 @@
                 danish: "Jeg er glad for samarbejde",
                 translations: {
                     "engelsk": "I enjoy collaborating / I like working with others",
+                    "arabisk": "يسعدني التعاون / أحب العمل الجماعي",
                     "bengali": "আমি সহযোগিতা করতে পছন্দ করি / আমি সহকর্মীদের সাথে কাজ করতে ভালোবাসি",
                     "hindi": "मुझे सहयोग करना पसंद है / मुझे टीम में काम करना अच्छा लगता है",
                     "urdu": "مجھے تعاون کرنا پسند ہے",
-                    "ukrainsk": "Мені подобається співпраця / Я отримую задоволення від співпраці",
+                    "ukrainsk": "Мені подобається співпраця / Я отримамую задоволення від співпраці",
                     "russisk": "Мне нравится сотрудничать / Я ценю совместную работу",
                     "persisk": "من از همکاری کردن خوشحالم / من همکاری را دوست دارم",
                     "tyrkisk": "İş birliği yapmaktan memnunum / Ortak çalışmayı seviyorum",
@@ -271,6 +275,7 @@
                 danish: "Jeg trives med at arbejde selvstændigt",
                 translations: {
                     "engelsk": "I thrive working independently / I work well on my own",
+                    "arabisk": "أحب العمل بشكل مستقل / أستمتع بالعمل بمفردي",
                     "bengali": "আমি স্বাধীনভাবে কাজ করতে পছন্দ করি / আমি নিজে নিজে কাজ করতে স্বাচ্ছন্দ্যবোধ করি",
                     "hindi": "मैं स्वतंत्र रूप से काम करना पसंद करता हूँ / मैं अकेले काम करने में सक्षम हूँ",
                     "urdu": "میں آزادانہ طور پر کام کرنا پسند کرتا ہوں / میں خود مختار ہو کر اچھا کام کرتا ہوں",
@@ -287,7 +292,7 @@
                     "bosnisk": "Volim raditi samostalno / Dobro se snalazim u samostalnom radu",
                     "somali": "Waxaan ku fiicanahay inaan keligay shaqeeyo",
                     "serbisk": "Uživam u samostalnom radu / Volim da radim samostalno",
-                    "tigrinya": "ብውልቀይ ክሰርሕ ባህ ይብለኒ",
+                    "tigrinya": "ብውልቀይ ክсеርሕ ባህ ይብለኒ",
                     "mandarin kinesisk": "我喜欢独立工作 / 我擅长自主工作",
                     "tadjikisk": "Ман мустақилона кор карданро дӯст медорам",
                     "spansk": "Me gusta trabajar de manera independiente / Me desenvuelvo bien trabajando solo"
@@ -297,9 +302,10 @@
                 danish: "Jeg er vant til at være kreativ",
                 translations: {
                     "engelsk": "I am used to being creative",
+                    "arabisk": "أنا معتاد على أن أكون مبدعاً / أنا معتادة على الإبداع",
                     "bengali": "আমি সৃজনশীল হতে অভ্যস্ত",
                     "hindi": "मुझे रचनात्मक होने की आदत है / मैं अक्सर नया और रचनात्मक काम करता हूँ",
-                    "urdu": "مجھے تخلیقی ہونے کی عادت ہے",
+                    "urdu": "مجھے تخلیقی ہونے کی आदत ہے",
                     "ukrainsk": "Я звик бути творчим / Я звикла проявляти креативність",
                     "russisk": "Я привык быть творческим / Я привыкла подходить к задачам творчески",
                     "persisk": "من به خلاق بودن عادت دارم",
@@ -313,7 +319,7 @@
                     "bosnisk": "Navikao sam biti kreativan / Navikla sam biti kreativna",
                     "somali": "Waxaan bartay inaan noqdo qof hal-abuur leh",
                     "serbisk": "Navikao sam da budem kreativan / Navikla sam да будем креативна",
-                    "tigrinya": "ፈጣሪ ክኸውን ልሙድ እየ",
+                    "tigrinya": "ፈጣሪ ክኸውን ልሙд እየ",
                     "mandarin kinesisk": "我习惯于富有创造力 / 我善于创新",
                     "tadjikisk": "Ман ба эҷодкорӣ одат кардаам",
                     "spansk": "Estoy acostumbrado a ser creativo / Estoy acostumbrada a ser creativa"
@@ -323,10 +329,11 @@
                 danish: "Jeg er færdig med min uddannelse",
                 translations: {
                     "engelsk": "I have completed my education / I have finished my studies",
+                    "arabisk": "لقد أنهيت تعليمي / لقد أكملت دراستي",
                     "bengali": "আমি আমার পড়াশোনা শেষ করেছি / আমার শিক্ষা জীবন শেষ হয়েছে",
                     "hindi": "मैंने अपनी शिक्षा पूरी कर ली है / मेरी पढ़ाई पूरी हो चुकी है",
                     "urdu": "میں نے اپنی تعلیم مکمل کر لی ہے / میری پڑھائی مکمل ہو گئی ہے",
-                    "ukrainsk": "Я закінчив своє навчання / Я закінчила свою освіту",
+                    "ukrainsk": "Я закінчив свое навчання / Я закінчила свою освіту",
                     "russisk": "Я закончил свое обучение / Я закончила свое образование",
                     "persisk": "تحصیلات من به پایان رسیده است / درسم تمام شده است",
                     "tyrkisk": "Eğitimimi tamamladım / Okulumu bitirdim",
@@ -349,6 +356,7 @@
                 danish: "Jeg tænker på at tage en uddannelse",
                 translations: {
                     "engelsk": "I am thinking about getting an education / I plan to study",
+                    "arabisk": "أفكر في الحصول على تعليم / أخطط للدراسة",
                     "bengali": "আমি একটি কোর্স বা পড়াশোনা করার কথা ভাবছি",
                     "hindi": "मैं शिक्षा प्राप्त करने के बारे में सोच रहा हूँ / मैं आगे पढ़ाई करने की सोच रही हूँ",
                     "urdu": "میں کوئی تعلیم حاصل کرنے کے بارے میں سوچ رہا ہوں",
@@ -375,6 +383,7 @@
                 danish: "Jeg har planer om at arbejde med børn",
                 translations: {
                     "engelsk": "I plan to work with children",
+                    "arabisk": "لدي خطط للعمل مع الأطفال / أخطط للعمل مع الأطفال",
                     "bengali": "আমার শিশুদের সাথে কাজ করার পরিকল্পনা আছে",
                     "hindi": "मेरी बच्चों के साथ काम करने की योजना है",
                     "urdu": "میرا بچوں کے ساتھ کام کرنے کا ارادہ ہے",
@@ -391,7 +400,7 @@
                     "bosnisk": "Planiram raditi s djecom / Imam u planu rad s djecom",
                     "somali": "Waxaan qorshaynayaa inaan la shaqeeyo carruurta",
                     "serbisk": "Planiram da radim sa decom",
-                    "tigrinya": "ምስ ቆልዑ ክሰርሕ መደብ ኣለኒ",
+                    "tigrinya": "ምስ ቆልዑ ክсеርሕ መደብ ኣለኒ",
                     "mandarin kinesisk": "我计划与孩子们一起工作 / 我打算从事儿童相关的工作",
                     "tadjikisk": "Ман нақша дорам, ки бо кӯдакон кор кунам",
                     "spansk": "Tengo planes de trabajar con niños / Planeo trabajar con niños"
@@ -401,6 +410,7 @@
                 danish: "Jeg har mulighed for at arbejde fuldtid",
                 translations: {
                     "engelsk": "I have the opportunity to work full-time / I am available for full-time work",
+                    "arabisk": "لدي القدرة على العمل بدوام كامل / أنا متاح للعمل بدوام كامل",
                     "bengali": "আমার ফুল-টাইম বা পূর্ণকালীন কাজ করার সুযোগ আছে",
                     "hindi": "मेरे पास पूर्णकालिक काम करने का अवसर है / मैं पूरे समय काम कर सकता हूँ",
                     "urdu": "میرے پاس کل وقتی کام کرنے کا موقع ہے / میں فل ٹائم کام کر سکتا ہوں",
@@ -417,7 +427,7 @@
                     "bosnisk": "Imam mogućnost rada u punom radnom vremenu / Mogu raditi puno radno vrijeme",
                     "somali": "Waxaan haystaa fursad aan ku shaqeeyo waqti buuxa",
                     "serbisk": "Imam mogućnost da radim puno radno vreme",
-                    "tigrinya": "ምሉእ ግዜ ክሰርሕ ዕድል ኣለኒ",
+                    "tigrinya": "ምሉእ ግዜ ክсеርሕ ዕድል ኣለኒ",
                     "mandarin kinesisk": "我有条件全职工作 / 我可以接受全职工作",
                     "tadjikisk": "Ман имкони кори пурравақт дорам",
                     "spansk": "Tengo la oportunidad de trabajar a tiempo completo / Tengo disponibilidad para trabajar jornada completa"
@@ -427,6 +437,7 @@
                 danish: "Jeg glæder mig til at høre fra jer",
                 translations: {
                     "engelsk": "I look forward to hearing from you",
+                    "arabisk": "أتطلع لسماع أخباركم / أتطلع لتلقي ردكم",
                     "bengali": "আমি আপনাদের উত্তর শোনার অপেক্ষায় আছি / আপনাদের সাথে যোগাযোগের অপেক্ষায় রইলাম",
                     "hindi": "मुझे आपसे सुनने का इंतज़ार है / मैं आपके उत्तर की प्रतीक्षा कर रहा हूँ",
                     "urdu": "مجھے آپ سے جواب کا انتظار ہے",
@@ -435,7 +446,7 @@
                     "persisk": "منتظر شنیدن خبر از طرف شما هستم",
                     "tyrkisk": "Sizden haber almayı heyecanla bekliyorum / Geri dönüşünüzü sabırsızlıkla bekliyorum",
                     "kurdisk kurmanji": "Ez li benda nûçeyekê ji we me",
-                    "kurdisk sorani": "خۆشحاڵ دەبم بە بیستنی هەواڵ لە ئێوەوە",
+                    "kurdisk sorani": "خۆشحاڵ دەبم بە biستنی هەواڵ لە ئێوەوە",
                     "nepalesisk": "म तपाईंको प्रतिक्रियाको पर्खाइमा छु",
                     "kiswahili": "Natazamia kwa hamu kusikia kutoka kwako",
                     "fransk": "Au plaisir de vous lire / Dans l'attente de votre retour",
@@ -443,7 +454,7 @@
                     "bosnisk": "Radujem se što ću se čuti sa vama / Radujem se vašem odgovoru",
                     "somali": "Waxaan rajaynayaa inaan idinka maqlo horta",
                     "serbisk": "Radujem se što ćemo biti u kontaktu / Radujem se vašem odgovoru",
-                    "tigrinya": "ካባኻትኩም መልሲ ክሰምዕ እጽበ",
+                    "tigrinya": "ካባኻትকুም መልሲ ክሰምዕ እጽበ",
                     "mandarin kinesisk": "我很期待收到您的来信",
                     "tadjikisk": "Ман мунтазири шунидани хабар аз шумо ҳастам",
                     "spansk": "Espero tener noticias suyas / Quedo a la espera de sus noticias"
@@ -453,6 +464,7 @@
                 danish: "Jeg ser frem til at høre fra jer",
                 translations: {
                     "engelsk": "I look forward to hearing from you",
+                    "arabisk": "أتطلع إلى السماع منكم / أنتظر ردكم بفارغ الصبر",
                     "bengali": "আমি আপনার কাছ থেকে শোনার জন্য উন্मुख / আমি আপনার সাড়া পাওয়ার জন্য অধীর আগ্রহে অপেক্ষা করছি",
                     "hindi": "मैं आपसे सुनने के लिए उत्सुक हूँ / मैं जल्द ही आपसे संपर्क की आशा करता हूँ",
                     "urdu": "میں آپ سے سننے کا منتظر ہوں",
@@ -461,7 +473,7 @@
                     "persisk": "با اشتیاق منتظر شنیدن از شما هستم",
                     "tyrkisk": "Sizden haber almayı dört gözle bekliyorum / Geri bildiriminizi sabırsızlıkla bekliyorum",
                     "kurdisk kurmanji": "Ez li benda bihîstina ji we me",
-                    "kurdisk sorani": "بە پەرۆشەوە چاوەڕێی بیستنی هەواڵ لە ئێوە دەکەم",
+                    "kurdisk sorani": "بە پەرۆشەوە چاوەڕێی biستنی هەواڵ لە ئێوە دەکەم",
                     "nepalesisk": "म तपाईंको सन्देशको उत्सुकतापूर्वक प्रतीक्षा गर्दैछु",
                     "kiswahili": "Natarajia kusikia kutoka kwenu hivi karibuni",
                     "fransk": "J'ai hâte de recevoir de vos nouvelles / Je me réjouis de votre réponse",
@@ -469,7 +481,7 @@
                     "bosnisk": "Radujem se vašem odgovoru / Sa nestrpljenjem očekujem vaš odgovor",
                     "somali": "Waxaan rajaynayaa inaan war idinka helo",
                     "serbisk": "Radujem se vašem odgovoru / Sa nestrpljenjem očekujem vaš odgovor",
-                    "tigrinya": "ካባኻትኩም ሓበሬታ ክሰምዕ ሃንቀው እብል",
+                    "tigrinya": "ካባኻትኩም ሓበሬታ ክሰምዕ ሃнቀው እብል",
                     "mandarin kinesisk": "我期待收到您的回复",
                     "tadjikisk": "Ман бесаброна мунтазири шунидани хабар аз шумо ҳастам",
                     "spansk": "Espero con ansias saber de usted / Espero con interés recibir sus noticias"
@@ -479,180 +491,152 @@
 
         // State variabler
         let currentLanguage = "engelsk";
-        let activeDeck = []; // Gemmer index på de tilbageværende kort
-        let currentIndex = 0; // Det nuværende kortindex i activeDeck
-        let isFlipped = false; // Om kortet i øjeblikket viser oversættelsen (bagsiden)
-        let isTransitioning = false; // Forhindrer klik under flip-animation
+        let activeCards = [];
+        let currentCardIndex = 0;
+        let isCardFlipped = false;
+        const totalCardsCount = flashcardsData.length;
 
-        // Initialisering af appen
-        window.onload = function() {
-            renderLanguageSelector();
-            restartGame();
-        };
+        // Bland kort (Fisher-Yates)
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
 
-        // Generér sprogknapper dynamisk
-        function renderLanguageSelector() {
-            const selector = document.getElementById("language-selector");
-            selector.innerHTML = "";
-
-            Object.keys(targetLanguages).forEach(langKey => {
+        // Generer sprogvælger
+        function buildLanguageSelector() {
+            const container = document.getElementById("language-selector");
+            container.innerHTML = "";
+            
+            Object.entries(targetLanguages).forEach(([key, name]) => {
                 const button = document.createElement("button");
-                button.type = "button";
-                button.className = `px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl border text-center transition-all ${
-                    currentLanguage === langKey
-                        ? "bg-indigo-600 text-white border-indigo-600 shadow-md scale-102"
-                        : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 hover:border-gray-300"
+                button.textContent = name;
+                button.className = `py-2 px-3 rounded-xl text-sm font-semibold transition-all border text-center ${
+                    currentLanguage === key 
+                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' 
+                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100 hover:border-gray-300'
                 }`;
-                
-                button.textContent = targetLanguages[langKey];
-                button.onclick = () => selectLanguage(langKey);
-                selector.appendChild(button);
+                button.onclick = () => selectLanguage(key);
+                container.appendChild(button);
             });
         }
 
-        // Vælg sprog og opdater skærmen med det samme
-        function selectLanguage(langKey) {
-            if (isTransitioning) return;
-            currentLanguage = langKey;
-            renderLanguageSelector();
-            
-            // Hvis kortet er vendt, så opdater den viste oversættelse med det samme
-            const backLabel = document.getElementById("back-language-label");
-            backLabel.textContent = targetLanguages[currentLanguage];
-            
-            if (activeDeck.length > 0) {
-                const currentCardObj = flashcardsData[activeDeck[currentIndex]];
-                const translationText = document.getElementById("translation-text");
-                translationText.textContent = currentCardObj.translations[currentLanguage];
-            }
+        // Skift aktivt sprog og genstart sessionen
+        function selectLanguage(languageKey) {
+            currentLanguage = languageKey;
+            buildLanguageSelector();
+            restartGame();
         }
 
-        // Genstart eller start spillet forfra
-        function restartGame() {
-            // Fyld bunken med alle de 11 ord (0 til 10)
-            activeDeck = Array.from({ length: flashcardsData.length }, (_, i) => i);
-            
-            // Bland bunken (Fisher-Yates shuffle) for at give en sjovere og mere varieret oplevelse
-            for (let i = activeDeck.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [activeDeck[i], activeDeck[j]] = [activeDeck[j], activeDeck[i]];
-            }
-            
-            currentIndex = 0;
-            isFlipped = false;
-            isTransitioning = false;
-
-            // Nulstil visning
-            document.getElementById("game-view").classList.remove("hidden");
-            document.getElementById("finish-view").classList.add("hidden");
-
-            // Nulstil 3D kortets retning uden animation
-            const cardEl = document.getElementById("flashcard");
-            cardEl.style.transition = 'none';
-            cardEl.classList.remove("rotate-y-180");
-            
-            // Tving browseren til at registrere ændringen før vi tilføjer transitionen igen
-            cardEl.offsetHeight; 
-            cardEl.style.transition = 'transform 0.5s ease-out';
-
-            updateCardData();
-            updateUIProgress();
-        }
-
-        // Opdaterer teksten på selve kortet (både for- og bagside)
-        function updateCardData() {
-            if (activeDeck.length === 0) return;
-
-            const cardIndexInDb = activeDeck[currentIndex];
-            const cardObj = flashcardsData[cardIndexInDb];
-
-            document.getElementById("danish-text").textContent = cardObj.danish;
-            document.getElementById("translation-text").textContent = cardObj.translations[currentLanguage];
-            document.getElementById("back-language-label").textContent = targetLanguages[currentLanguage];
-        }
-
-        // Opdaterer fremskridt bar, tal og badges
-        function updateUIProgress() {
-            const cardsLeft = activeDeck.length;
-            const totalCards = flashcardsData.length;
-            const guessedCorrectly = totalCards - cardsLeft;
-            const percentage = Math.round((guessedCorrectly / totalCards) * 100);
-
-            document.getElementById("cards-left-badge").textContent = `Kort tilbage: ${cardsLeft}`;
-            document.getElementById("progress-text").textContent = `Fremskridt: ${percentage}%`;
-            document.getElementById("progress-bar").style.width = `${percentage}%`;
-        }
-
-        // Håndterer selve vend-effekten (flip) ved klik på kortet
+        // Vend kortet frem og tilbage
         function flipCard() {
-            if (isTransitioning) return;
-            
             const cardEl = document.getElementById("flashcard");
-            isFlipped = !isFlipped;
-            
-            if (isFlipped) {
+            isCardFlipped = !isCardFlipped;
+            if (isCardFlipped) {
                 cardEl.classList.add("rotate-y-180");
             } else {
                 cardEl.classList.remove("rotate-y-180");
             }
         }
 
-        // Håndterer svar-knapper (Rigtigt / Forkert)
-        function markCard(isCorrect) {
-            if (isTransitioning) return;
-            isTransitioning = true;
+        // Indlæs det nuværende kort i visningen
+        function displayCurrentCard() {
+            if (activeCards.length === 0) {
+                showFinishScreen();
+                return;
+            }
 
-            // 1. Vend kortet tilbage til forsiden (Dansk) først
+            // Sørg for at forside-retningen er nulstillet
             const cardEl = document.getElementById("flashcard");
-            isFlipped = false;
+            isCardFlipped = false;
             cardEl.classList.remove("rotate-y-180");
 
-            // 2. Brug setTimeout på ca. 400ms for at vente på, at kortet har forsiden mod brugeren
-            setTimeout(() => {
-                const answeredIndex = activeDeck[currentIndex];
+            const card = activeCards[currentCardIndex];
+            
+            // Opdater dansk tekst
+            document.getElementById("danish-text").textContent = card.danish;
+            
+            // Opdater oversættelse og sproglabel bagpå
+            const translation = card.translations[currentLanguage] || "Oversættelse ikke tilgængelig";
+            document.getElementById("translation-text").textContent = translation;
+            document.getElementById("back-language-label").textContent = targetLanguages[currentLanguage];
 
-                if (isCorrect) {
-                    // Fjern ordet fra bunken
-                    activeDeck.splice(currentIndex, 1);
-                    
-                    // Tjek om alt er gennemført
-                    if (activeDeck.length === 0) {
-                        showFinishedScreen();
-                        isTransitioning = false;
-                        return;
-                    }
+            // Retningsspecifik opsætning for Arabisk/RTL hvis nødvendigt
+            const translationTextEl = document.getElementById("translation-text");
+            if (currentLanguage === "arabisk" || currentLanguage === "persisk" || currentLanguage === "urdu") {
+                translationTextEl.dir = "rtl";
+            } else {
+                translationTextEl.dir = "ltr";
+            }
 
-                    // Da kortet fjernes, bliver currentIndex automatisk den næste i rækken.
-                    // Hvis vi slettede det sidste element, hopper vi tilbage til 0.
-                    if (currentIndex >= activeDeck.length) {
-                        currentIndex = 0;
-                    }
-                } else {
-                    // Forkert: Flyt ordet om bag i bunken for at se det igen senere
-                    const currentCardIdx = activeDeck.splice(currentIndex, 1)[0];
-                    activeDeck.push(currentCardIdx);
-
-                    // Gå til næste kort (som nu ligger på currentIndex fordi vi trak det forrige ud)
-                    if (currentIndex >= activeDeck.length) {
-                        currentIndex = 0;
-                    }
-                }
-
-                // 3. Opdater kortets data og statuslinjen i baggrunden, mens forsiden vender udad
-                updateCardData();
-                updateUIProgress();
-
-                // Åbn op for kliks igen
-                isTransitioning = false;
-            }, 400); // Passer perfekt med 3D transformationens varighed
+            // Opdater status, badge og fremskridtslinje
+            const completedCount = totalCardsCount - activeCards.length;
+            const progressPercent = Math.round((completedCount / totalCardsCount) * 100);
+            
+            document.getElementById("cards-left-badge").textContent = `Kort tilbage: ${activeCards.length}`;
+            document.getElementById("progress-text").textContent = `Fremskridt: ${progressPercent}%`;
+            document.getElementById("progress-bar").style.width = `${progressPercent}%`;
         }
 
-        // Viser den endelige sejrsskærm
-        function showFinishedScreen() {
+        // Håndtering af rigtige og forkerte svar
+        function markCard(isCorrect) {
+            if (isCorrect) {
+                // Fjern det rigtigt besvarede kort
+                activeCards.splice(currentCardIndex, 1);
+                
+                // Hvis der er flere kort tilbage, hold indeks inden for grænserne
+                if (activeCards.length > 0) {
+                    currentCardIndex = currentCardIndex % activeCards.length;
+                }
+            } else {
+                // Forkert besvaret: Gå til næste kort (lad det blive i bunken til senere)
+                if (activeCards.length > 1) {
+                    currentCardIndex = (currentCardIndex + 1) % activeCards.length;
+                }
+            }
+
+            // Vend kortet til forsiden med en lille forsinkelse for blid overgang
+            const cardEl = document.getElementById("flashcard");
+            isCardFlipped = false;
+            cardEl.classList.remove("rotate-y-180");
+
+            setTimeout(() => {
+                displayCurrentCard();
+            }, 250);
+        }
+
+        // Vis færdig-skærmen
+        function showFinishScreen() {
             document.getElementById("game-view").classList.add("hidden");
             document.getElementById("finish-view").classList.remove("hidden");
             document.getElementById("finish-lang-label").textContent = targetLanguages[currentLanguage];
+            
+            // Opdater fremskridtslinjen til fuld (100%)
+            document.getElementById("progress-bar").style.width = "100%";
+            document.getElementById("progress-text").textContent = "Fremskridt: 100%";
+            document.getElementById("cards-left-badge").textContent = "Kort tilbage: 0";
         }
+
+        // Start spillet helt forfra
+        function restartGame() {
+            // Bland alle 11 kort til den nye runde
+            activeCards = shuffleArray(flashcardsData);
+            currentCardIndex = 0;
+            
+            document.getElementById("game-view").classList.remove("hidden");
+            document.getElementById("finish-view").classList.add("hidden");
+            
+            displayCurrentCard();
+        }
+
+        // Kør ved indlæsning af siden
+        window.onload = function() {
+            buildLanguageSelector();
+            restartGame();
+        };
     </script>
 </body>
 </html>
