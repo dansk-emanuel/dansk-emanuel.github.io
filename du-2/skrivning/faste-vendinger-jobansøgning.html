@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dansk Flashcards - Job & Uddannelse</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 3D-vende-animation og perspektiv-effekter */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .preserve-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans text-gray-800">
+
+    <!-- App Container -->
+    <div class="flex-grow flex flex-col max-w-4xl w-full mx-auto p-4 sm:p-6">
+        
+        <!-- Header -->
+        <header class="text-center my-4 sm:my-6">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-indigo-950 tracking-tight flex items-center justify-center gap-2">
+                <span>🇩🇰</span> Dansk Flashcards
+            </h1>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">Træn vigtige sætninger til job og uddannelse</p>
+        </header>
+
+        <!-- Sprogvælger -->
+        <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
+            <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+                </svg>
+                Vælg målsprog (Target Language)
+            </h2>
+            
+            <!-- Responsiv grid af sprogpiller -->
+            <div id="language-selector" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                <!-- Genereres dynamisk via JS -->
+            </div>
+        </section>
+
+        <!-- Hovedindhold / Flashcard Område -->
+        <main class="flex-grow flex flex-col items-center justify-center">
+            
+            <!-- Flashcard Skærm -->
+            <div id="game-view" class="w-full max-w-xl flex flex-col items-center">
+                
+                <!-- Statuslinje -->
+                <div class="w-full flex justify-between items-center mb-3 text-sm font-medium text-gray-500 px-1">
+                    <span id="cards-left-badge" class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold border border-indigo-100">
+                        Kort tilbage: 11
+                    </span>
+                    <span id="progress-text" class="text-xs">
+                        Fremskridt: 0%
+                    </span>
+                </div>
+
+                <!-- Fremskridtslinje -->
+                <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden mb-6">
+                    <div id="progress-bar" class="bg-indigo-600 h-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+
+                <!-- 3D Flashcard Container -->
+                <div class="w-full perspective-1000 cursor-pointer mb-6" style="height: 320px;" onclick="flipCard()">
+                    <div id="flashcard" class="relative w-full h-full duration-500 preserve-3d transition-transform">
+                        
+                        <!-- FORSIDE: Dansk (Hvid med sort skrift) -->
+                        <div class="absolute w-full h-full bg-white text-black rounded-2xl shadow-xl border border-gray-200 p-8 flex flex-col justify-between backface-hidden">
+                            <div class="flex justify-between items-center text-gray-400 text-xs font-semibold tracking-wider">
+                                <span>DANSK</span>
+                                <span class="bg-gray-100 px-2 py-1 rounded">Klik for at vende ↺</span>
+                            </div>
+                            
+                            <div class="flex-grow flex items-center justify-center text-center px-4">
+                                <p id="danish-text" class="text-xl sm:text-2xl font-bold leading-relaxed">
+                                    Indlæser...
+                                </p>
+                            </div>
+
+                            <div class="text-center text-xs text-gray-400 mt-2">
+                                Prøv at huske eller udtale sætningen
+                            </div>
+                        </div>
+
+                        <!-- BAGSIDE: Sprog (Beige med sort skrift) -->
+                        <div class="absolute w-full h-full bg-[#fdf6e2] text-black rounded-2xl shadow-xl border border-amber-100 p-8 flex flex-col justify-between backface-hidden rotate-y-180">
+                            <div class="flex justify-between items-center text-amber-800 text-xs font-semibold tracking-wider">
+                                <span id="back-language-label" class="uppercase">MÅLSPROG</span>
+                                <span class="bg-[#f3ead1] px-2 py-1 rounded">Oversættelse</span>
+                            </div>
+                            
+                            <div class="flex-grow flex flex-col items-center justify-center text-center px-4">
+                                <p id="translation-text" class="text-xl sm:text-2xl font-bold leading-relaxed text-amber-950">
+                                    Indlæser...
+                                </p>
+                            </div>
+
+                            <!-- Svarknapper (Forhindrer at klik på knapperne flipper kortet igen pga. stopPropagation) -->
+                            <div class="grid grid-cols-2 gap-4 w-full mt-4" onclick="event.stopPropagation()">
+                                <button onclick="markCard(false)" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>
+                                    Forkert
+                                </button>
+                                <button onclick="markCard(true)" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                    Rigtigt
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <p class="text-xs text-gray-400 text-center">
+                    Tip: Du kan også trykke på kortet for at vende det frem og tilbage.
+                </p>
+
+            </div>
+
+            <!-- FÆRDIG-skærm (Skjult som standard) -->
+            <div id="finish-view" class="hidden w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 p-8 text-center flex flex-col items-center">
+                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6 animate-bounce">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-12 h-12">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                    </svg>
+                </div>
+                
+                <h2 class="text-3xl font-extrabold text-gray-950 mb-2">Fantastisk klaret!</h2>
+                <p class="text-gray-500 mb-6">Du har lært og svaret rigtigt på alle 11 sætninger på <span id="finish-lang-label" class="font-bold text-indigo-600">målsproget</span>.</p>
+                
+                <button onclick="restartGame()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-indigo-100 transition-all flex items-center justify-center gap-2 active:scale-98">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                    Start forfra
+                </button>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center mt-6 py-4 border-t border-gray-200 text-xs text-gray-400">
+            Dansk Flashcards &copy; 2026. Designet til nem og uafhængig sprogtræning uden login.
+        </footer>
+    </div>
+
+    <!-- JavaScript Logik -->
+    <script>
+        // Målsprog konfiguration
+        const targetLanguages = {
+            "engelsk": "Engelsk",
+            "bengali": "Bengali",
+            "hindi": "Hindi",
+            "urdu": "Urdu",
+            "ukrainsk": "Ukrainsk",
+            "russisk": "Russisk",
+            "persisk": "Persisk",
+            "tyrkisk": "Tyrkisk",
+            "kurdisk kurmanji": "Kurdisk Kurmanji",
+            "kurdisk sorani": "Kurdisk Sorani",
+            "nepalesisk": "Nepalesisk",
+            "kiswahili": "Kiswahili",
+            "fransk": "Fransk",
+            "twi": "Twi",
+            "bosnisk": "Bosnisk",
+            "somali": "Somali",
+            "serbisk": "Serbisk",
+            "tigrinya": "Tigrinya",
+            "mandarin kinesisk": "Mandarin Kinesisk",
+            "tadjikisk": "Tadjikisk",
+            "spansk": "Spansk"
+        };
+
+        // De 11 præcise danske sætninger med dertilhørende oversættelser (uden translitteration, men med alle leksikale betydninger)
+        const flashcardsData = [
+            {
+                danish: "Jeg er interesseret i jobbet",
+                translations: {
+                    "engelsk": "I am interested in the job",
+                    "bengali": "আমি এই কাজটিতে আগ্রহী / আমি চাকরিতে আগ্রহী",
+                    "hindi": "मैं इस नौकरी में रुचि रखता हूँ / मैं इस नौकरी में रुचि रखती हूँ",
+                    "urdu": "میں اس نوکری میں دلچسپی رکھتا ہوں / میں اس نوکری میں دلچسپی رکھتی ہوں",
+                    "ukrainsk": "Я зацікавлений у цій роботі / Я зацікавлена в цій роботі",
+                    "russisk": "Я заинтересован в этой работе / Я заинтересована в этой работе",
+                    "persisk": "من به این کار علاقه‌مند هستم",
+                    "tyrkisk": "İşle ilgileniyorum / Bu işe ilgi duyuyorum",
+                    "kurdisk kurmanji": "Ez bi vî karî re eleqedar im",
+                    "kurdisk sorani": "من گرنگی بەم کارە دەدەم / من ئارەزووی ئەم کارە دەکەم",
+                    "nepalesisk": "म यस काममा रुचि राख्छु",
+                    "kiswahili": "Ninavutiwa na kazi hii",
+                    "fransk": "Je suis intéressé par le poste / Je suis intéressée par le poste",
+                    "twi": "Me ho wɔ anigyeɛ wɔ adwuma yi ho",
+                    "bosnisk": "Zainteresovan sam za posao / Zainteresovana sam za posao",
+                    "somali": "Waan xiisaynayaa shaqadan",
+                    "serbisk": "Zainteresovan sam za posao / Zainteresovana sam za posao",
+                    "tigrinya": "ኣብቲ ስራሕ ተገዳስነት ኣለኒ",
+                    "mandarin kinesisk": "我对这份工作很感兴趣",
+                    "tadjikisk": "Ман ба ин кор таваҷҷӯҳ дорам",
+                    "spansk": "Estoy interesado en el trabajo / Estoy interesada en el trabajo"
+                }
+            },
+            {
+                danish: "Jeg er god til at samarbejde",
+                translations: {
+                    "engelsk": "I am good at collaborating / I am good at working with others",
+                    "bengali": "আমি সহযোগিতা করতে পারদর্শী / আমি দলগত কাজে ভালো",
+                    "hindi": "मैं सहयोग करने में अच्छा हूँ / मैं दूसरों के साथ मिलकर काम करने में अच्छी हूँ",
+                    "urdu": "میں تعاون کرنے میں اچھا ہوں / میں مل کر کام کرنے میں اچھی ہوں",
+                    "ukrainsk": "Я вмію добре співпрацювати / Я добре працюю в команді",
+                    "russisk": "Я хорошо умею сотрудничать / Я командный игрок",
+                    "persisk": "من در همکاری کردن خوب هستم",
+                    "tyrkisk": "İş birliği yapmakta iyiyim / Takım çalışmasında başarılıyım",
+                    "kurdisk kurmanji": "Ez di hevkariyê de baş im",
+                    "kurdisk sorani": "من لە هاوکاری کردندا باشم",
+                    "nepalesisk": "म मिलेर काम गर्न राम्रो छु / म सहकार्य गर्नमा कुशल छु",
+                    "kiswahili": "Mimi ni mzuri katika kushirikiana",
+                    "fransk": "Je suis doué pour collaborer / J'ai l'esprit d'équipe",
+                    "twi": "Minim nkabom adwuma yɛ yie",
+                    "bosnisk": "Dobar sam u saradnji / Dobra sam u saradnji",
+                    "somali": "Waxaan ku fiicanahay wada shaqaynta",
+                    "serbisk": "Dobar sam u saradnji / Dobra sam u saradnji",
+                    "tigrinya": "ብሓባር ምስራሕ ንፉዕ እየ",
+                    "mandarin kinesisk": "我擅长团队合作 / 我具有良好的协作能力",
+                    "tadjikisk": "Ман дар ҳамкорӣ хуб ҳастам",
+                    "spansk": "Soy bueno colaborando / Soy buena en el trabajo en equipo"
+                }
+            },
+            {
+                danish: "Jeg er glad for samarbejde",
+                translations: {
+                    "engelsk": "I enjoy collaborating / I like working with others",
+                    "bengali": "আমি সহযোগিতা করতে পছন্দ করি / আমি সহকর্মীদের সাথে কাজ করতে ভালোবাসি",
+                    "hindi": "मुझे सहयोग करना पसंद है / मुझे टीम में काम करना अच्छा लगता है",
+                    "urdu": "مجھے تعاون کرنا پسند ہے",
+                    "ukrainsk": "Мені подобається співпраця / Я отримую задоволення від співпраці",
+                    "russisk": "Мне нравится сотрудничать / Я ценю совместную работу",
+                    "persisk": "من از همکاری کردن خوشحالم / من همکاری را دوست دارم",
+                    "tyrkisk": "İş birliği yapmaktan memnunum / Ortak çalışmayı seviyorum",
+                    "kurdisk kurmanji": "Ez ji hevkariyê hez dikim",
+                    "kurdisk sorani": "من دڵخۆشم بە هاوکاری کردن / حەزم لە هاوکارییە",
+                    "nepalesisk": "म सहकार्य गर्न मन पराउँछु",
+                    "kiswahili": "Ninafurahia kushirikiana",
+                    "fransk": "J'apprécie la collaboration / J'aime coopérer",
+                    "twi": "Me ho tɔ me wɔ nkabom adwuma ho",
+                    "bosnisk": "Raduje me saradnja / Volim saradnju",
+                    "somali": "Waan ku faraxsanahay wada shaqaynta",
+                    "serbisk": "Radujem se saradnji / Volim saradnju",
+                    "tigrinya": "ብሓባር ብምስራሕ ሕጉስ እየ",
+                    "mandarin kinesisk": "我喜欢合作 / 我乐于协作",
+                    "tadjikisk": "Ман аз ҳамкорӣ шодам",
+                    "spansk": "Me gusta colaborar / Disfruto de la colaboración"
+                }
+            },
+            {
+                danish: "Jeg trives med at arbejde selvstændigt",
+                translations: {
+                    "engelsk": "I thrive working independently / I work well on my own",
+                    "bengali": "আমি স্বাধীনভাবে কাজ করতে পছন্দ করি / আমি নিজে নিজে কাজ করতে স্বাচ্ছন্দ্যবোধ করি",
+                    "hindi": "मैं स्वतंत्र रूप से काम करना पसंद करता हूँ / मैं अकेले काम करने में सक्षम हूँ",
+                    "urdu": "میں آزادانہ طور پر کام کرنا پسند کرتا ہوں / میں خود مختار ہو کر اچھا کام کرتا ہوں",
+                    "ukrainsk": "Мені подобається працювати самостійно / Я успішно працюю незалежно",
+                    "russisk": "Мне нравится работать самостоятельно / Я умею работать автономно",
+                    "persisk": "من از کار کردن به صورت مستقل لذت می‌برم",
+                    "tyrkisk": "Bağımsız çalışmaktan keyif alırım / Kendi başıma çalışırken verimliyim",
+                    "kurdisk kurmanji": "Ez bi serbixwe xebitînê rehet im / Ez bi serê xwe xweş dixebitim",
+                    "kurdisk sorani": "من حەز بە کارکردنی سەربەخۆ دەکەم / لەگەڵ کارکردنی سەربەخۆدا دەگونجێم",
+                    "nepalesisk": "म स्वतन्त्र रूपमा काम गर्न मन पराउँछु",
+                    "kiswahili": "Ninafanikiwa faisant kazi kwa kujitegemea",
+                    "fransk": "Je m'épanouis dans le travail indépendant / J'aime travailler en autonomie",
+                    "twi": "Metumi yɛ adwuma mko ara yie / Metumi gyina me nan so yɛ adwuma",
+                    "bosnisk": "Volim raditi samostalno / Dobro se snalazim u samostalnom radu",
+                    "somali": "Waxaan ku fiicanahay inaan keligay shaqeeyo",
+                    "serbisk": "Uživam u samostalnom radu / Volim da radim samostalno",
+                    "tigrinya": "ብውልቀይ ክሰርሕ ባህ ይብለኒ",
+                    "mandarin kinesisk": "我喜欢独立工作 / 我擅长自主工作",
+                    "tadjikisk": "Ман мустақилона кор карданро дӯст медорам",
+                    "spansk": "Me gusta trabajar de manera independiente / Me desenvuelvo bien trabajando solo"
+                }
+            },
+            {
+                danish: "Jeg er vant til at være kreativ",
+                translations: {
+                    "engelsk": "I am used to being creative",
+                    "bengali": "আমি সৃজনশীল হতে অভ্যস্ত",
+                    "hindi": "मुझे रचनात्मक होने की आदत है / मैं अक्सर नया और रचनात्मक काम करता हूँ",
+                    "urdu": "مجھے تخلیقی ہونے کی عادت ہے",
+                    "ukrainsk": "Я звик бути творчим / Я звикла проявляти креативність",
+                    "russisk": "Я привык быть творческим / Я привыкла подходить к задачам творчески",
+                    "persisk": "من به خلاق بودن عادت دارم",
+                    "tyrkisk": "Yaratıcı olmaya alışkınım / Üretken olmaya alışkınım",
+                    "kurdisk kurmanji": "Ez hînî afirîneriyê bûme",
+                    "kurdisk sorani": "من ڕاهاتووم لەسەر داهێنەر بوون",
+                    "nepalesisk": "म रचनात्मक हुन बानी परेको छु",
+                    "kiswahili": "Nimezoea kuwa mbunifu",
+                    "fransk": "J'ai l'habitude d'être créatif / J'ai l'habitude d'être créative",
+                    "twi": "M'ataadeɛ sɛ mɛyɛ mfonini anaa adwene foforɔ",
+                    "bosnisk": "Navikao sam biti kreativan / Navikla sam biti kreativna",
+                    "somali": "Waxaan bartay inaan noqdo qof hal-abuur leh",
+                    "serbisk": "Navikao sam da budem kreativan / Navikla sam да будем креативна",
+                    "tigrinya": "ፈጣሪ ክኸውን ልሙድ እየ",
+                    "mandarin kinesisk": "我习惯于富有创造力 / 我善于创新",
+                    "tadjikisk": "Ман ба эҷодкорӣ одат кардаам",
+                    "spansk": "Estoy acostumbrado a ser creativo / Estoy acostumbrada a ser creativa"
+                }
+            },
+            {
+                danish: "Jeg er færdig med min uddannelse",
+                translations: {
+                    "engelsk": "I have completed my education / I have finished my studies",
+                    "bengali": "আমি আমার পড়াশোনা শেষ করেছি / আমার শিক্ষা জীবন শেষ হয়েছে",
+                    "hindi": "मैंने अपनी शिक्षा पूरी कर ली है / मेरी पढ़ाई पूरी हो चुकी है",
+                    "urdu": "میں نے اپنی تعلیم مکمل کر لی ہے / میری پڑھائی مکمل ہو گئی ہے",
+                    "ukrainsk": "Я закінчив своє навчання / Я закінчила свою освіту",
+                    "russisk": "Я закончил свое обучение / Я закончила свое образование",
+                    "persisk": "تحصیلات من به پایان رسیده است / درسم تمام شده است",
+                    "tyrkisk": "Eğitimimi tamamladım / Okulumu bitirdim",
+                    "kurdisk kurmanji": "Min perwerdehiya xwe qedandiye / Xwendina min qediya",
+                    "kurdisk sorani": "من خوێندنەکەم تەواو کردووە / تەواوی خوێندنم کردووە",
+                    "nepalesisk": "मैले मेरो शिक्षा पूरा गरेको छु / मेरो अध्ययन समाप्त भयो",
+                    "kiswahili": "Nimemaliza masomo yangu / Nimekamilisha elimu yangu",
+                    "fransk": "J'ai terminé mes études / J'ai fini ma formation",
+                    "twi": "Meweie m'adesua",
+                    "bosnisk": "Završio sam svoje obrazovanje / Završila sam svoje obrazovanje",
+                    "somali": "Waxaan dhameeyay waxbarashadayda",
+                    "serbisk": "Završio sam svoje školovanje / Završila sam svoje obrazovanje",
+                    "tigrinya": "ትምህርተይ ወዲአ ኣለኹ",
+                    "mandarin kinesisk": "我已完成学业 / 我已经毕业了",
+                    "tadjikisk": "Ман таҳсили худро хатм кардам",
+                    "spansk": "He terminado mis estudios / He completado mi formación"
+                }
+            },
+            {
+                danish: "Jeg tænker på at tage en uddannelse",
+                translations: {
+                    "engelsk": "I am thinking about getting an education / I plan to study",
+                    "bengali": "আমি একটি কোর্স বা পড়াশোনা করার কথা ভাবছি",
+                    "hindi": "मैं शिक्षा प्राप्त करने के बारे में सोच रहा हूँ / मैं आगे पढ़ाई करने की सोच रही हूँ",
+                    "urdu": "میں کوئی تعلیم حاصل کرنے کے بارے میں سوچ رہا ہوں",
+                    "ukrainsk": "Я думаю про здобуття освіти / Я розглядаю можливість навчання",
+                    "russisk": "Я думаю о получении образования / Я планирую пойти учиться",
+                    "persisk": "من به فکر ادامه تحصیل هستم",
+                    "tyrkisk": "Bir eğitim almayı düşünüyorum / Okumayı düşünüyorum",
+                    "kurdisk kurmanji": "Ez difikirim ku perwerdehiyekê bibînim / Ez difikirim ku bixwînim",
+                    "kurdisk sorani": "من بیر لەوە دەکەمەوە بخوێنم / بیر لە خوێندن دەکەمەوە",
+                    "nepalesisk": "म अध्ययन गर्ने बारे सोचिरहेको छु",
+                    "kiswahili": "Nafikiria kusoma zaidi / Nafikiria kujiendeleza kimasomo",
+                    "fransk": "Je pense à faire des études / J'envisage de suivre une formation",
+                    "twi": "Medwen ho sɛ mɛkɔ sukuu bio",
+                    "bosnisk": "Razmišljam o obrazovanju / Razmišljam o tome da upišem školu",
+                    "somali": "Waxaan ku fekerayaa inaan waxbarasho bilaabo",
+                    "serbisk": "Razmišljam o daljem školovanju / Razmišljam o obrazovanju",
+                    "tigrinya": "ክመሃር ይሓስብ ኣለኹ",
+                    "mandarin kinesisk": "我正考虑接受教育 / 我有读书深造的想法",
+                    "tadjikisk": "Ман дар бораи таҳсил кардан фикр дорам",
+                    "spansk": "Estoy pensando en estudiar / Considero la posibilidad de formarme"
+                }
+            },
+            {
+                danish: "Jeg har planer om at arbejde med børn",
+                translations: {
+                    "engelsk": "I plan to work with children",
+                    "bengali": "আমার শিশুদের সাথে কাজ করার পরিকল্পনা আছে",
+                    "hindi": "मेरी बच्चों के साथ काम करने की योजना है",
+                    "urdu": "میرا بچوں کے ساتھ کام کرنے کا ارادہ ہے",
+                    "ukrainsk": "Я планую працювати з дітьми",
+                    "russisk": "Я планирую работать с детьми",
+                    "persisk": "من برنامه‌هایی برای کار با کودکان دارم",
+                    "tyrkisk": "Çocuklarla çalışmayı planlıyorum",
+                    "kurdisk kurmanji": "Planên min hene ku ez bi zarokan re bixebitim",
+                    "kurdisk sorani": "من پلانم هەیە لەگەڵ منداڵان کار بکەم",
+                    "nepalesisk": "मेरो बच्चाहरूसँग काम गर्ने योजना छ",
+                    "kiswahili": "Nina mpango wa kufanya kazi na watoto",
+                    "fransk": "J'ai l'intention de travailler avec des enfants / Je projette de travailler avec des enfants",
+                    "twi": "Mewɔ nhyehyɛeɛ sɛ me ne mmofra bɛyɛ adwuma",
+                    "bosnisk": "Planiram raditi s djecom / Imam u planu rad s djecom",
+                    "somali": "Waxaan qorshaynayaa inaan la shaqeeyo carruurta",
+                    "serbisk": "Planiram da radim sa decom",
+                    "tigrinya": "ምስ ቆልዑ ክሰርሕ መደብ ኣለኒ",
+                    "mandarin kinesisk": "我计划与孩子们一起工作 / 我打算从事儿童相关的工作",
+                    "tadjikisk": "Ман нақша дорам, ки бо кӯдакон кор кунам",
+                    "spansk": "Tengo planes de trabajar con niños / Planeo trabajar con niños"
+                }
+            },
+            {
+                danish: "Jeg har mulighed for at arbejde fuldtid",
+                translations: {
+                    "engelsk": "I have the opportunity to work full-time / I am available for full-time work",
+                    "bengali": "আমার ফুল-টাইম বা পূর্ণকালীন কাজ করার সুযোগ আছে",
+                    "hindi": "मेरे पास पूर्णकालिक काम करने का अवसर है / मैं पूरे समय काम कर सकता हूँ",
+                    "urdu": "میرے پاس کل وقتی کام کرنے کا موقع ہے / میں فل ٹائم کام کر سکتا ہوں",
+                    "ukrainsk": "У мене є можливість працювати повний робочий день",
+                    "russisk": "У меня есть возможность работать полный рабочий день / Я доступен для полной занятости",
+                    "persisk": "من فرصت کار تمام‌وقت را دارم",
+                    "tyrkisk": "Tam zamanlı çalışma imkanım var / Tam gün çalışabilirim",
+                    "kurdisk kurmanji": "Derfeta min heye ku ez bi tevahî wext bixebitim / Ez dikarim her dem bixebitim",
+                    "kurdisk sorani": "من توانای کارکردنی تەواو کاتم هەیە / دەتوانم بە شێوەی فول تایم کار بکەم",
+                    "nepalesisk": "म पूर्ण-समय काम गर्न सक्छु / म पूर्ण-समय कामको लागि उपलब्ध छु",
+                    "kiswahili": "Nina fursa ya kufanya kazi kwa muda wote",
+                    "fransk": "J'ai la possibilité de travailler à plein temps / Je suis disponible à temps plein",
+                    "twi": "Mewɔ kwan sɛ meyɛ adwuma bere nyinaa",
+                    "bosnisk": "Imam mogućnost rada u punom radnom vremenu / Mogu raditi puno radno vrijeme",
+                    "somali": "Waxaan haystaa fursad aan ku shaqeeyo waqti buuxa",
+                    "serbisk": "Imam mogućnost da radim puno radno vreme",
+                    "tigrinya": "ምሉእ ግዜ ክሰርሕ ዕድል ኣለኒ",
+                    "mandarin kinesisk": "我有条件全职工作 / 我可以接受全职工作",
+                    "tadjikisk": "Ман имкони кори пурравақт дорам",
+                    "spansk": "Tengo la oportunidad de trabajar a tiempo completo / Tengo disponibilidad para trabajar jornada completa"
+                }
+            },
+            {
+                danish: "Jeg glæder mig til at høre fra jer",
+                translations: {
+                    "engelsk": "I look forward to hearing from you",
+                    "bengali": "আমি আপনাদের উত্তর শোনার অপেক্ষায় আছি / আপনাদের সাথে যোগাযোগের অপেক্ষায় রইলাম",
+                    "hindi": "मुझे आपसे सुनने का इंतज़ार है / मैं आपके उत्तर की प्रतीक्षा कर रहा हूँ",
+                    "urdu": "مجھے آپ سے جواب کا انتظار ہے",
+                    "ukrainsk": "Буду радий почути вас / З нетерпінням очікую на вашу відповідь",
+                    "russisk": "Буду рад получить от вас ответ / Я с радостью получу ваш ответ",
+                    "persisk": "منتظر شنیدن خبر از طرف شما هستم",
+                    "tyrkisk": "Sizden haber almayı heyecanla bekliyorum / Geri dönüşünüzü sabırsızlıkla bekliyorum",
+                    "kurdisk kurmanji": "Ez li benda nûçeyekê ji we me",
+                    "kurdisk sorani": "خۆشحاڵ دەبم بە بیستنی هەواڵ لە ئێوەوە",
+                    "nepalesisk": "म तपाईंको प्रतिक्रियाको पर्खाइमा छु",
+                    "kiswahili": "Natazamia kwa hamu kusikia kutoka kwako",
+                    "fransk": "Au plaisir de vous lire / Dans l'attente de votre retour",
+                    "twi": "M'ani da so sɛ mɛte wo nka",
+                    "bosnisk": "Radujem se što ću se čuti sa vama / Radujem se vašem odgovoru",
+                    "somali": "Waxaan rajaynayaa inaan idinka maqlo horta",
+                    "serbisk": "Radujem se što ćemo biti u kontaktu / Radujem se vašem odgovoru",
+                    "tigrinya": "ካባኻትኩም መልሲ ክሰምዕ እጽበ",
+                    "mandarin kinesisk": "我很期待收到您的来信",
+                    "tadjikisk": "Ман мунтазири шунидани хабар аз шумо ҳастам",
+                    "spansk": "Espero tener noticias suyas / Quedo a la espera de sus noticias"
+                }
+            },
+            {
+                danish: "Jeg ser frem til at høre fra jer",
+                translations: {
+                    "engelsk": "I look forward to hearing from you",
+                    "bengali": "আমি আপনার কাছ থেকে শোনার জন্য উন্मुख / আমি আপনার সাড়া পাওয়ার জন্য অধীর আগ্রহে অপেক্ষা করছি",
+                    "hindi": "मैं आपसे सुनने के लिए उत्सुक हूँ / मैं जल्द ही आपसे संपर्क की आशा करता हूँ",
+                    "urdu": "میں آپ سے سننے کا منتظر ہوں",
+                    "ukrainsk": "З нетерпінням чекаю вашої відповіді / Чекаю на звістку від вас",
+                    "russisk": "С нетерпением жду вашего ответа / С нетерпением ожидаю ответа от вас",
+                    "persisk": "با اشتیاق منتظر شنیدن از شما هستم",
+                    "tyrkisk": "Sizden haber almayı dört gözle bekliyorum / Geri bildiriminizi sabırsızlıkla bekliyorum",
+                    "kurdisk kurmanji": "Ez li benda bihîstina ji we me",
+                    "kurdisk sorani": "بە پەرۆشەوە چاوەڕێی بیستنی هەواڵ لە ئێوە دەکەم",
+                    "nepalesisk": "म तपाईंको सन्देशको उत्सुकतापूर्वक प्रतीक्षा गर्दैछु",
+                    "kiswahili": "Natarajia kusikia kutoka kwenu hivi karibuni",
+                    "fransk": "J'ai hâte de recevoir de vos nouvelles / Je me réjouis de votre réponse",
+                    "twi": "Metwɛn wo mmuaeɛ pa ara",
+                    "bosnisk": "Radujem se vašem odgovoru / Sa nestrpljenjem očekujem vaš odgovor",
+                    "somali": "Waxaan rajaynayaa inaan war idinka helo",
+                    "serbisk": "Radujem se vašem odgovoru / Sa nestrpljenjem očekujem vaš odgovor",
+                    "tigrinya": "ካባኻትኩም ሓበሬታ ክሰምዕ ሃንቀው እብል",
+                    "mandarin kinesisk": "我期待收到您的回复",
+                    "tadjikisk": "Ман бесаброна мунтазири шунидани хабар аз шумо ҳастам",
+                    "spansk": "Espero con ansias saber de usted / Espero con interés recibir sus noticias"
+                }
+            }
+        ];
+
+        // State variabler
+        let currentLanguage = "engelsk";
+        let activeDeck = []; // Gemmer index på de tilbageværende kort
+        let currentIndex = 0; // Det nuværende kortindex i activeDeck
+        let isFlipped = false; // Om kortet i øjeblikket viser oversættelsen (bagsiden)
+        let isTransitioning = false; // Forhindrer klik under flip-animation
+
+        // Initialisering af appen
+        window.onload = function() {
+            renderLanguageSelector();
+            restartGame();
+        };
+
+        // Generér sprogknapper dynamisk
+        function renderLanguageSelector() {
+            const selector = document.getElementById("language-selector");
+            selector.innerHTML = "";
+
+            Object.keys(targetLanguages).forEach(langKey => {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = `px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl border text-center transition-all ${
+                    currentLanguage === langKey
+                        ? "bg-indigo-600 text-white border-indigo-600 shadow-md scale-102"
+                        : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 hover:border-gray-300"
+                }`;
+                
+                button.textContent = targetLanguages[langKey];
+                button.onclick = () => selectLanguage(langKey);
+                selector.appendChild(button);
+            });
+        }
+
+        // Vælg sprog og opdater skærmen med det samme
+        function selectLanguage(langKey) {
+            if (isTransitioning) return;
+            currentLanguage = langKey;
+            renderLanguageSelector();
+            
+            // Hvis kortet er vendt, så opdater den viste oversættelse med det samme
+            const backLabel = document.getElementById("back-language-label");
+            backLabel.textContent = targetLanguages[currentLanguage];
+            
+            if (activeDeck.length > 0) {
+                const currentCardObj = flashcardsData[activeDeck[currentIndex]];
+                const translationText = document.getElementById("translation-text");
+                translationText.textContent = currentCardObj.translations[currentLanguage];
+            }
+        }
+
+        // Genstart eller start spillet forfra
+        function restartGame() {
+            // Fyld bunken med alle de 11 ord (0 til 10)
+            activeDeck = Array.from({ length: flashcardsData.length }, (_, i) => i);
+            
+            // Bland bunken (Fisher-Yates shuffle) for at give en sjovere og mere varieret oplevelse
+            for (let i = activeDeck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [activeDeck[i], activeDeck[j]] = [activeDeck[j], activeDeck[i]];
+            }
+            
+            currentIndex = 0;
+            isFlipped = false;
+            isTransitioning = false;
+
+            // Nulstil visning
+            document.getElementById("game-view").classList.remove("hidden");
+            document.getElementById("finish-view").classList.add("hidden");
+
+            // Nulstil 3D kortets retning uden animation
+            const cardEl = document.getElementById("flashcard");
+            cardEl.style.transition = 'none';
+            cardEl.classList.remove("rotate-y-180");
+            
+            // Tving browseren til at registrere ændringen før vi tilføjer transitionen igen
+            cardEl.offsetHeight; 
+            cardEl.style.transition = 'transform 0.5s ease-out';
+
+            updateCardData();
+            updateUIProgress();
+        }
+
+        // Opdaterer teksten på selve kortet (både for- og bagside)
+        function updateCardData() {
+            if (activeDeck.length === 0) return;
+
+            const cardIndexInDb = activeDeck[currentIndex];
+            const cardObj = flashcardsData[cardIndexInDb];
+
+            document.getElementById("danish-text").textContent = cardObj.danish;
+            document.getElementById("translation-text").textContent = cardObj.translations[currentLanguage];
+            document.getElementById("back-language-label").textContent = targetLanguages[currentLanguage];
+        }
+
+        // Opdaterer fremskridt bar, tal og badges
+        function updateUIProgress() {
+            const cardsLeft = activeDeck.length;
+            const totalCards = flashcardsData.length;
+            const guessedCorrectly = totalCards - cardsLeft;
+            const percentage = Math.round((guessedCorrectly / totalCards) * 100);
+
+            document.getElementById("cards-left-badge").textContent = `Kort tilbage: ${cardsLeft}`;
+            document.getElementById("progress-text").textContent = `Fremskridt: ${percentage}%`;
+            document.getElementById("progress-bar").style.width = `${percentage}%`;
+        }
+
+        // Håndterer selve vend-effekten (flip) ved klik på kortet
+        function flipCard() {
+            if (isTransitioning) return;
+            
+            const cardEl = document.getElementById("flashcard");
+            isFlipped = !isFlipped;
+            
+            if (isFlipped) {
+                cardEl.classList.add("rotate-y-180");
+            } else {
+                cardEl.classList.remove("rotate-y-180");
+            }
+        }
+
+        // Håndterer svar-knapper (Rigtigt / Forkert)
+        function markCard(isCorrect) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            // 1. Vend kortet tilbage til forsiden (Dansk) først
+            const cardEl = document.getElementById("flashcard");
+            isFlipped = false;
+            cardEl.classList.remove("rotate-y-180");
+
+            // 2. Brug setTimeout på ca. 400ms for at vente på, at kortet har forsiden mod brugeren
+            setTimeout(() => {
+                const answeredIndex = activeDeck[currentIndex];
+
+                if (isCorrect) {
+                    // Fjern ordet fra bunken
+                    activeDeck.splice(currentIndex, 1);
+                    
+                    // Tjek om alt er gennemført
+                    if (activeDeck.length === 0) {
+                        showFinishedScreen();
+                        isTransitioning = false;
+                        return;
+                    }
+
+                    // Da kortet fjernes, bliver currentIndex automatisk den næste i rækken.
+                    // Hvis vi slettede det sidste element, hopper vi tilbage til 0.
+                    if (currentIndex >= activeDeck.length) {
+                        currentIndex = 0;
+                    }
+                } else {
+                    // Forkert: Flyt ordet om bag i bunken for at se det igen senere
+                    const currentCardIdx = activeDeck.splice(currentIndex, 1)[0];
+                    activeDeck.push(currentCardIdx);
+
+                    // Gå til næste kort (som nu ligger på currentIndex fordi vi trak det forrige ud)
+                    if (currentIndex >= activeDeck.length) {
+                        currentIndex = 0;
+                    }
+                }
+
+                // 3. Opdater kortets data og statuslinjen i baggrunden, mens forsiden vender udad
+                updateCardData();
+                updateUIProgress();
+
+                // Åbn op for kliks igen
+                isTransitioning = false;
+            }, 400); // Passer perfekt med 3D transformationens varighed
+        }
+
+        // Viser den endelige sejrsskærm
+        function showFinishedScreen() {
+            document.getElementById("game-view").classList.add("hidden");
+            document.getElementById("finish-view").classList.remove("hidden");
+            document.getElementById("finish-lang-label").textContent = targetLanguages[currentLanguage];
+        }
+    </script>
+</body>
+</html>
