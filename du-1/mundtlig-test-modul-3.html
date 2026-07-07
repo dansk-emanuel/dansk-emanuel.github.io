@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modultest Træner - DU1 Modul 3</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS til stilrent og responsivt layout -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter & Fredoka for a friendly, readable educational interface -->
+    <!-- Google Fonts for et venligt og letlæseligt udtryk for DU1-kursister -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome for educational icons -->
+    <!-- FontAwesome til ikoner -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #fcfbf7; /* Soft warm-neutral backdrop */
+            background-color: #f8fafc; /* Meget rolig lys baggrund */
         }
         .title-font {
             font-family: 'Fredoka', sans-serif;
@@ -24,7 +24,7 @@
 <body class="min-h-screen flex flex-col justify-between text-slate-800">
 
     <!-- HEADER -->
-    <header class="bg-gradient-to-r from-emerald-700 to-teal-800 text-white shadow-sm py-4 px-4 sticky top-0 z-50">
+    <header class="bg-gradient-to-r from-indigo-700 to-violet-800 text-white shadow-sm py-4 px-4 sticky top-0 z-50">
         <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <div class="bg-white/10 p-2 rounded-xl">
@@ -32,10 +32,10 @@
                 </div>
                 <div>
                     <h1 class="text-xl sm:text-2xl font-bold tracking-tight title-font">Mundtlig Træner (DU1 Modul 3)</h1>
-                    <p class="text-xs text-emerald-100">Naturlige stemmer · Træn helt anonymt · Virker på mobil og computer</p>
+                    <p class="text-xs text-indigo-100">Visuelt øveværktøj · Træn helt anonymt · Virker på mobil og computer</p>
                 </div>
             </div>
-            <!-- Global progress pill -->
+            <!-- Global fremskridtsbjælke -->
             <div class="bg-white/10 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2 border border-white/10">
                 <span class="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></span>
                 <span id="global-progress">Status: 0 / 36 spørgsmål lært</span>
@@ -46,22 +46,22 @@
     <!-- MAIN CONTAINER -->
     <main class="max-w-5xl w-full mx-auto px-4 py-6 flex-grow">
 
-        <!-- Top Navigation / Mode Selector -->
+        <!-- Kategori-vælgere i toppen -->
         <div class="flex flex-col sm:flex-row gap-4 mb-6">
-            <!-- Theme: Arbejde -->
-            <button id="btn-theme-arbejde" onclick="switchTheme('arbejde')" class="flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-emerald-600 bg-emerald-50 text-emerald-800 transition duration-150 shadow-sm">
+            <!-- Emne: Arbejde -->
+            <button id="btn-theme-arbejde" onclick="switchTheme('arbejde')" class="flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-indigo-600 bg-indigo-50 text-indigo-800 transition duration-150 shadow-sm">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl">💼</span>
                     <div class="text-left">
                         <span class="block font-bold title-font">Emne: Arbejde</span>
-                        <span class="block text-xs text-emerald-600" id="progress-arbejde">0 af 21 lært</span>
+                        <span class="block text-xs text-indigo-600" id="progress-arbejde">0 af 21 lært</span>
                     </div>
                 </div>
-                <i class="fa-solid fa-chevron-right text-emerald-400"></i>
+                <i class="fa-solid fa-chevron-right text-indigo-400"></i>
             </button>
 
-            <!-- Theme: Bolig -->
-            <button id="btn-theme-bolig" onclick="switchTheme('bolig')" class="flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-slate-200 bg-white text-slate-600 hover:border-teal-200 hover:bg-slate-50 transition duration-150">
+            <!-- Emne: Bolig -->
+            <button id="btn-theme-bolig" onclick="switchTheme('bolig')" class="flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:bg-slate-50 transition duration-150">
                 <div class="flex items-center gap-3">
                     <span class="text-2xl">🏠</span>
                     <div class="text-left">
@@ -73,174 +73,159 @@
             </button>
         </div>
 
-        <!-- TWO COLUMN INTERACTIVE INTERFACE -->
+        <!-- TO-KOLONNE INTERACTIVE GRÆNSEFLADE -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-            <!-- LEFT COLUMN: QUESTION LIST -->
-            <div class="lg:col-span-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col h-[350px] lg:h-[620px]">
+            <!-- VENSTRE KOLONNE: SPØRGSMÅLSLISTE -->
+            <div class="lg:col-span-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col h-[350px] lg:h-[650px]">
                 <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
                     <h3 class="font-bold text-slate-700 flex items-center gap-2 text-sm sm:text-base title-font">
-                        <i class="fa-solid fa-list text-emerald-600"></i>
+                        <i class="fa-solid fa-list text-indigo-600"></i>
                         Vælg et spørgsmål:
                     </h3>
                     <span id="question-count-badge" class="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-md"></span>
                 </div>
                 <div class="overflow-y-auto flex-grow space-y-2 pr-1" id="questions-list">
-                    <!-- Javascript populates question items dynamically here -->
+                    <!-- Javascript genererer listen af spørgsmål dynamisk her -->
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: MASTER WORKSPACE -->
+            <!-- HØJRE KOLONNE: DET AKTIVE ARBEJDSOMRÅDE -->
             <div class="lg:col-span-8 flex flex-col gap-6">
                 
-                <!-- MAIN WORKSPACE CARD -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between min-h-[450px] relative overflow-hidden">
+                <!-- HOVEDKORT MED DET AKTIVE SPØRGSMÅL -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between min-h-[480px] relative overflow-hidden">
                     
-                    <!-- Decorative background badge -->
-                    <div class="absolute -top-6 -right-6 w-24 h-24 bg-emerald-50 rounded-full -z-10 opacity-60"></div>
+                    <!-- Dekorativ baggrundscirkel -->
+                    <div class="absolute -top-6 -right-6 w-24 h-24 bg-indigo-50 rounded-full -z-10 opacity-60"></div>
 
-                    <!-- Card Header -->
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
-                        <span class="text-xs font-extrabold text-emerald-700 uppercase tracking-wider bg-emerald-50 px-3 py-1 rounded-full title-font" id="current-badge">Arbejde 💼</span>
-                        <div class="flex items-center gap-1">
-                            <span class="text-xs text-slate-400 font-medium mr-1">Hvordan gik det?</span>
-                            <!-- Self-assessment smiles for offline training -->
-                            <button onclick="setSelfAssessment('difficult')" id="smile-sad" class="p-1 rounded-lg border border-slate-100 hover:bg-rose-50 hover:border-rose-300 transition" title="Svært / Skal øves">
-                                <span class="text-xl">😢</span>
-                            </button>
-                            <button onclick="setSelfAssessment('normal')" id="smile-neutral" class="p-1 rounded-lg border border-slate-100 hover:bg-amber-50 hover:border-amber-300 transition" title="Næsten / OK">
-                                <span class="text-xl">😐</span>
-                            </button>
-                            <button onclick="setSelfAssessment('learnt')" id="smile-happy" class="p-1 rounded-lg border border-slate-100 hover:bg-emerald-50 hover:border-emerald-300 transition" title="Lært / Kan godt">
-                                <span class="text-xl">😊</span>
-                            </button>
+                    <!-- Kortets øverste linje med emne og selvvurdering -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-4">
+                        <span class="text-xs font-extrabold text-indigo-700 uppercase tracking-wider bg-indigo-50 px-3 py-1 rounded-full title-font w-fit" id="current-badge">Arbejde 💼</span>
+                        
+                        <div class="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-100">
+                            <span class="text-xs text-slate-500 font-medium px-2">Hvordan gik det med at svare højt?</span>
+                            <div class="flex gap-1">
+                                <button onclick="setSelfAssessment('difficult')" id="smile-sad" class="p-1 rounded-lg hover:bg-rose-50 border border-transparent transition" title="Svært / Skal øves">
+                                    <span class="text-xl">😢</span>
+                                </button>
+                                <button onclick="setSelfAssessment('normal')" id="smile-neutral" class="p-1 rounded-lg hover:bg-amber-50 border border-transparent transition" title="Næsten / OK">
+                                    <span class="text-xl">😐</span>
+                                </button>
+                                <button onclick="setSelfAssessment('learnt')" id="smile-happy" class="p-1 rounded-lg hover:bg-emerald-50 border border-transparent transition" title="Lært / Kan godt">
+                                    <span class="text-xl">😊</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Core Question Engine -->
-                    <div class="flex flex-col items-center justify-center flex-grow text-center py-4">
+                    <!-- Visuel Spørgsmåls-Visning -->
+                    <div class="flex flex-col items-center justify-center flex-grow text-center py-6">
                         
-                        <!-- Toggle visible text trigger -->
-                        <div class="mb-5">
-                            <button onclick="toggleTextVisibility()" id="btn-toggle-text" class="text-xs font-semibold px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200/60 rounded-full transition flex items-center gap-2 mx-auto">
-                                <i class="fa-solid fa-eye-slash text-slate-400" id="toggle-text-icon"></i>
-                                <span id="toggle-text-lbl">Skjul teksten (øv dig i kun at lytte)</span>
+                        <!-- Knap til at skjule eller vise tekst for at udfordre sig selv -->
+                        <div class="mb-6">
+                            <button onclick="toggleTextVisibility()" id="btn-toggle-text" class="text-xs font-semibold px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-full transition flex items-center gap-2 mx-auto">
+                                <i class="fa-solid fa-eye-slash text-slate-500" id="toggle-text-icon"></i>
+                                <span id="toggle-text-lbl">Skjul spørgsmål (så en ven eller lærer kan læse det højt for dig)</span>
                             </button>
                         </div>
 
-                        <!-- Question Display Area -->
-                        <div class="min-h-[70px] flex items-center justify-center px-4 w-full">
-                            <h2 id="current-question-text" class="text-xl sm:text-2xl font-bold text-slate-800 leading-snug title-font">
+                        <!-- Selve Spørgsmålsteksten -->
+                        <div class="min-h-[110px] flex flex-col items-center justify-center px-4 w-full">
+                            <span class="text-xs text-indigo-400 font-bold uppercase tracking-wider mb-2 title-font">Læs spørgsmålet og svar højt:</span>
+                            <h2 id="current-question-text" class="text-2xl sm:text-3xl font-bold text-indigo-950 leading-snug title-font">
                                 Hvad laver du på dit arbejde?
                             </h2>
                         </div>
 
-                        <!-- Audio Triggers using Premium Google TTS Engine -->
-                        <div class="mt-6 flex flex-wrap justify-center gap-3">
-                            <button onclick="playQuestionSpeech('normal')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transition duration-150 flex items-center gap-2 text-sm">
-                                <i class="fa-solid fa-volume-high"></i>
-                                Læs op (Normal)
-                            </button>
-                            <button onclick="playQuestionSpeech('slow')" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transition duration-150 flex items-center gap-2 text-sm">
-                                <i class="fa-solid fa-person-walking"></i>
-                                Læs op (Langsomt)
-                            </button>
-                        </div>
-
-                        <div class="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
-                            <i class="fa-solid fa-sparkles text-amber-500 animate-pulse"></i>
-                            <span>Premium klar menneskestemme aktiveret</span>
+                        <!-- Lille instruktionsnote -->
+                        <div class="mt-4 text-xs text-slate-400 max-w-sm flex items-center gap-1.5 justify-center">
+                            <i class="fa-solid fa-microphone text-slate-300"></i>
+                            <span>Sig svaret højt ud i rummet på fuldstændig dansk!</span>
                         </div>
 
                     </div>
 
-                    <!-- CLIENT-SIDE WRITING PAD & EXAMPLES (No backend required) -->
+                    <!-- SKRIVEØVELSE OG MODEL-SVAR -->
                     <div class="mt-4 border-t border-slate-100 pt-4">
-                        <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-100">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
                             <div class="flex justify-between items-center mb-2">
                                 <label for="student-answer-input" class="text-xs font-bold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
-                                    <i class="fa-solid fa-keyboard text-emerald-600"></i> Skriv dit svar her for at øve dig:
+                                    <i class="fa-solid fa-pen text-indigo-600"></i> Skriv dit svar her, hvis du vil øve stavning (valgfrit):
                                 </label>
                                 <button onclick="clearCurrentInput()" class="text-[11px] text-slate-400 hover:text-rose-500 font-medium">Ryd felt</button>
                             </div>
-                            <textarea id="student-answer-input" rows="2" oninput="saveCurrentWrittenAnswer()" placeholder="F.eks.: Jeg arbejder i et supermarked..." class="w-full p-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all resize-none"></textarea>
+                            <textarea id="student-answer-input" rows="2" oninput="saveCurrentWrittenAnswer()" placeholder="F.eks.: Jeg gør rent i en børnehave..." class="w-full p-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all resize-none"></textarea>
                         </div>
 
-                        <!-- Accordion for model answers -->
+                        <!-- Accordion til model-svar -->
                         <div class="mt-3">
-                            <button onclick="toggleExampleAnswer()" class="w-full py-2 px-3 bg-amber-50/60 hover:bg-amber-50 text-amber-800 border border-amber-100/60 font-medium rounded-xl text-xs sm:text-sm flex items-center justify-between transition">
+                            <button onclick="toggleExampleAnswer()" class="w-full py-2.5 px-3 bg-amber-50 hover:bg-amber-100/80 text-amber-900 border border-amber-200/50 font-semibold rounded-xl text-xs sm:text-sm flex items-center justify-between transition">
                                 <span class="flex items-center gap-2">
-                                    <span class="text-base">💡</span> Se et eksempel på et rigtigt svar
+                                    <span class="text-base">💡</span> Se et eksempel på et godt og rigtigt svar
                                 </span>
-                                <i class="fa-solid fa-chevron-down transition-transform duration-200 text-amber-500" id="example-chevron"></i>
+                                <i class="fa-solid fa-chevron-down transition-transform duration-200 text-amber-600" id="example-chevron"></i>
                             </button>
                             
                             <div id="example-answer-container" class="hidden mt-2 p-4 bg-amber-50/30 rounded-xl border border-amber-100/50 text-slate-700 text-sm">
-                                <!-- Populated dynamically by JS -->
+                                <!-- Indsættes dynamisk af JS -->
                             </div>
                         </div>
                     </div>
 
-                    <!-- CARD FOOTER NAVIGATION -->
+                    <!-- BUND-NAVIGATION PÅ AKTIVT SPØRGSMÅLSKORT -->
                     <div class="flex items-center justify-between mt-5 border-t border-slate-100 pt-4">
-                        <button onclick="prevQuestion()" class="flex items-center gap-1 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 transition py-1.5 px-3 hover:bg-slate-100 rounded-lg">
+                        <button onclick="prevQuestion()" class="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 transition py-1.5 px-3 hover:bg-slate-100 rounded-lg">
                             <i class="fa-solid fa-arrow-left"></i> Forrige
                         </button>
                         <span class="text-xs font-bold text-slate-400" id="question-index-indicator">Spørgsmål 1 / 21</span>
-                        <button onclick="nextQuestion()" class="flex items-center gap-1 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 transition py-1.5 px-3 hover:bg-slate-100 rounded-lg">
+                        <button onclick="nextQuestion()" class="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 transition py-1.5 px-3 hover:bg-slate-100 rounded-lg">
                             Næste <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
 
                 </div>
 
-                <!-- EXAM SIMULATOR PANEL -->
+                <!-- VISUEL HURTIG-SVAR SIMULATOR -->
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
                     <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                        <i class="fa-solid fa-user-tie text-8xl"></i>
+                        <i class="fa-solid fa-clock text-8xl"></i>
                     </div>
 
+                    <!-- Intro-visning for simulatoren -->
                     <div id="sim-intro-view" class="space-y-3">
                         <div class="flex items-center gap-2">
-                            <span class="bg-amber-500 text-slate-900 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded">Prøvesimulator</span>
-                            <h4 class="font-bold title-font text-base sm:text-lg text-amber-300">Test dig selv! (Modultest Simulation)</h4>
+                            <span class="bg-amber-500 text-slate-900 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded">Selvtest</span>
+                            <h4 class="font-bold title-font text-base sm:text-lg text-amber-300">Test din reaktion! (Simuleret test)</h4>
                         </div>
                         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                            Simulatoren stiller dig 5 tilfældige spørgsmål efter hinanden. Den læser spørgsmålene højt uden at vise teksten på skærmen. Du har 15 sekunder til at svare højt på hver enkelt.
+                            Simulatoren viser dig 5 tilfældige spørgsmål efter hinanden. Du har kun 15 sekunder til at nå at læse spørgsmålet og svare højt og hurtigt ud i luften på dansk, før tiden løber ud!
                         </p>
                         <button onclick="startExamSimulation()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-5 rounded-xl text-xs sm:text-sm shadow-md transition transform active:scale-95 flex items-center gap-2">
-                            <i class="fa-solid fa-play"></i> Start prøven nu
+                            <i class="fa-solid fa-play"></i> Start selvtest nu
                         </button>
                     </div>
 
-                    <!-- Active Simulator View (hidden initially) -->
+                    <!-- Aktiv Simulator-visning (Skjult som standard) -->
                     <div id="sim-active-view" class="hidden space-y-4">
                         <div class="flex justify-between items-center border-b border-white/10 pb-2">
                             <span class="text-xs font-bold uppercase tracking-widest text-amber-400 title-font" id="sim-progress-lbl">Spørgsmål 1 af 5</span>
                             <button onclick="stopExamSimulation()" class="text-xs text-rose-400 hover:text-rose-300 font-medium">Afbryd test</button>
                         </div>
 
-                        <div class="py-2 text-center">
-                            <div class="text-xs text-slate-400 mb-1">Censor spørger... lyt godt efter!</div>
-                            <!-- Live visual wave -->
-                            <div class="flex items-center justify-center gap-1.5 h-10" id="sim-pulse-wave">
-                                <span class="w-1 bg-amber-400 h-2 rounded animate-pulse"></span>
-                                <span class="w-1 bg-amber-400 h-4 rounded animate-pulse" style="animation-delay: 0.1s"></span>
-                                <span class="w-1 bg-amber-400 h-6 rounded animate-pulse" style="animation-delay: 0.2s"></span>
-                                <span class="w-1 bg-amber-400 h-3 rounded animate-pulse" style="animation-delay: 0.3s"></span>
-                                <span class="w-1 bg-amber-400 h-1 rounded animate-pulse"></span>
-                            </div>
+                        <div class="py-4 text-center">
+                            <div class="text-xs text-slate-400 mb-2">Læs hurtigt og svar højt nu!</div>
                             
-                            <!-- Hidden question text option for emergency -->
-                            <div class="mt-2 min-h-[50px] flex items-center justify-center px-4">
-                                <p id="sim-spoken-question" class="text-sm italic text-slate-400">Svar højt på dansk nu!</p>
+                            <!-- Spørgsmåls-container til simulatoren -->
+                            <div class="min-h-[70px] flex items-center justify-center px-4 bg-white/5 rounded-xl border border-white/10 p-4">
+                                <p id="sim-spoken-question" class="text-lg sm:text-xl font-bold text-white"></p>
                             </div>
                         </div>
 
-                        <!-- Progress Bar and Timer -->
+                        <!-- Countdown-timerbjælke -->
                         <div class="space-y-1.5">
                             <div class="flex justify-between text-[11px] text-slate-400">
-                                <span>Tid tilbage til at svare:</span>
+                                <span>Svartid tilbage:</span>
                                 <span class="font-bold text-amber-400" id="sim-timer-text">15s</span>
                             </div>
                             <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
@@ -248,25 +233,24 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-2 pt-2">
-                            <button id="sim-reveal-btn" onclick="revealSimQuestionText()" class="px-3 py-1 bg-white/10 hover:bg-white/15 text-[11px] font-semibold rounded text-slate-300 transition">
-                                Vis spørgsmålet (tekst)
-                            </button>
-                            <button id="sim-next-btn" onclick="nextSimQuestion()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold rounded text-white shadow transition flex items-center gap-1">
+                        <!-- Simulator Bund-styring -->
+                        <div class="flex justify-between items-center pt-2">
+                            <div id="sim-feedback-tip" class="text-xs text-slate-400 italic"></div>
+                            <button id="sim-next-btn" onclick="nextSimQuestion()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-xs font-bold rounded-lg text-white shadow transition flex items-center gap-1.5">
                                 Næste spørgsmål <i class="fa-solid fa-forward"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Simulator Finished View (hidden initially) -->
+                    <!-- Simulator Afsluttet Visning (Skjult som standard) -->
                     <div id="sim-finished-view" class="hidden space-y-3 text-center py-4">
                         <span class="text-4xl">🎉</span>
-                        <h4 class="font-bold text-lg text-emerald-400 title-font">Godt klaret!</h4>
+                        <h4 class="font-bold text-lg text-emerald-400 title-font">Super flot klaret!</h4>
                         <p class="text-xs text-slate-300 max-w-md mx-auto">
-                            Du har gennemført en simuleret mundtlig prøve. Husk at øve dig regelmæssigt i at udtale svarene hurtigt og tydeligt.
+                            Du svarede på alle 5 spørgsmål indenfor tiden. At øve sig i at udtale svaret hurtigt og flydende er fantastisk træning til din mundtlige modultest.
                         </p>
                         <button onclick="stopExamSimulation()" class="mt-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-5 rounded-xl text-xs transition">
-                            Gå tilbage til træning
+                            Gå tilbage til oversigten
                         </button>
                     </div>
 
@@ -276,94 +260,91 @@
 
         </div>
 
-        <!-- TIPS FOR DU1 STUDENTS -->
+        <!-- GENERELLE GODE RÅD TIL PRØVEN -->
         <div class="mt-8 bg-amber-50/50 rounded-2xl p-5 border border-amber-100/60 flex flex-col sm:flex-row gap-4 items-start">
             <div class="text-3xl p-2 bg-white rounded-xl shadow-sm border border-amber-100 flex-shrink-0">💡</div>
             <div>
                 <h4 class="font-bold text-slate-800 text-sm sm:text-base title-font">Vigtige råd til den mundtlige modultest:</h4>
                 <ul class="list-disc list-inside text-xs sm:text-sm text-slate-600 mt-2 space-y-1.5 leading-relaxed">
-                    <li><strong>Svar altid med en hel sætning:</strong> Siger censor f.eks. <em>"Hvor bor du?"</em>, så svar <strong>"Jeg bor i Roskilde"</strong>, og ikke kun <em>"Roskilde"</em>.</li>
-                    <li><strong>Prøv uden tekst:</strong> Klik på "Skjul teksten" knappen. Til prøven har du ingen tekst – der skal du kunne forstå censor udelukkende ved at lytte.</li>
-                    <li><strong>Dine data er sikre:</strong> Alt du skriver og markerer i dette program gemmes kun på din egen computer i browseren (ingen ekstern database).</li>
+                    <li><strong>Svar altid med en hel sætning:</strong> Siger censor eller læreren f.eks. <em>"Hvor bor du?"</em>, så svar <strong>"Jeg bor i Roskilde"</strong>, og ikke kun <em>"Roskilde"</em>.</li>
+                    <li><strong>Brug makker-træning:</strong> Sæt dig sammen med en klassekammerat. Tryk på <em>"Skjul spørgsmål"</em>, lad din kammerat læse spørgsmålet højt for dig, og svar ham/hende på dansk uden at smugkigge på skærmen!</li>
+                    <li><strong>Dine fremskridt gemmes lokalt:</strong> Alt hvad du markerer som "lært" eller skriver i felterne, gemmes sikkert på din egen computer. Ingen data sendes ud af huset.</li>
                 </ul>
             </div>
         </div>
 
     </main>
 
-    <!-- FOOTER -->
+    <!-- FODNOTE / SYSTEM-INFO -->
     <footer class="bg-white border-t border-slate-100 py-5 text-center text-xs text-slate-400 mt-12">
-        <p>Lavet til modultesttræning - Danskuddannelse 1, Modul 3.</p>
-        <p class="mt-1">Static web-app: Kræver ingen backend eller konto.</p>
+        <p>Visuelt Træningsværktøj - Danskuddannelse 1, Modul 3.</p>
+        <p class="mt-1">Static Web-App: Ingen backend, lyd, eller mikrofon-rettigheder påkrævet.</p>
     </footer>
 
-    <!-- BUSINESS LOGIC & COMPREHENSIVE QUESTION DATABASE -->
+    <!-- COMPREHENSIVE QUESTION DATABASE & CONTROLLER LOGIC -->
     <script>
-        // Exact 100% complete DB with all user-supplied questions
+        // Fuldstændig og uændret database over alle brugerens DU1 Modul 3 spørgsmål
         const questionsDB = {
             arbejde: [
                 { id: "a1", question: "Hvad laver du på dit arbejde?", examples: "Jeg gør rent på en skole. Jeg fejer gulvet og tørrer støv af.", rating: "unrated" },
                 { id: "a2", question: "Hvad arbejder du med?", examples: "Jeg arbejder med rengøring på et kontor.", rating: "unrated" },
-                { id: "a3", question: "Hvad er dit arbejde?", examples: "Jeg er rengøringsassistent.", rating: "unrated" },
-                { id: "a4", question: "Hvad arbejder du som?", examples: "Jeg arbejder som køkkenmedhjælper på en café.", rating: "unrated" },
+                { id: "a3", question: "Hvad er dit arbejde?", examples: "Jeg er rengøringsassistent på en skole.", rating: "unrated" },
+                { id: "a4", question: "Hvad arbejder du som?", examples: "Jeg arbejder som køkkenmedhjælper på en hyggelig café.", rating: "unrated" },
                 { id: "a5", question: "Hvor arbejder du?", examples: "Jeg arbejder i Netto i Roskilde.", rating: "unrated" },
                 { id: "a6", question: "Hvad hedder din arbejdsplads?", examples: "Min arbejdsplads hedder ISS Rengøring.", rating: "unrated" },
                 { id: "a7", question: "Hvornår arbejder du?", examples: "Jeg arbejder om morgenen fra mandag til fredag.", rating: "unrated" },
                 { id: "a8", question: "Hvilke dage arbejder du?", examples: "Jeg arbejder hver mandag, onsdag og fredag.", rating: "unrated" },
                 { id: "a9", question: "Hvor lang tid er du på arbejde?", examples: "Jeg er på arbejde i 4 timer hver dag.", rating: "unrated" },
                 { id: "a10", question: "Hvad tid arbejder du?", examples: "Jeg arbejder fra klokken 8.00 til klokken 12.00.", rating: "unrated" },
-                { id: "a11", question: "Hvor mange kollegaer har du?", examples: "Jeg har 3 kollegaer på min afdeling.", rating: "unrated" },
+                { id: "a11", question: "Hvor mange kollegaer har du?", examples: "Jeg har 3 gode kollegaer på min afdeling.", rating: "unrated" },
                 { id: "a12", question: "Hvor kommer dine kollegaer fra?", examples: "Mine kollegaer kommer fra Syrien, Ukraine og Danmark.", rating: "unrated" },
                 { id: "a13", question: "Hvordan er din chef?", examples: "Min chef er meget sød, glad og hjælpsom.", rating: "unrated" },
                 { id: "a14", question: "Hvad hedder din chef?", examples: "Min chef hedder Thomas.", rating: "unrated" },
-                { id: "a15", question: "Har du pauser?", examples: "Ja, jeg har en lille pause hver dag.", rating: "unrated" },
-                { id: "a16", question: "Hvor mange pauser har du?", examples: "Jeg har 1 pause på en arbejdsdag.", rating: "unrated" },
+                { id: "a15", question: "Har du pauser?", examples: "Ja, jeg har en lille pause hver dag på min arbejdsplads.", rating: "unrated" },
+                { id: "a16", question: "Hvor mange pauser har du?", examples: "Jeg har 1 god pause i løbet af min arbejdsdag.", rating: "unrated" },
                 { id: "a17", question: "Hvor lang tid har du pause?", examples: "Jeg har pause i 30 minutter.", rating: "unrated" },
                 { id: "a18", question: "Hvornår har du pause?", examples: "Jeg har pause klokken 12.00 midt på dagen.", rating: "unrated" },
                 { id: "a19", question: "Hvad laver du i din pause?", examples: "Jeg drikker kaffe, spiser min madpakke og taler med mine kollegaer.", rating: "unrated" },
                 { id: "a20", question: "Hvordan kommer du på arbejde?", examples: "Jeg cykler på arbejde, eller jeg tager bussen.", rating: "unrated" },
-                { id: "a21", question: "Hvor lang tid tager det?", examples: "Det tager 15 minutter at cykle på arbejde.", rating: "unrated" }
+                { id: "a21", question: "Hvor lang tid tager det?", examples: "Det tager cirka 15 minutter at cykle på arbejde.", rating: "unrated" }
             ],
             bolig: [
                 { id: "b1", question: "Hvor bor du?", examples: "Jeg bor i en lejlighed i Hillerød.", rating: "unrated" },
                 { id: "b2", question: "Hvilken by bor du i?", examples: "Jeg bor i Roskilde.", rating: "unrated" },
                 { id: "b3", question: "Hvad er din adresse?", examples: "Min adresse er Storgade nummer 4, 2. sal.", rating: "unrated" },
-                { id: "b4", question: "Hvordan bor du?", examples: "Jeg bor i en lejlighed i et gult højhus.", rating: "unrated" },
+                { id: "b4", question: "Hvordan bor du?", examples: "Jeg bor i en stor lejlighed i et gult højhus.", rating: "unrated" },
                 { id: "b5", question: "Hvilken etage/sal bor du på?", examples: "Jeg bor på første sal til venstre.", rating: "unrated" },
                 { id: "b6", question: "Hvor mange værelser er der i din bolig?", examples: "Der er 3 værelser i min bolig: en stue og to soveværelser.", rating: "unrated" },
-                { id: "b7", question: "Hvor mange kvadratmeter er din bolig?", examples: "Min bolig er 75 kvadratmeter.", rating: "unrated" },
+                { id: "b7", question: "Hvor mange kvadratmeter er din bolig?", examples: "Min bolig er 75 kvadratmeter stor.", rating: "unrated" },
                 { id: "b8", question: "Bor du alene?", examples: "Nej, jeg bor ikke alene. Jeg bor sammen med min familie.", rating: "unrated" },
                 { id: "b9", question: "Bor du sammen med nogen?", examples: "Ja, jeg bor sammen med min kone og vores to børn.", rating: "unrated" },
                 { id: "b10", question: "Hvem bor du sammen med?", examples: "Jeg bor sammen med min mand og min datter.", rating: "unrated" },
-                { id: "b11", question: "Har du naboer?", examples: "Ja, jeg har many naboer i min opgang.", rating: "unrated" },
+                { id: "b11", question: "Har du naboer?", examples: "Ja, jeg har mange naboer i min opgang.", rating: "unrated" },
                 { id: "b12", question: "Hvor mange naboer har du?", examples: "Jeg har fire naboer på min etage.", rating: "unrated" },
                 { id: "b13", question: "Hvordan er dine naboer?", examples: "Mine naboer er meget søde, venlige og stille.", rating: "unrated" },
-                { id: "b14", question: "Hvordan er dit område?", examples: "Mit område er roligt og har meget natur og grønne træer.", rating: "unrated" },
-                { id: "b15", question: "Hvad er der i dit område?", examples: "Der er en legeplads, en lille park og et supermarked.", rating: "unrated" }
+                { id: "b14", question: "Hvordan er dit område?", examples: "Mit område er roligt og har meget smuk natur og grønne træer.", rating: "unrated" },
+                { id: "b15", question: "Hvad er der i dit område?", examples: "Der er en god legeplads, en lille park og et supermarked.", rating: "unrated" }
             ]
         };
 
-        // Application State
+        // Applikations-status (State)
         let currentTheme = 'arbejde';
         let currentIndex = 0;
         let isTextHidden = false;
 
-        // Written Answers cache
+        // Skriftlige svar (Cache)
         let writtenAnswers = {};
 
-        // Simulation State
+        // Simulator-status
         let isSimulating = false;
         let simQuestions = [];
         let simCurrentIndex = 0;
         let simTimer = null;
         let simSecondsLeft = 15;
 
-        // Audio Object holder to stop ongoing playback immediately
-        let activeAudio = null;
-
-        // Load visual progress states
+        // Hent gemte fremskridt og ratings
         function loadProgress() {
-            const savedRatings = localStorage.getItem('du1_modultest_ratings_v2');
+            const savedRatings = localStorage.getItem('du1_modultest_ratings_v4_visualOnly');
             if (savedRatings) {
                 try {
                     const ratings = JSON.parse(savedRatings);
@@ -377,12 +358,12 @@
                         }
                     });
                 } catch(e) {
-                    console.error("Fejl ved indlæsning af ratings", e);
+                    console.error("Fejl ved indlæsning af karakterer/ratings", e);
                 }
             }
 
-            // Load saved written answers too
-            const savedWritten = localStorage.getItem('du1_modultest_written_v2');
+            // Hent gemte tekstuelle svar
+            const savedWritten = localStorage.getItem('du1_modultest_written_v4_visualOnly');
             if (savedWritten) {
                 try {
                     writtenAnswers = JSON.parse(savedWritten);
@@ -392,7 +373,7 @@
             }
         }
 
-        // Save progress helper
+        // Gem status i browseren
         function saveProgress() {
             const ratings = {};
             Object.keys(questionsDB).forEach(theme => {
@@ -401,11 +382,28 @@
                     ratings[theme][q.id] = q.rating;
                 });
             });
-            localStorage.setItem('du1_modultest_ratings_v2', JSON.stringify(ratings));
+            localStorage.setItem('du1_modultest_ratings_v4_visualOnly', JSON.stringify(ratings));
             updateProgressCounters();
         }
 
-        // Render Sidebar List
+        // Vis eller skjul teksten til lytteøvelse / flashcard-træning
+        function toggleTextVisibility() {
+            isTextHidden = !isTextHidden;
+            const btnText = document.getElementById('toggle-text-lbl');
+            const btnIcon = document.getElementById('toggle-text-icon');
+
+            if (isTextHidden) {
+                btnText.textContent = "Vis spørgsmålet igen";
+                btnIcon.className = "fa-solid fa-eye text-indigo-600";
+            } else {
+                btnText.textContent = "Skjul spørgsmål (så en ven eller lærer kan læse det højt for dig)";
+                btnIcon.className = "fa-solid fa-eye-slash text-slate-500";
+            }
+
+            updateActiveQuestion();
+        }
+
+        // Tegn spørgsmålslisten i venstre side (Sidebar)
         function renderQuestionsList() {
             const container = document.getElementById('questions-list');
             container.innerHTML = '';
@@ -417,13 +415,13 @@
                 const btn = document.createElement('button');
                 btn.className = `w-full text-left p-3 rounded-xl border text-sm flex items-center justify-between transition-all ${
                     index === currentIndex 
-                    ? 'border-emerald-600 bg-emerald-50/50 font-semibold text-emerald-900 shadow-sm' 
+                    ? 'border-indigo-600 bg-indigo-50/50 font-semibold text-indigo-950 shadow-sm' 
                     : 'border-slate-100 bg-white hover:bg-slate-50 text-slate-600'
                 }`;
 
                 btn.onclick = () => { selectQuestion(index); };
 
-                // Choose list indicators based on rating
+                // Visuel statusindikator ud fra brugernes selvvurdering
                 let statusIcon = '<i class="fa-regular fa-circle text-slate-200"></i>';
                 if (q.rating === 'learnt') {
                     statusIcon = '<i class="fa-solid fa-circle-check text-emerald-500 text-lg"></i>';
@@ -441,7 +439,7 @@
             });
         }
 
-        // Update Progress Pills
+        // Opdater de små statustællere
         function updateProgressCounters() {
             const totalArbejde = questionsDB.arbejde.length;
             const totalBolig = questionsDB.bolig.length;
@@ -457,7 +455,7 @@
             document.getElementById('global-progress').textContent = `Status: ${totalLearnt} / ${grandTotal} spørgsmål lært`;
         }
 
-        // Handle category switching
+        // Skift tema/kategori (Arbejde <-> Bolig)
         function switchTheme(theme) {
             currentTheme = theme;
             currentIndex = 0;
@@ -466,53 +464,50 @@
             const btnBolig = document.getElementById('btn-theme-bolig');
 
             if (theme === 'arbejde') {
-                btnArbejde.className = "flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-emerald-600 bg-emerald-50 text-emerald-800 transition duration-150 shadow-sm";
-                btnBolig.className = "flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-slate-200 bg-white text-slate-600 hover:border-teal-200 hover:bg-slate-50 transition duration-150";
+                btnArbejde.className = "flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-indigo-600 bg-indigo-50 text-indigo-800 transition duration-150 shadow-sm";
+                btnBolig.className = "flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:bg-slate-50 transition duration-150";
                 document.getElementById('current-badge').textContent = "Arbejde 💼";
-                document.getElementById('current-badge').className = "text-xs font-extrabold text-emerald-700 uppercase tracking-wider bg-emerald-50 px-3 py-1 rounded-full title-font";
+                document.getElementById('current-badge').className = "text-xs font-extrabold text-indigo-700 uppercase tracking-wider bg-indigo-50 px-3 py-1 rounded-full title-font w-fit";
             } else {
-                btnArbejde.className = "flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-slate-200 bg-white text-slate-600 hover:border-emerald-200 hover:bg-slate-50 transition duration-150";
-                btnBolig.className = "flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-teal-600 bg-teal-50 text-teal-800 transition duration-150 shadow-sm";
+                btnArbejde.className = "flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:bg-slate-50 transition duration-150";
+                btnBolig.className = "flex-1 flex items-center justify-between p-4 rounded-2xl border-2 border-indigo-600 bg-indigo-50 text-indigo-800 transition duration-150 shadow-sm";
                 document.getElementById('current-badge').textContent = "Bolig 🏠";
-                document.getElementById('current-badge').className = "text-xs font-extrabold text-teal-700 uppercase tracking-wider bg-teal-50 px-3 py-1 rounded-full title-font";
+                document.getElementById('current-badge').className = "text-xs font-extrabold text-indigo-700 uppercase tracking-wider bg-indigo-50 px-3 py-1 rounded-full title-font w-fit";
             }
 
             updateActiveQuestion();
             renderQuestionsList();
         }
 
-        // Select Question from List
+        // Vælg et specifikt spørgsmål i listen
         function selectQuestion(index) {
             currentIndex = index;
             updateActiveQuestion();
             renderQuestionsList();
         }
 
-        // Update Workspace state
+        // Opdater hele arbejdsområdet til det nye valgte spørgsmål
         function updateActiveQuestion() {
             const list = questionsDB[currentTheme];
             const q = list[currentIndex];
 
-            // Stop any ongoing speech
-            stopAllSpeech();
-
-            // Render current question text inside element
+            // Opdater spørgsmålstekst og tag højde for "skjult"-status
             const questionTextEl = document.getElementById('current-question-text');
             if (isTextHidden) {
-                questionTextEl.innerHTML = `<span class="text-slate-400 italic text-base sm:text-lg font-normal"><i class="fa-solid fa-microphone-lines animate-pulse mr-2 text-emerald-500"></i>Teksten er skjult for lytteforståelse. Tryk "Læs op"!</span>`;
+                questionTextEl.innerHTML = `<span class="text-slate-400 italic text-base sm:text-lg font-normal"><i class="fa-solid fa-microphone-lines mr-2 text-indigo-500"></i>Spørgsmålet er skjult! Få din makker/underviser til at læse det højt for dig.</span>`;
             } else {
                 questionTextEl.textContent = q.question;
             }
 
-            // Set indicators
+            // Opdater sideindikator
             document.getElementById('question-index-indicator').textContent = `Spørgsmål ${currentIndex + 1} / ${list.length}`;
 
-            // Load saved text input
+            // Hent eventuelt gemt skriftligt øve-svar ind i tekstfeltet
             const inputEl = document.getElementById('student-answer-input');
             const savedKey = `${currentTheme}_${q.id}`;
             inputEl.value = writtenAnswers[savedKey] || '';
 
-            // Handle smiley highlight classes based on current rating
+            // Nulstil humørikonernes markeringer, og marker derefter den valgte rating
             resetSmileyHighlights();
             if (q.rating === 'learnt') {
                 document.getElementById('smile-happy').className = "p-1 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-xl transform scale-110 shadow-sm transition";
@@ -522,63 +517,52 @@
                 document.getElementById('smile-sad').className = "p-1 rounded-lg border-2 border-rose-500 bg-rose-50 text-xl transform scale-110 shadow-sm transition";
             }
 
-            // Prepare Example Answer container
+            // Forbered eksempel/model-svaret
             const exampleContainer = document.getElementById('example-answer-container');
             exampleContainer.innerHTML = `
-                <div class="mb-2 font-semibold text-amber-950">Vejledende modelsvar:</div>
-                <div class="text-slate-800 font-medium italic mb-3">"${q.examples}"</div>
-                <button onclick="playExampleSpeech()" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold py-1.5 px-3 rounded-lg flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-volume-high"></i> Hør eksempelsvar (langsomt)
-                </button>
+                <div class="mb-2 font-bold text-amber-950 flex items-center gap-1.5 text-xs sm:text-sm">
+                    <i class="fa-regular fa-star text-amber-600"></i> Vejledende modelsvar (fuld sætning):
+                </div>
+                <div class="text-slate-800 font-semibold italic text-sm sm:text-base border-l-4 border-amber-400 pl-3 py-1.5 my-2 bg-amber-50/50 rounded-r-lg">
+                    "${q.examples}"
+                </div>
+                <div class="text-[11px] text-amber-800 mt-2 flex items-center gap-1">
+                    <i class="fa-solid fa-info-circle"></i>
+                    <span>Husk at ændre oplysningerne, så de passer til dig selv!</span>
+                </div>
             `;
 
             hideExampleAnswerDirect();
         }
 
-        // Reset Smiley Button Styles
+        // Nulstil rammerne omkring humørikonerne
         function resetSmileyHighlights() {
-            document.getElementById('smile-sad').className = "p-1 rounded-lg border border-slate-100 hover:bg-rose-50 hover:border-rose-300 transition text-xl";
-            document.getElementById('smile-neutral').className = "p-1 rounded-lg border border-slate-100 hover:bg-amber-50 hover:border-amber-300 transition text-xl";
-            document.getElementById('smile-happy').className = "p-1 rounded-lg border border-slate-100 hover:bg-emerald-50 hover:border-emerald-300 transition text-xl";
+            document.getElementById('smile-sad').className = "p-1 rounded-lg border border-transparent hover:bg-rose-50 transition text-xl";
+            document.getElementById('smile-neutral').className = "p-1 rounded-lg border border-transparent hover:bg-amber-50 transition text-xl";
+            document.getElementById('smile-happy').className = "p-1 rounded-lg border border-transparent hover:bg-emerald-50 transition text-xl";
         }
 
-        // Save typed response locally
+        // Gemmer løbende hvad eleven taster ind i skrivefeltet
         function saveCurrentWrittenAnswer() {
             const list = questionsDB[currentTheme];
             const q = list[currentIndex];
             const inputVal = document.getElementById('student-answer-input').value;
             const savedKey = `${currentTheme}_${q.id}`;
             writtenAnswers[savedKey] = inputVal;
-            localStorage.setItem('du1_modultest_written_v2', JSON.stringify(writtenAnswers));
+            localStorage.setItem('du1_modultest_written_v4_visualOnly', JSON.stringify(writtenAnswers));
         }
 
+        // Rydder tekstfeltet
         function clearCurrentInput() {
             const list = questionsDB[currentTheme];
             const q = list[currentIndex];
             const savedKey = `${currentTheme}_${q.id}`;
             document.getElementById('student-answer-input').value = '';
             delete writtenAnswers[savedKey];
-            localStorage.setItem('du1_modultest_written_v2', JSON.stringify(writtenAnswers));
+            localStorage.setItem('du1_modultest_written_v4_visualOnly', JSON.stringify(writtenAnswers));
         }
 
-        // Toggle text hiding
-        function toggleTextVisibility() {
-            isTextHidden = !isTextHidden;
-            const btnText = document.getElementById('toggle-text-lbl');
-            const btnIcon = document.getElementById('toggle-text-icon');
-
-            if (isTextHidden) {
-                btnText.textContent = "Vis teksten";
-                btnIcon.className = "fa-solid fa-eye text-emerald-600";
-            } else {
-                btnText.textContent = "Skjul teksten (øv dig i kun at lytte)";
-                btnIcon.className = "fa-solid fa-eye-slash text-slate-400";
-            }
-
-            updateActiveQuestion();
-        }
-
-        // Example Answers Accordion Toggle
+        // Fold model-svar ind og ud (Accordion)
         function toggleExampleAnswer() {
             const container = document.getElementById('example-answer-container');
             const chevron = document.getElementById('example-chevron');
@@ -600,11 +584,11 @@
             chevron.classList.remove('rotate-180');
         }
 
-        // Set Smiley Status (Difficult, Normal, Learnt)
+        // Sæt selvvurdering (Karakter) for et spørgsmål
         function setSelfAssessment(status) {
             const q = questionsDB[currentTheme][currentIndex];
             if (q.rating === status) {
-                q.rating = 'unrated'; // toggle off
+                q.rating = 'unrated'; // Slå fra hvis man trykker igen
             } else {
                 q.rating = status;
             }
@@ -613,13 +597,13 @@
             renderQuestionsList();
         }
 
-        // Basic Slideshow Navigation
+        // Forrige og Næste knapperne
         function nextQuestion() {
             const list = questionsDB[currentTheme];
             if (currentIndex < list.length - 1) {
                 currentIndex++;
             } else {
-                currentIndex = 0; // wrap around
+                currentIndex = 0; // Gå tilbage til start
             }
             updateActiveQuestion();
             renderQuestionsList();
@@ -636,112 +620,16 @@
             renderQuestionsList();
         }
 
-        /**
-         * Ultra-reliable Premium Speech Controller.
-         * Streams directly from Google TTS for clear, natural human pronounciation in Danish.
-         * Seamless slowdown functionality through native hardware playback acceleration.
-         */
-        function playSpeech(text, speed) {
-            // First cancel any existing audio or speech synthesis
-            stopAllSpeech();
-
-            // Construct the high-fidelity Google Translate TTS audio request URL
-            const url = "https://translate.google.com/translate_tts?ie=UTF-8&tl=da&client=tw-ob&q=" + encodeURIComponent(text);
-            const audio = new Audio(url);
-            
-            // Adjust the hardware-playback rate. 
-            // Normal: 0.90 (slightly comfortable for DU1), Slow: 0.65 (extremely crystal clear, smooth and non-robotic)
-            const targetRate = speed === 'slow' ? 0.65 : 0.90;
-            
-            // We set default and playback rates
-            audio.defaultPlaybackRate = targetRate;
-            audio.playbackRate = targetRate;
-
-            // Some mobile browsers reset playbackRate upon playing, so we re-assert it on canplay and play events
-            audio.addEventListener('play', () => {
-                audio.playbackRate = targetRate;
-            });
-            audio.addEventListener('canplay', () => {
-                audio.playbackRate = targetRate;
-            });
-
-            let played = false;
-            
-            audio.play()
-                .then(() => {
-                    played = true;
-                })
-                .catch(err => {
-                    console.warn("Google TTS stream blocked or failed, falling back to local SpeechSynthesis:", err);
-                    fallbackLocalSpeech(text, speed);
-                });
-
-            // If the audio hangs on load/network block for more than 1.5s, fall back silently
-            setTimeout(() => {
-                if (!played && !audio.paused && audio.readyState < 2) {
-                    audio.pause();
-                    fallbackLocalSpeech(text, speed);
-                }
-            }, 1500);
-
-            activeAudio = audio;
-        }
-
-        // Stop all sounds cleanly
-        function stopAllSpeech() {
-            if (activeAudio) {
-                activeAudio.pause();
-                activeAudio = null;
-            }
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-            }
-        }
-
-        // Fallback safety layer: Native System Speech Synthesis
-        function fallbackLocalSpeech(text, speed) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'da-DK';
-                
-                // Adjust rates safely for local speech engine fallbacks
-                utterance.rate = speed === 'slow' ? 0.55 : 0.80;
-                
-                // Find a decent Danish voice locally installed
-                const rawVoices = window.speechSynthesis.getVoices();
-                const daVoice = rawVoices.find(v => v.lang.toLowerCase().startsWith('da'));
-                if (daVoice) {
-                    utterance.voice = daVoice;
-                }
-                
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        function playQuestionSpeech(speed) {
-            const q = questionsDB[currentTheme][currentIndex];
-            playSpeech(q.question, speed);
-        }
-
-        function playExampleSpeech() {
-            const q = questionsDB[currentTheme][currentIndex];
-            playSpeech(q.examples, 'slow');
-        }
-
-
-        // EXAM SIMULATOR SYSTEM
+        // Start den visuelle simulator
         function startExamSimulation() {
             isSimulating = true;
             simCurrentIndex = 0;
             
-            // Gather 5 random questions across both themes to simulate realistic test conditions
+            // Sammensæt en liste af alle spørgsmål for at vælge 5 tilfældige på tværs af kategorierne
             const allQs = [...questionsDB.arbejde, ...questionsDB.bolig];
-            
-            // Shuffle and pick 5
             simQuestions = allQs.sort(() => 0.5 - Math.random()).slice(0, 5);
 
-            // Toggle active Simulator UI cards
+            // Skift synlighed i simulator-sektionen
             document.getElementById('sim-intro-view').classList.add('hidden');
             document.getElementById('sim-finished-view').classList.add('hidden');
             document.getElementById('sim-active-view').classList.remove('hidden');
@@ -749,85 +637,72 @@
             loadSimulatorQuestion();
         }
 
+        // Indlæs det næste spørgsmål i simulatoren
         function loadSimulatorQuestion() {
             if (simTimer) clearInterval(simTimer);
 
             const currentSimQ = simQuestions[simCurrentIndex];
             
-            // Update UI elements
+            // Opdater teksterne
             document.getElementById('sim-progress-lbl').textContent = `Spørgsmål ${simCurrentIndex + 1} af 5`;
-            
-            // Reset text status (always start hidden for real oral testing simulation)
-            const textPlaceholder = document.getElementById('sim-spoken-question');
-            textPlaceholder.textContent = "Lyt godt efter og svar højt nu...";
-            textPlaceholder.className = "text-sm italic text-slate-400";
-            
-            // Reveal Button State Reset
-            document.getElementById('sim-reveal-btn').classList.remove('hidden');
+            document.getElementById('sim-spoken-question').textContent = currentSimQ.question;
+            document.getElementById('sim-feedback-tip').innerHTML = `<i class="fa-solid fa-hourglass-start text-amber-500"></i> Hurtigt! Sig dit svar højt på dansk...`;
 
-            // Play question audio automatically (using normal/comfortable speed)
-            playSpeech(currentSimQ.question, 'normal');
-
-            // Initialize Timer Countdown
+            // Nulstil tidsmåleren (15 sekunder)
             simSecondsLeft = 15;
             document.getElementById('sim-timer-text').textContent = `${simSecondsLeft}s`;
             
             const timerBar = document.getElementById('sim-timer-bar');
             timerBar.style.width = '100%';
 
+            // Start nedtællingen
             simTimer = setInterval(() => {
                 simSecondsLeft--;
                 document.getElementById('sim-timer-text').textContent = `${simSecondsLeft}s`;
                 
-                // Animate timer width linearly
+                // Træk bredden på bjælken gradvist tilbage
                 const percentage = (simSecondsLeft / 15) * 100;
                 timerBar.style.width = `${percentage}%`;
 
                 if (simSecondsLeft <= 0) {
                     clearInterval(simTimer);
-                    // Automatically proceed or flash to hint answers
-                    textPlaceholder.textContent = `Tiden er gået! Svaret var f.eks.: "${currentSimQ.examples}"`;
-                    textPlaceholder.className = "text-sm font-medium text-amber-300";
-                    document.getElementById('sim-reveal-btn').classList.add('hidden');
+                    // Svartid udløbet - vis modelsvaret som hjælp
+                    document.getElementById('sim-feedback-tip').innerHTML = `
+                        <div class="text-[11px] text-amber-400 text-left leading-normal">
+                            <strong>Tiden løb ud! Et godt svar var f.eks:</strong><br/>
+                            "${currentSimQ.examples}"
+                        </div>
+                    `;
                 }
             }, 1000);
         }
 
-        function revealSimQuestionText() {
-            const currentSimQ = simQuestions[simCurrentIndex];
-            const textPlaceholder = document.getElementById('sim-spoken-question');
-            textPlaceholder.textContent = `Spørgsmål: "${currentSimQ.question}"`;
-            textPlaceholder.className = "text-sm font-bold text-amber-300";
-        }
-
+        // Gå til næste spørgsmål i simulatoren
         function nextSimQuestion() {
             if (simCurrentIndex < 4) {
                 simCurrentIndex++;
                 loadSimulatorQuestion();
             } else {
-                // Done!
+                // Hele testen er afsluttet
                 clearInterval(simTimer);
-                stopAllSpeech();
                 document.getElementById('sim-active-view').classList.add('hidden');
                 document.getElementById('sim-finished-view').classList.remove('hidden');
             }
         }
 
+        // Afbryd simulatoren undervejs
         function stopExamSimulation() {
             isSimulating = false;
             if (simTimer) clearInterval(simTimer);
-            stopAllSpeech();
             
             document.getElementById('sim-active-view').classList.add('hidden');
             document.getElementById('sim-finished-view').classList.add('hidden');
             document.getElementById('sim-intro-view').classList.remove('hidden');
         }
 
-
-        // Bootstrapping setup on load
+        // Første opstart af siden
         window.onload = function() {
             loadProgress();
-            
             updateProgressCounters();
             updateActiveQuestion();
             renderQuestionsList();
