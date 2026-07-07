@@ -32,7 +32,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl sm:text-2xl font-bold tracking-tight title-font">Mundtlig Træner (DU1 Modul 3)</h1>
-                    <p class="text-xs text-emerald-100">Intet login · Træn helt anonymt · Virker på mobil og computer</p>
+                    <p class="text-xs text-emerald-100">Naturlige stemmer · Træn helt anonymt · Virker på mobil og computer</p>
                 </div>
             </div>
             <!-- Global progress pill -->
@@ -135,29 +135,21 @@
                             </h2>
                         </div>
 
-                        <!-- Audio Triggers -->
+                        <!-- Audio Triggers using Premium Google TTS Engine -->
                         <div class="mt-6 flex flex-wrap justify-center gap-3">
-                            <button onclick="playQuestionSpeech('normal')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-5 rounded-full shadow-sm hover:shadow transition duration-150 flex items-center gap-2 text-sm">
+                            <button onclick="playQuestionSpeech('normal')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transition duration-150 flex items-center gap-2 text-sm">
                                 <i class="fa-solid fa-volume-high"></i>
                                 Læs op (Normal)
                             </button>
-                            <button onclick="playQuestionSpeech('slow')" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2.5 px-5 rounded-full shadow-sm hover:shadow transition duration-150 flex items-center gap-2 text-sm">
+                            <button onclick="playQuestionSpeech('slow')" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transition duration-150 flex items-center gap-2 text-sm">
                                 <i class="fa-solid fa-person-walking"></i>
                                 Læs op (Langsomt)
                             </button>
                         </div>
 
-                        <!-- VOICE SELECTOR (New Feature for clear, less digital voice selection) -->
-                        <div class="mt-5 w-full max-w-xs mx-auto bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/60">
-                            <label for="voice-select" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                                <i class="fa-solid fa-headset text-emerald-600"></i> Stemmekontrol (Oplæsning):
-                            </label>
-                            <select id="voice-select" onchange="saveSelectedVoice()" class="w-full text-xs bg-white text-slate-700 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer">
-                                <option value="">Søger efter stemmer...</option>
-                            </select>
-                            <p class="text-[9px] text-slate-400 mt-1 leading-tight">
-                                Microsoft Edge eller Chrome anbefales for de mest livagtige stemmer.
-                            </p>
+                        <div class="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+                            <i class="fa-solid fa-sparkles text-amber-500 animate-pulse"></i>
+                            <span>Premium klar menneskestemme aktiveret</span>
                         </div>
 
                     </div>
@@ -343,7 +335,7 @@
                 { id: "b8", question: "Bor du alene?", examples: "Nej, jeg bor ikke alene. Jeg bor sammen med min familie.", rating: "unrated" },
                 { id: "b9", question: "Bor du sammen med nogen?", examples: "Ja, jeg bor sammen med min kone og vores to børn.", rating: "unrated" },
                 { id: "b10", question: "Hvem bor du sammen med?", examples: "Jeg bor sammen med min mand og min datter.", rating: "unrated" },
-                { id: "b11", question: "Har du naboer?", examples: "Ja, jeg har mange naboer i min opgang.", rating: "unrated" },
+                { id: "b11", question: "Har du naboer?", examples: "Ja, jeg har many naboer i min opgang.", rating: "unrated" },
                 { id: "b12", question: "Hvor mange naboer har du?", examples: "Jeg har fire naboer på min etage.", rating: "unrated" },
                 { id: "b13", question: "Hvordan er dine naboer?", examples: "Mine naboer er meget søde, venlige og stille.", rating: "unrated" },
                 { id: "b14", question: "Hvordan er dit område?", examples: "Mit område er roligt og har meget natur og grønne træer.", rating: "unrated" },
@@ -366,8 +358,8 @@
         let simTimer = null;
         let simSecondsLeft = 15;
 
-        // Voice List State
-        let voicesList = [];
+        // Audio Object holder to stop ongoing playback immediately
+        let activeAudio = null;
 
         // Load visual progress states
         function loadProgress() {
@@ -500,6 +492,9 @@
         function updateActiveQuestion() {
             const list = questionsDB[currentTheme];
             const q = list[currentIndex];
+
+            // Stop any ongoing speech
+            stopAllSpeech();
 
             // Render current question text inside element
             const questionTextEl = document.getElementById('current-question-text');
@@ -641,123 +636,86 @@
             renderQuestionsList();
         }
 
-        // Advanced Speech Synthesis Voice Loader
-        function populateVoiceList() {
-            if (!('speechSynthesis' in window)) return;
+        /**
+         * Ultra-reliable Premium Speech Controller.
+         * Streams directly from Google TTS for clear, natural human pronounciation in Danish.
+         * Seamless slowdown functionality through native hardware playback acceleration.
+         */
+        function playSpeech(text, speed) {
+            // First cancel any existing audio or speech synthesis
+            stopAllSpeech();
+
+            // Construct the high-fidelity Google Translate TTS audio request URL
+            const url = "https://translate.google.com/translate_tts?ie=UTF-8&tl=da&client=tw-ob&q=" + encodeURIComponent(text);
+            const audio = new Audio(url);
             
-            // Fetch system voice list
-            const rawVoices = window.speechSynthesis.getVoices();
+            // Adjust the hardware-playback rate. 
+            // Normal: 0.90 (slightly comfortable for DU1), Slow: 0.65 (extremely crystal clear, smooth and non-robotic)
+            const targetRate = speed === 'slow' ? 0.65 : 0.90;
             
-            // Filter strictly to Danish voices
-            voicesList = rawVoices.filter(v => v.lang.toLowerCase().startsWith('da'));
-            
-            // Sortere listen, så mere menneskelige (neurale, online, premium) stemmer ryger øverst
-            voicesList.sort((a, b) => {
-                const keywords = ['natural', 'online', 'premium', 'google', 'neural', 'enhanced', 'siri', 'helle', 'jeppe'];
-                const aName = a.name.toLowerCase();
-                const bName = b.name.toLowerCase();
-                
-                let aScore = 0;
-                let bScore = 0;
-                
-                keywords.forEach((kw, index) => {
-                    if (aName.includes(kw)) aScore += (keywords.length - index);
-                    if (bName.includes(kw)) bScore += (keywords.length - index);
-                });
-                
-                return bScore - aScore; // Højeste score først
+            // We set default and playback rates
+            audio.defaultPlaybackRate = targetRate;
+            audio.playbackRate = targetRate;
+
+            // Some mobile browsers reset playbackRate upon playing, so we re-assert it on canplay and play events
+            audio.addEventListener('play', () => {
+                audio.playbackRate = targetRate;
+            });
+            audio.addEventListener('canplay', () => {
+                audio.playbackRate = targetRate;
             });
 
-            // Update voice selector drop-down in UI
-            const selectEl = document.getElementById('voice-select');
-            if (selectEl) {
-                selectEl.innerHTML = '';
-                
-                if (voicesList.length === 0) {
-                    const opt = document.createElement('option');
-                    opt.value = "";
-                    opt.textContent = "Standard systemstemme 🌐";
-                    selectEl.appendChild(opt);
-                } else {
-                    voicesList.forEach((voice, index) => {
-                        const opt = document.createElement('option');
-                        opt.value = index;
-                        
-                        // Make the voice name look cleaner and friendlier to teachers/students
-                        let displayName = voice.name
-                            .replace(/microsoft/gi, '')
-                            .replace(/google/gi, 'Google')
-                            .replace(/apple/gi, 'Apple')
-                            .replace(/desktop/gi, '')
-                            .replace(/online \(natural\)/gi, '✨ Naturlig')
-                            .replace(/natural/gi, '✨ Naturlig')
-                            .trim();
-                        
-                        // Add country flags or gender signals if known
-                        if (displayName.toLowerCase().includes('helle') || displayName.toLowerCase().includes('sara') || displayName.toLowerCase().includes('nanna')) {
-                            displayName += " (Kvinde)";
-                        } else if (displayName.toLowerCase().includes('jeppe') || displayName.toLowerCase().includes('mads') || displayName.toLowerCase().includes('magnus')) {
-                            displayName += " (Mand)";
-                        }
-                        
-                        opt.textContent = displayName;
-                        selectEl.appendChild(opt);
-                    });
+            let played = false;
+            
+            audio.play()
+                .then(() => {
+                    played = true;
+                })
+                .catch(err => {
+                    console.warn("Google TTS stream blocked or failed, falling back to local SpeechSynthesis:", err);
+                    fallbackLocalSpeech(text, speed);
+                });
 
-                    // Restore user's previous voice choice if cached
-                    const savedVoiceName = localStorage.getItem('du1_modultest_selected_voice_v2');
-                    if (savedVoiceName) {
-                        const matchedIndex = voicesList.findIndex(v => v.name === savedVoiceName);
-                        if (matchedIndex !== -1) {
-                            selectEl.value = matchedIndex;
-                        }
-                    }
+            // If the audio hangs on load/network block for more than 1.5s, fall back silently
+            setTimeout(() => {
+                if (!played && !audio.paused && audio.readyState < 2) {
+                    audio.pause();
+                    fallbackLocalSpeech(text, speed);
                 }
-            }
+            }, 1500);
+
+            activeAudio = audio;
         }
 
-        // Save selected voice in browser
-        function saveSelectedVoice() {
-            const selectEl = document.getElementById('voice-select');
-            if (selectEl && voicesList.length > 0) {
-                const idx = selectEl.value;
-                if (voicesList[idx]) {
-                    localStorage.setItem('du1_modultest_selected_voice_v2', voicesList[idx].name);
-                }
+        // Stop all sounds cleanly
+        function stopAllSpeech() {
+            if (activeAudio) {
+                activeAudio.pause();
+                activeAudio = null;
             }
-        }
-
-        // Native Speech Synthesis System with custom Voice Selection and clean pitch adjustments
-        function playSpeech(text, rate) {
             if ('speechSynthesis' in window) {
-                // Cancel current speech before reading next
                 window.speechSynthesis.cancel();
-                
+            }
+        }
+
+        // Fallback safety layer: Native System Speech Synthesis
+        function fallbackLocalSpeech(text, speed) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'da-DK';
                 
-                // Fine-tune rates: 0.82 is clear and slightly measured, 0.58 is slow and digestible
-                utterance.rate = rate === 'slow' ? 0.58 : 0.82; 
-                utterance.pitch = 1.0; // Perfect standard pitch to prevent robotic digital chirps
-
-                // Set preferred voice
-                const selectEl = document.getElementById('voice-select');
-                if (selectEl && voicesList.length > 0 && selectEl.value !== "") {
-                    const selectedIdx = selectEl.value;
-                    if (voicesList[selectedIdx]) {
-                        utterance.voice = voicesList[selectedIdx];
-                    }
-                } else {
-                    // Fallback to highest scored Danish voice
-                    const daVoice = voicesList[0] || window.speechSynthesis.getVoices().find(v => v.lang.toLowerCase().startsWith('da'));
-                    if (daVoice) {
-                        utterance.voice = daVoice;
-                    }
+                // Adjust rates safely for local speech engine fallbacks
+                utterance.rate = speed === 'slow' ? 0.55 : 0.80;
+                
+                // Find a decent Danish voice locally installed
+                const rawVoices = window.speechSynthesis.getVoices();
+                const daVoice = rawVoices.find(v => v.lang.toLowerCase().startsWith('da'));
+                if (daVoice) {
+                    utterance.voice = daVoice;
                 }
-
+                
                 window.speechSynthesis.speak(utterance);
-            } else {
-                console.warn("Speech synthesis not supported in this browser.");
             }
         }
 
@@ -807,8 +765,8 @@
             // Reveal Button State Reset
             document.getElementById('sim-reveal-btn').classList.remove('hidden');
 
-            // Play question audio automatically (using slow speed to give DU1 students a fair chance)
-            playSpeech(currentSimQ.question, 'slow');
+            // Play question audio automatically (using normal/comfortable speed)
+            playSpeech(currentSimQ.question, 'normal');
 
             // Initialize Timer Countdown
             simSecondsLeft = 15;
@@ -849,6 +807,7 @@
             } else {
                 // Done!
                 clearInterval(simTimer);
+                stopAllSpeech();
                 document.getElementById('sim-active-view').classList.add('hidden');
                 document.getElementById('sim-finished-view').classList.remove('hidden');
             }
@@ -857,6 +816,7 @@
         function stopExamSimulation() {
             isSimulating = false;
             if (simTimer) clearInterval(simTimer);
+            stopAllSpeech();
             
             document.getElementById('sim-active-view').classList.add('hidden');
             document.getElementById('sim-finished-view').classList.add('hidden');
@@ -864,20 +824,13 @@
         }
 
 
-        // Warm up and Bootstrapping setup
+        // Bootstrapping setup on load
         window.onload = function() {
             loadProgress();
             
             updateProgressCounters();
             updateActiveQuestion();
             renderQuestionsList();
-
-            // Set up Speech Voices detection
-            if ('speechSynthesis' in window) {
-                populateVoiceList();
-                // Browsers load voices asynchronously, so we bind to this trigger event
-                window.speechSynthesis.onvoiceschanged = populateVoiceList;
-            }
         };
     </script>
 </body>
