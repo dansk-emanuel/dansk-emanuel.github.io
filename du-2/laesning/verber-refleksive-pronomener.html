@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Træningsapp: Personlige og Refleksive Pronomener</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .correct-anim { animation: pulseGreen 0.4s ease-in-out; }
+    .wrong-anim { animation: shakeRed 0.4s ease-in-out; }
+    @keyframes pulseGreen {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shakeRed {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="bg-indigo-700 text-white py-6 shadow-md">
+    <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold flex items-center gap-2">
+          <i class="fa-solid fa-graduation-cap"></i> Pronomen-Træneren
+        </h1>
+        <p class="text-indigo-200 text-sm mt-1">
+          Træn personlige og refleksive pronomener med refleksive verber
+        </p>
+      </div>
+      <div class="flex items-center gap-3 bg-indigo-800/60 px-4 py-2 rounded-xl border border-indigo-500/30">
+        <i class="fa-solid fa-trophy text-amber-400 text-xl"></i>
+        <div>
+          <div class="text-xs text-indigo-200 uppercase tracking-wider font-semibold">Point</div>
+          <div class="text-xl font-bold text-white"><span id="score">0</span> / <span id="total-count">20</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
+
+    <!-- Overview / Controls -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <!-- Mode Toggle -->
+      <div class="flex bg-slate-100 p-1 rounded-xl w-full sm:w-auto">
+        <button id="btn-mode-step" onclick="setMode('step')" class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white shadow-sm text-indigo-700">
+          <i class="fa-solid fa-list-check mr-1"></i> Trin for trin
+        </button>
+        <button id="btn-mode-all" onclick="setMode('all')" class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900">
+          <i class="fa-solid fa-table-cells mr-1"></i> Alle opgaver
+        </button>
+      </div>
+
+      <!-- Filter by verb -->
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <label for="verb-filter" class="text-xs font-semibold text-slate-500 whitespace-nowrap">Filtrer verb:</label>
+        <select id="verb-filter" onchange="filterTasks()" class="w-full sm:w-auto bg-slate-50 border border-slate-300 text-slate-700 text-sm rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          <option value="all">Alle 8 verber</option>
+          <option value="at vaske sig">at vaske sig</option>
+          <option value="at gifte sig">at gifte sig</option>
+          <option value="at tænke sig om">at tænke sig om</option>
+          <option value="at vise sig frem">at vise sig frem</option>
+          <option value="at skære sig et stykke kage">at skære sig et stykke kage</option>
+          <option value="at skynde sig">at skynde sig</option>
+          <option value="at gøre sig umage">at gøre sig umage</option>
+          <option value="at udvikle sig">at udvikle sig</option>
+        </select>
+      </div>
+
+      <!-- Reset button -->
+      <button onclick="resetApp()" class="text-slate-500 hover:text-red-600 text-sm font-medium transition-colors flex items-center gap-1">
+        <i class="fa-solid fa-rotate-right"></i> Nulstil
+      </button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="mb-6">
+      <div class="flex justify-between text-xs text-slate-500 font-semibold mb-1">
+        <span>FREMGANG</span>
+        <span id="progress-text">0 af 20 besvaret</span>
+      </div>
+      <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+        <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- STEP BY STEP VIEW -->
+    <div id="step-view" class="space-y-6">
+      <div id="card-container" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 relative">
+        <div class="flex justify-between items-center mb-4">
+          <span id="task-badge" class="px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold text-xs rounded-full">
+            Opgave <span id="current-task-num">1</span> af <span id="filtered-total-num">20</span>
+          </span>
+          <span id="verb-tag" class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">
+            at vaske sig
+          </span>
+        </div>
+
+        <!-- Task prompt -->
+        <div class="my-6">
+          <h2 class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Udfyld det manglende ord:</h2>
+          <div id="task-sentence-wrapper" class="text-xl sm:text-2xl font-medium text-slate-800 leading-relaxed bg-slate-50 p-4 sm:p-6 rounded-xl border border-slate-200">
+            <!-- Dynamic sentence -->
+          </div>
+        </div>
+
+        <!-- Hint -->
+        <div id="task-hint" class="text-xs text-slate-500 flex items-center gap-1.5 mb-6 italic">
+          <i class="fa-regular fa-lightbulb text-amber-500"></i> <span id="hint-text">Hint her...</span>
+        </div>
+
+        <!-- Input and Submit Button -->
+        <form onsubmit="handleStepSubmit(event)" class="flex flex-col sm:flex-row gap-3">
+          <input 
+            type="text" 
+            id="step-input" 
+            placeholder="Skriv dit svar her..." 
+            autocomplete="off" 
+            class="flex-1 px-4 py-3 border-2 border-slate-300 rounded-xl text-lg focus:outline-none focus:border-indigo-600 transition-colors"
+          >
+          <button 
+            type="submit" 
+            id="step-check-btn"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
+          >
+            <span>Tjek svar</span>
+            <i class="fa-solid fa-check"></i>
+          </button>
+        </form>
+
+        <!-- Feedback Box -->
+        <div id="step-feedback" class="hidden mt-6 p-4 rounded-xl text-sm transition-all">
+          <div class="flex items-start gap-3">
+            <div id="feedback-icon" class="text-xl mt-0.5"></div>
+            <div>
+              <h4 id="feedback-title" class="font-bold text-base mb-1"></h4>
+              <p id="feedback-msg" class="text-slate-700"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="flex justify-between items-center mt-8 pt-6 border-t border-slate-100">
+          <button 
+            onclick="prevTask()" 
+            id="prev-btn" 
+            class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <i class="fa-solid fa-arrow-left mr-1"></i> Forrige
+          </button>
+          
+          <button 
+            onclick="nextTask()" 
+            id="next-btn" 
+            class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-1.5"
+          >
+            <span>Næste</span> <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL TASKS VIEW -->
+    <div id="all-view" class="hidden space-y-4">
+      <div id="all-cards-list" class="space-y-4">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Completion Modal / Card -->
+    <div id="summary-card" class="hidden bg-white rounded-2xl border border-slate-200 shadow-md p-8 text-center my-6">
+      <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-slate-800 mb-2">Flot arbejdet!</h2>
+      <p class="text-slate-600 mb-6">Du har gennemført alle opgaverne i det valgte filter.</p>
+      
+      <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 inline-block mb-6 min-w-[240px]">
+        <div class="text-sm font-semibold text-slate-500 uppercase">Din samlede score</div>
+        <div class="text-4xl font-extrabold text-indigo-600 my-1"><span id="final-score">0</span> / <span id="final-total">20</span></div>
+        <div id="final-percent" class="text-xs font-bold text-slate-500">0% korrekte svar</div>
+      </div>
+
+      <div class="flex justify-center gap-4">
+        <button onclick="resetApp()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors">
+          Prøv igen
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-100 border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    Dansktræning • Personlige pronomener (jeg, du, han, hun, vi, I, de) og refleksive pronomener (mig, dig, sig, os, jer)
+  </footer>
+
+  <script>
+    // 20 Tasks dataset
+    const tasksData = [
+      {
+        id: 1,
+        verb: "at vaske sig",
+        sentence: "Jeg vasker _____ hver morgen.",
+        answer: "mig",
+        hint: "Skal være det refleksive pronomen svarende til 'jeg'",
+        explanation: "Subjektet er 'jeg' (1. person ental), så det refleksive pronomen er 'mig'."
+      },
+      {
+        id: 2,
+        verb: "at gifte sig",
+        sentence: "_____ gifter dig til sommer.",
+        answer: "Du",
+        altAnswers: ["du"],
+        hint: "Skal være det personlige pronomen, der passer til 'dig'",
+        explanation: "Refleksivt pronomen er 'dig' (2. person ental), så subjektet skal være 'Du'."
+      },
+      {
+        id: 3,
+        verb: "at tænke sig om",
+        sentence: "Han tænker _____ om, før han svarer.",
+        answer: "sig",
+        hint: "Skal være det refleksive pronomen svarende til 'han'",
+        explanation: "Subjektet er 'han' (3. person ental), så det refleksive pronomen er 'sig'."
+      },
+      {
+        id: 4,
+        verb: "at vise sig frem",
+        sentence: "Vi viser _____ frem for publikum.",
+        answer: "os",
+        hint: "Skal være det refleksive pronomen svarende til 'vi'",
+        explanation: "Subjektet er 'vi' (1. person flertal), så det refleksive pronomen er 'os'."
+      },
+      {
+        id: 5,
+        verb: "at skære sig et stykke kage",
+        sentence: "I skærer _____ et stykke kage.",
+        answer: "jer",
+        hint: "Skal være det refleksive pronomen svarende til 'I'",
+        explanation: "Subjektet er 'I' (2. person flertal), så det refleksive pronomen er 'jer'."
+      },
+      {
+        id: 6,
+        verb: "at skynde sig",
+        sentence: "De skynder _____ for ikke at komme for sent.",
+        answer: "sig",
+        hint: "Skal være det refleksive pronomen svarende til 'de'",
+        explanation: "Subjektet er 'de' (3. person flertal), så det refleksive pronomen er 'sig'."
+      },
+      {
+        id: 7,
+        verb: "at gøre sig umage",
+        sentence: "Hun gør _____ umage med sine lektier.",
+        answer: "sig",
+        hint: "Skal være det refleksive pronomen svarende til 'hun'",
+        explanation: "Subjektet er 'hun' (3. person ental), så det refleksive pronomen er 'sig'."
+      },
+      {
+        id: 8,
+        verb: "at udvikle sig",
+        sentence: "Virksomheden udvikler _____ hurtigt i disse år.",
+        answer: "sig",
+        hint: "Skal være det refleksive pronomen svarende til 'virksomheden' (den)",
+        explanation: "'Virksomheden' er 3. person ental (den), så det refleksive pronomen er 'sig'."
+      },
+      {
+        id: 9,
+        verb: "at vaske sig",
+        sentence: "_____ vasker os grundigt efter træning.",
+        answer: "Vi",
+        altAnswers: ["vi"],
+        hint: "Skal være det personlige pronomen, der passer til 'os'",
+        explanation: "Refleksivt pronomen er 'os', så subjektet skal være 'Vi'."
+      },
+      {
+        id: 10,
+        verb: "at skynde sig",
+        sentence: "Skynder _____ jer ikke til bussen?",
+        answer: "I",
+        altAnswers: ["i"],
+        hint: "Skal være det personlige pronomen, der passer til 'jer'",
+        explanation: "Refleksivt pronomen er 'jer', så subjektet skal være 'I'."
+      },
+      {
+        id: 11,
+        verb: "at skære sig et stykke kage",
+        sentence: "Peter skar _____ et stykke kage i køkkenet.",
+        answer: "sig",
+        hint: "Skal være det refleksive pronomen svarende til 'Peter' (han)",
+        explanation: "'Peter' er 3. person ental (han), så det refleksive pronomen er 'sig'."
+      },
+      {
+        id: 12,
+        verb: "at tænke sig om",
+        sentence: "_____ må tænke mig om en ekstra gang.",
+        answer: "Jeg",
+        altAnswers: ["jeg"],
+        hint: "Skal være det personlige pronomen, der passer til 'mig'",
+        explanation: "Refleksivt pronomen er 'mig', så subjektet skal være 'Jeg'."
+      },
+      {
+        id: 13,
+        verb: "at vise sig frem",
+        sentence: "Børnene viser _____ frem på scenen.",
+        answer: "sig",
+        hint: "Skal være det refleksive pronomen svarende til 'børnene' (de)",
+        explanation: "'Børnene' er 3. person flertal (de), så det refleksive pronomen er 'sig'."
+      },
+      {
+        id: 14,
+        verb: "at gifte sig",
+        sentence: "Hvornår gifter _____ os?",
+        answer: "vi",
+        altAnswers: ["Vi"],
+        hint: "Skal være det personlige pronomen, der passer til 'os'",
+        explanation: "Refleksivt pronomen er 'os', så subjektet er 'vi'."
+      },
+      {
+        id: 15,
+        verb: "at gøre sig umage",
+        sentence: "Gør _____ dig altid umage i skolen?",
+        answer: "du",
+        altAnswers: ["Du"],
+        hint: "Skal være det personlige pronomen, der passer til 'dig'",
+        explanation: "Refleksivt pronomen er 'dig', så subjektet er 'du'."
+      },
+      {
+        id: 16,
+        verb: "at udvikle sig",
+        sentence: "Sproget udvikler _____ konstant.",
+        answer: "sig",
+        hint: "Skal være det refleksive pronomen svarende til 'sproget' (det)",
+        explanation: "'Sproget' er 3. person ental (det), så det refleksive pronomen er 'sig'."
+      },
+      {
+        id: 17,
+        verb: "at skynde sig",
+        sentence: "Hvorfor skynder _____ dig sådan?",
+        answer: "du",
+        altAnswers: ["Du"],
+        hint: "Skal være det personlige pronomen, der passer til 'dig'",
+        explanation: "Refleksivt pronomen er 'dig', så subjektet er 'du'."
+      },
+      {
+        id: 18,
+        verb: "at skære sig et stykke kage",
+        sentence: "Vi skærer _____ et stykke lækker kage.",
+        answer: "os",
+        hint: "Skal være det refleksive pronomen svarende til 'vi'",
+        explanation: "Subjektet er 'vi', så det refleksive pronomen er 'os'."
+      },
+      {
+        id: 19,
+        verb: "at gøre sig umage",
+        sentence: "_____ gør os altid umage med opgaverne.",
+        answer: "Vi",
+        altAnswers: ["vi"],
+        hint: "Skal være det personlige pronomen, der passer til 'os'",
+        explanation: "Refleksivt pronomen er 'os', så subjektet skal være 'Vi'."
+      },
+      {
+        id: 20,
+        verb: "at udvikle sig",
+        sentence: "Mennesker udvikler _____ hele livet.",
+        answer: "sig",
+        hint: "Skal være det refleksive pronomen svarende til 'mennesker' (de)",
+        explanation: "'Mennesker' er 3. person flertal (de), så det refleksive pronomen er 'sig'."
+      }
+    ];
+
+    // State
+    let currentMode = 'step'; // 'step' or 'all'
+    let currentVerbFilter = 'all';
+    let filteredTasks = [...tasksData];
+    let currentStepIndex = 0;
+    
+    // User progress state: { taskId: { answer: string, checked: boolean, isCorrect: boolean } }
+    let userState = {};
+
+    function init() {
+      tasksData.forEach(t => {
+        userState[t.id] = { answer: '', checked: false, isCorrect: false };
+      });
+      filterTasks();
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('btn-mode-step').className = mode === 'step' 
+        ? "flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white shadow-sm text-indigo-700"
+        : "flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900";
+      
+      document.getElementById('btn-mode-all').className = mode === 'all' 
+        ? "flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white shadow-sm text-indigo-700"
+        : "flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900";
+
+      if (mode === 'step') {
+        document.getElementById('step-view').classList.remove('hidden');
+        document.getElementById('all-view').classList.add('hidden');
+        renderStepView();
+      } else {
+        document.getElementById('step-view').classList.add('hidden');
+        document.getElementById('all-view').classList.remove('hidden');
+        renderAllView();
+      }
+    }
+
+    function filterTasks() {
+      const filterVal = document.getElementById('verb-filter').value;
+      currentVerbFilter = filterVal;
+      
+      if (filterVal === 'all') {
+        filteredTasks = [...tasksData];
+      } else {
+        filteredTasks = tasksData.filter(t => t.verb === filterVal);
+      }
+
+      currentStepIndex = 0;
+      updateHeaderStats();
+
+      if (currentMode === 'step') {
+        renderStepView();
+      } else {
+        renderAllView();
+      }
+    }
+
+    function resetApp() {
+      tasksData.forEach(t => {
+        userState[t.id] = { answer: '', checked: false, isCorrect: false };
+      });
+      document.getElementById('verb-filter').value = 'all';
+      currentVerbFilter = 'all';
+      filteredTasks = [...tasksData];
+      currentStepIndex = 0;
+      document.getElementById('summary-card').classList.add('hidden');
+      updateHeaderStats();
+      if (currentMode === 'step') {
+        renderStepView();
+      } else {
+        renderAllView();
+      }
+    }
+
+    function isAnswerCorrect(task, userAns) {
+      if (!userAns) return false;
+      const cleanAns = userAns.trim();
+      if (cleanAns.toLowerCase() === task.answer.toLowerCase()) return true;
+      if (task.altAnswers && task.altAnswers.some(a => a.toLowerCase() === cleanAns.toLowerCase())) {
+        return true;
+      }
+      return false;
+    }
+
+    function updateHeaderStats() {
+      let correctCount = 0;
+      let answeredCount = 0;
+
+      tasksData.forEach(t => {
+        if (userState[t.id].checked) {
+          answeredCount++;
+          if (userState[t.id].isCorrect) correctCount++;
+        }
+      });
+
+      document.getElementById('score').innerText = correctCount;
+      document.getElementById('total-count').innerText = tasksData.length;
+      document.getElementById('progress-text').innerText = `${answeredCount} af ${tasksData.length} besvaret`;
+      
+      const pct = (answeredCount / tasksData.length) * 100;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+
+      // Check if all filtered tasks answered
+      const filteredAnswered = filteredTasks.filter(t => userState[t.id].checked).length;
+      if (filteredAnswered === filteredTasks.length && filteredTasks.length > 0) {
+        showSummary();
+      } else {
+        document.getElementById('summary-card').classList.add('hidden');
+      }
+    }
+
+    function showSummary() {
+      let correctInFilter = 0;
+      filteredTasks.forEach(t => {
+        if (userState[t.id].isCorrect) correctInFilter++;
+      });
+      
+      document.getElementById('final-score').innerText = correctInFilter;
+      document.getElementById('final-total').innerText = filteredTasks.length;
+      const pct = Math.round((correctInFilter / filteredTasks.length) * 100);
+      document.getElementById('final-percent').innerText = `${pct}% korrekte svar`;
+      document.getElementById('summary-card').classList.remove('hidden');
+    }
+
+    // --- STEP VIEW LOGIC ---
+    function renderStepView() {
+      if (filteredTasks.length === 0) return;
+      
+      const task = filteredTasks[currentStepIndex];
+      const state = userState[task.id];
+
+      document.getElementById('current-task-num').innerText = currentStepIndex + 1;
+      document.getElementById('filtered-total-num').innerText = filteredTasks.length;
+      document.getElementById('verb-tag').innerText = task.verb;
+      document.getElementById('hint-text').innerText = task.hint;
+
+      // Sentence rendering with gap
+      const parts = task.sentence.split('_____');
+      let currentVal = state.answer || '';
+      
+      let htmlSentence = `
+        ${parts[0]}
+        <span class="inline-block border-b-2 border-indigo-500 font-bold px-2 text-indigo-700 bg-indigo-50/50 min-w-[60px] text-center">
+          ${state.checked ? (state.answer || '_____') : (currentVal || '_____')}
+        </span>
+        ${parts[1]}
+      `;
+      document.getElementById('task-sentence-wrapper').innerHTML = htmlSentence;
+
+      // Input field
+      const inputEl = document.getElementById('step-input');
+      inputEl.value = state.answer;
+      inputEl.disabled = state.checked;
+
+      // Check button
+      const checkBtn = document.getElementById('step-check-btn');
+      if (state.checked) {
+        checkBtn.disabled = true;
+        checkBtn.className = "bg-slate-300 text-slate-500 font-semibold px-6 py-3 rounded-xl cursor-not-allowed flex items-center justify-center gap-2";
+      } else {
+        checkBtn.disabled = false;
+        checkBtn.className = "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2";
+      }
+
+      // Feedback Box
+      const fbBox = document.getElementById('step-feedback');
+      const fbIcon = document.getElementById('feedback-icon');
+      const fbTitle = document.getElementById('feedback-title');
+      const fbMsg = document.getElementById('feedback-msg');
+
+      if (state.checked) {
+        fbBox.classList.remove('hidden');
+        if (state.isCorrect) {
+          fbBox.className = "mt-6 p-4 rounded-xl text-sm bg-emerald-50 border border-emerald-200 text-emerald-900 correct-anim";
+          fbIcon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i>`;
+          fbTitle.innerText = "Korrekt!";
+          fbMsg.innerText = task.explanation;
+        } else {
+          fbBox.className = "mt-6 p-4 rounded-xl text-sm bg-rose-50 border border-rose-200 text-rose-900 wrong-anim";
+          fbIcon.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600"></i>`;
+          fbTitle.innerText = `Forkert. Det rigtige svar er: "${task.answer}"`;
+          fbMsg.innerText = task.explanation;
+        }
+      } else {
+        fbBox.classList.add('hidden');
+      }
+
+      // Nav buttons
+      document.getElementById('prev-btn').disabled = currentStepIndex === 0;
+      document.getElementById('next-btn').disabled = currentStepIndex === filteredTasks.length - 1;
+
+      if (!state.checked) {
+        setTimeout(() => inputEl.focus(), 50);
+      }
+    }
+
+    function handleStepSubmit(e) {
+      e.preventDefault();
+      const task = filteredTasks[currentStepIndex];
+      if (userState[task.id].checked) return;
+
+      const inputVal = document.getElementById('step-input').value;
+      if (!inputVal.trim()) return;
+
+      const correct = isAnswerCorrect(task, inputVal);
+      userState[task.id] = {
+        answer: inputVal.trim(),
+        checked: true,
+        isCorrect: correct
+      };
+
+      updateHeaderStats();
+      renderStepView();
+    }
+
+    function prevTask() {
+      if (currentStepIndex > 0) {
+        currentStepIndex--;
+        renderStepView();
+      }
+    }
+
+    function nextTask() {
+      if (currentStepIndex < filteredTasks.length - 1) {
+        currentStepIndex++;
+        renderStepView();
+      }
+    }
+
+
+    // --- ALL TASKS VIEW LOGIC ---
+    function renderAllView() {
+      const container = document.getElementById('all-cards-list');
+      container.innerHTML = '';
+
+      if (filteredTasks.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-500">Ingen opgaver matchede filteret.</div>`;
+        return;
+      }
+
+      filteredTasks.forEach((task, index) => {
+        const state = userState[task.id];
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-xl border border-slate-200 p-5 shadow-sm transition-all";
+
+        const parts = task.sentence.split('_____');
+
+        let statusBadge = '';
+        if (state.checked) {
+          if (state.isCorrect) {
+            statusBadge = `<span class="text-xs px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full font-bold flex items-center gap-1"><i class="fa-solid fa-check"></i> Korrekt</span>`;
+          } else {
+            statusBadge = `<span class="text-xs px-2.5 py-1 bg-rose-100 text-rose-800 rounded-full font-bold flex items-center gap-1"><i class="fa-solid fa-xmark"></i> Forkert</span>`;
+          }
+        }
+
+        card.innerHTML = `
+          <div class="flex justify-between items-start gap-2 mb-3">
+            <span class="text-xs font-semibold text-slate-400">Opgave ${index + 1} • <span class="text-indigo-600">${task.verb}</span></span>
+            ${statusBadge}
+          </div>
+
+          <div class="text-lg font-medium text-slate-800 mb-3">
+            ${parts[0]}
+            <span class="inline-block border-b-2 border-indigo-500 font-bold px-1 text-indigo-700">
+              ${state.checked ? (state.answer || '_____') : '_____'}
+            </span>
+            ${parts[1]}
+          </div>
+
+          <form onsubmit="handleAllSubmit(event, ${task.id})" class="flex gap-2">
+            <input 
+              type="text" 
+              id="all-input-${task.id}" 
+              placeholder="Svar..." 
+              value="${state.answer}"
+              ${state.checked ? 'disabled' : ''}
+              class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-indigo-600 disabled:bg-slate-50 disabled:text-slate-500"
+            >
+            <button 
+              type="submit" 
+              ${state.checked ? 'disabled' : ''}
+              class="px-4 py-2 ${state.checked ? 'bg-slate-200 text-slate-400' : 'bg-indigo-600 hover:bg-indigo-700 text-white'} rounded-lg text-sm font-semibold transition-colors"
+            >
+              Tjek
+            </button>
+          </form>
+
+          ${state.checked ? `
+            <div class="mt-3 p-3 rounded-lg text-xs ${state.isCorrect ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-900 border border-rose-200'}">
+              ${!state.isCorrect ? `<div class="font-bold mb-1">Korrekt svar: "${task.answer}"</div>` : ''}
+              <div>${task.explanation}</div>
+            </div>
+          ` : ''}
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function handleAllSubmit(e, taskId) {
+      e.preventDefault();
+      const task = tasksData.find(t => t.id === taskId);
+      if (!task || userState[taskId].checked) return;
+
+      const inputEl = document.getElementById(`all-input-${taskId}`);
+      const val = inputEl ? inputEl.value : '';
+      if (!val.trim()) return;
+
+      const correct = isAnswerCorrect(task, val);
+      userState[taskId] = {
+        answer: val.trim(),
+        checked: true,
+        isCorrect: correct
+      };
+
+      updateHeaderStats();
+      renderAllView();
+    }
+
+    // Key listeners for step view navigation
+    document.addEventListener('keydown', (e) => {
+      if (currentMode !== 'step') return;
+      if (e.target.tagName === 'INPUT') return; // let enter key handle form submit
+      if (e.key === 'ArrowLeft') prevTask();
+      if (e.key === 'ArrowRight') nextTask();
+    });
+
+    // Run on startup
+    window.onload = init;
+  </script>
+</body>
+</html>
