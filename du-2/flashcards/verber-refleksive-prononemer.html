@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dansk Flashcard App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+
+        .backface-hidden {
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        .card-inner {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Beige bagside som foreskrevet */
+        .bg-beige {
+            background-color: #f5f0eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col items-center justify-between p-4 sm:p-6">
+
+    <div class="w-full max-w-lg mx-auto flex-1 flex flex-col justify-center items-center my-auto">
+        
+        <!-- Header & Sprogvelger -->
+        <header class="w-full mb-6 text-center">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Lær Danske Verber</h1>
+            
+            <div class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-gray-200">
+                <label for="languageSelect" class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1 text-left">
+                    Vælg Målsprog:
+                </label>
+                <select id="languageSelect" class="w-full p-2.5 bg-gray-50 border border-gray-300 text-gray-900 text-sm sm:text-base rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer">
+                    <!-- Sprogmuligheder oprettes dynamisk via JS -->
+                </select>
+            </div>
+        </header>
+
+        <!-- Statuslinje -->
+        <div id="statusContainer" class="w-full flex justify-between items-center mb-4 px-1 text-sm font-medium text-gray-600">
+            <span>Status:</span>
+            <span id="cardsCount" class="bg-blue-100 text-blue-800 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full">
+                Kort tilbage: 8
+            </span>
+        </div>
+
+        <!-- Flashcard Område -->
+        <div id="gameScreen" class="w-full flex flex-col items-center">
+            
+            <!-- Card Container -->
+            <div class="w-full h-64 sm:h-72 perspective-1000 cursor-pointer" id="cardContainer">
+                <div id="cardInner" class="relative w-full h-full transform-style-3d card-inner rounded-2xl shadow-lg">
+                    
+                    <!-- Forside (Dansk): Hvid baggrund, sort skrift -->
+                    <div class="absolute w-full h-full backface-hidden bg-white text-gray-900 border border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center select-none">
+                        <span class="text-xs uppercase tracking-widest font-semibold text-gray-400 mb-3">Dansk</span>
+                        <p id="cardFrontText" class="text-2xl sm:text-3xl font-bold text-gray-800">at vaske sig</p>
+                        <span class="text-xs text-gray-400 mt-6 animate-pulse">Klik for at se oversættelsen ↻</span>
+                    </div>
+
+                    <!-- Bagside (Målsprog): Beige baggrund, sort skrift -->
+                    <div class="absolute w-full h-full backface-hidden bg-beige text-gray-900 border border-amber-200/60 rounded-2xl p-6 flex flex-col items-center justify-center text-center rotate-y-180 select-none">
+                        <span id="targetLangLabel" class="text-xs uppercase tracking-widest font-semibold text-amber-800/60 mb-3">Oversættelse</span>
+                        <p id="cardBackText" class="text-xl sm:text-2xl font-bold text-gray-900">wash oneself</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Interaktionsknapper (Kun synlige når kortet er vendt) -->
+            <div id="buttonGroup" class="w-full grid grid-cols-2 gap-4 mt-6 opacity-0 pointer-events-none transition-opacity duration-300">
+                <button id="wrongBtn" class="w-full py-3.5 px-4 bg-red-500 hover:bg-red-600 active:scale-95 text-white font-semibold rounded-xl shadow-md transition-all duration-150 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    Forkert
+                </button>
+                <button id="correctBtn" class="w-full py-3.5 px-4 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-semibold rounded-xl shadow-md transition-all duration-150 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Rigtigt
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Færdig Skærm -->
+        <div id="finishScreen" class="hidden w-full bg-white border border-gray-200 rounded-2xl p-8 shadow-lg text-center flex flex-col items-center">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mb-4">
+                🎉
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Flot klaret!</h2>
+            <p class="text-gray-600 mb-6">Du har lært alle ordene i denne runde.</p>
+            <button id="restartBtn" class="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold rounded-xl shadow-md transition-all duration-150">
+                Start forfra
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Sprogkonfiguration
+        const LANGUAGES = [
+            { code: "en", name: "Engelsk" },
+            { code: "bn", name: "Bengali" },
+            { code: "hi", name: "Hindi" },
+            { code: "ur", name: "Urdu" },
+            { code: "uk", name: "Ukrainsk" },
+            { code: "ru", name: "Russisk" },
+            { code: "fa", name: "Persisk" },
+            { code: "tr", name: "Tyrkisk" },
+            { code: "ku", name: "Kurdisk Kurmanji" },
+            { code: "ckb", name: "Kurdisk Sorani" },
+            { code: "ne", name: "Nepalesisk" },
+            { code: "sw", name: "Kiswahili" },
+            { code: "fr", name: "Fransk" },
+            { code: "ak", name: "Twi" },
+            { code: "bs", name: "Bosnisk" },
+            { code: "so", name: "Somali" },
+            { code: "sr", name: "Serbisk" },
+            { code: "ti", name: "Tigrinya" },
+            { code: "zh", name: "Mandarin kinesisk" },
+            { code: "tg", name: "Tadjikisk" },
+            { code: "es", name: "Spansk" },
+            { code: "ta", name: "Tamil" },
+            { code: "lt", name: "Litauisk" },
+            { code: "id", name: "Indonesisk" }
+        ];
+
+        // Ordliste med præcise leksikale oversættelser uden translitterationer
+        const WORDS = [
+            {
+                id: 1,
+                da: "at vaske sig",
+                translations: {
+                    en: "wash oneself",
+                    bn: "নিজেেকে ধোয়া",
+                    hi: "खुद को धोना, नहाना",
+                    ur: "اپنے آپ کو دھونا",
+                    uk: "митися",
+                    ru: "мыться",
+                    fa: "خود را شستن",
+                    tr: "yıkanmak",
+                    ku: "xwe şûştin",
+                    ckb: "خۆ شۆردن",
+                    ne: "आफूलाई धुनु",
+                    sw: "kujiosha",
+                    fr: "se laver",
+                    ak: "hohoro wo ho",
+                    bs: "prati se",
+                    so: "is dhaq",
+                    sr: "прати се, умивати се",
+                    ti: "ምሕጻብ",
+                    zh: "洗澡, 洗漱",
+                    tg: "худро шустан",
+                    es: "lavarse",
+                    ta: "கழுவிக்கொள்ள",
+                    lt: "praustis",
+                    id: "mencuci diri, mandi"
+                }
+            },
+            {
+                id: 2,
+                da: "at gifte sig",
+                translations: {
+                    en: "get married, marry",
+                    bn: "বিয়ে করা",
+                    hi: "शादी करना",
+                    ur: "شادی کرنا",
+                    uk: "одружуватися",
+                    ru: "жениться, выходить замуж",
+                    fa: "ازدواج کردن",
+                    tr: "evlenmek",
+                    ku: "zewicîn",
+                    ckb: "هاوسەرگیری کردن",
+                    ne: "विवाह गर्नु",
+                    sw: "kuolewa, kuoa",
+                    fr: "se marier",
+                    ak: "ware",
+                    bs: "vjenčati se",
+                    so: "guursan",
+                    sr: "венчати се",
+                    ti: "መርዓ",
+                    zh: "结婚",
+                    tg: "хонадор шудан",
+                    es: "casarse",
+                    ta: "திருமணம் செய்து கொள்ள",
+                    lt: "susituokti",
+                    id: "menikah"
+                }
+            },
+            {
+                id: 3,
+                da: "at tænke sig om",
+                translations: {
+                    en: "think carefully, consider",
+                    bn: "ভেবেচিন্তে দেখা",
+                    hi: "सोच-विचार करना",
+                    ur: "غور کرنا",
+                    uk: "задуматися, обдумати",
+                    ru: "подумать, обдумать",
+                    fa: "فکر کردن, تامل کردن",
+                    tr: "etraflıca düşünmek",
+                    ku: "baş bifikirin",
+                    ckb: "بە ئارامی بیرکردنەوە",
+                    ne: "विचार गर्नु",
+                    sw: "kufikiria kwa makini",
+                    fr: "bien réfléchir",
+                    ak: "dwene ho yie",
+                    bs: "razmisliti",
+                    so: "ka fikir",
+                    sr: "размислити",
+                    ti: "ምሕሳብ",
+                    zh: "深思熟虑, 仔细想想",
+                    tg: "фикр кардан",
+                    es: "pensa-lo, reflexionar",
+                    ta: "யோசித்துச் செயல்பட",
+                    lt: "pagalvoti, apsvarstyti",
+                    id: "berpikir matang-matang"
+                }
+            },
+            {
+                id: 4,
+                da: "at vise sig frem",
+                translations: {
+                    en: "show off",
+                    bn: "দেখানো, জাহির করা",
+                    hi: "दिखावा करना",
+                    ur: "دکھاوا کرنا",
+                    uk: "красуватися, хизуватися",
+                    ru: "красоваться, хвастаться",
+                    fa: "خودنمایی کردن",
+                    tr: "gösteriş yapmak",
+                    ku: "xwe nîşan dan",
+                    ckb: "خۆ دەرخستن",
+                    ne: "देखाउनु",
+                    sw: "kujionyesha",
+                    fr: "se pavaner, frimer",
+                    ak: "kyerɛ wo ho",
+                    bs: "pokazivati se, hvalisati se",
+                    so: "is tus",
+                    sr: "показивати се",
+                    ti: "ምእራይ",
+                    zh: "炫耀, 卖弄",
+                    tg: "худнамоӣ кардан",
+                    es: "lucirse, presumir",
+                    ta: "காட்டிக்கொள்ள",
+                    lt: "rodytis, puikuotis",
+                    id: "pamer, menonjolkan diri"
+                }
+            },
+            {
+                id: 5,
+                da: "at skære sig et stykke kage",
+                translations: {
+                    en: "cut oneself a piece of cake",
+                    bn: "নিজের জন্য এক টুকরো কেক কাটা",
+                    hi: "अपने लिए केक का एक टुकड़ा काटना",
+                    ur: "اپنے لیے کیک کا ایک ٹکڑا کاٹنا",
+                    uk: "відрізати собі шматок торта",
+                    ru: "отрезать себе кусок торта",
+                    fa: "بریدن یک تکه کیک برای خود",
+                    tr: "kendine bir dilim pasta kesmek",
+                    ku: "jibo xwe perçeyek kekê jêkirin",
+                    ckb: "بڕینی پارچەیەک کێک بۆ خۆت",
+                    ne: "आफूलाई केकको टुक्रा काट्नु",
+                    sw: "kujikatia kipande cha keki",
+                    fr: "se couper un morceau de gâteau",
+                    ak: "twa cake no bi ma wo ho",
+                    bs: "odrezati sebi komad torte",
+                    so: "is jar kipande kasta oo keeg ah",
+                    sr: "одрезати себи комад торте",
+                    ti: "ሓደ ቆራጽ ኬክ ምቁራጽ",
+                    zh: "切一块蛋糕给自己",
+                    tg: "барои худ як бурида торт бурдан",
+                    es: "cortarse un trozo de pastel",
+                    ta: "ஒரு கேக் துண்டு வெட்டி",
+                    lt: "atsipjauti pyrago gabalėlį",
+                    id: "memotong sepotong kue untuk diri sendiri"
+                }
+            },
+            {
+                id: 6,
+                da: "at skynde sig",
+                translations: {
+                    en: "hurry up, rush",
+                    bn: "তাড়া করা, দ্রুত করা",
+                    hi: "जल्दी करना",
+                    ur: "جلدی کرنا",
+                    uk: "поспішати",
+                    ru: "торопиться, спешить",
+                    fa: "عجله کردن",
+                    tr: "acele etmek",
+                    ku: "lez kirin",
+                    ckb: "پەلەکردن",
+                    ne: "हतार गर्नु",
+                    sw: "kuharakisha",
+                    fr: "se dépêcher",
+                    ak: "yɛ nttem",
+                    bs: "požuriti",
+                    so: "degdego",
+                    sr: "пожурити",
+                    ti: "ምቅልጣፍ",
+                    zh: "赶紧, 抓紧时间",
+                    tg: "шитоб кардан",
+                    es: "darse prisa, apurarse",
+                    ta: "அவசரப்பட",
+                    lt: "skubėti",
+                    id: "bergegas, terburu-buru"
+                }
+            },
+            {
+                id: 7,
+                da: "at gøre sig umage",
+                translations: {
+                    en: "make an effort, try hard",
+                    bn: "চেষ্টা করা",
+                    hi: "कड़ी मेहनत करना, प्रयास करना",
+                    ur: "کوشش کرنا",
+                    uk: "старатися, докладати зусиль",
+                    ru: "стараться, прилагать усилия",
+                    fa: "تلاش کردن, زحمت کشیدن",
+                    tr: "çaba göstermek, özenmek",
+                    ku: "hewl dan",
+                    ckb: "هەوڵدان",
+                    ne: "प्रयास गर्नु",
+                    sw: "kujitahidi",
+                    fr: "faire des efforts, s'efforcer",
+                    ak: "mmoa wo ho",
+                    bs: "potruditi se",
+                    so: "dadaal",
+                    sr: "потрудити се",
+                    ti: "ምጽዓር",
+                    zh: "努力, 尽力",
+                    tg: "кӯшиш кардан",
+                    es: "esmerarse, hacer un esfuerzo",
+                    ta: "முயற்சி செய்ய",
+                    lt: "pasistengti",
+                    id: "berusaha keras"
+                }
+            },
+            {
+                id: 8,
+                da: "at udvikle sig",
+                translations: {
+                    en: "develop, evolve",
+                    bn: "বিকাশ লাভ করা, উন্নত হওয়া",
+                    hi: "विकसित होना",
+                    ur: "ترقی کرنا",
+                    uk: "розвиватися",
+                    ru: "развиваться",
+                    fa: "توسعه یافتن, پیشرفت کردن",
+                    tr: "gelişmek",
+                    ku: "geşbûn, pêşketin",
+                    ckb: "گەشەکردن",
+                    ne: "विकास हुनु",
+                    sw: "kuendelea, kukua",
+                    fr: "se développer, évoluer",
+                    ak: "nya nkoso",
+                    bs: "razvijati se",
+                    so: "horumarin",
+                    sr: "развијати се",
+                    ti: "ምዕባለ",
+                    zh: "发展, 演变",
+                    tg: "инкишоф ёфтан",
+                    es: "desarrollarse, evolucionar",
+                    ta: "வளர்ச்சியடைய",
+                    lt: "vystytis, tobulėti",
+                    id: "berkembang"
+                }
+            }
+        ];
+
+        // App State
+        let currentDeck = [];
+        let currentCardIndex = 0;
+        let selectedLanguage = "en";
+        let isFlipped = false;
+        let isTransitioning = false;
+
+        // DOM Elementer
+        const languageSelect = document.getElementById("languageSelect");
+        const cardsCountEl = document.getElementById("cardsCount");
+        const cardContainer = document.getElementById("cardContainer");
+        const cardInner = document.getElementById("cardInner");
+        const cardFrontText = document.getElementById("cardFrontText");
+        const cardBackText = document.getElementById("cardBackText");
+        const targetLangLabel = document.getElementById("targetLangLabel");
+        const buttonGroup = document.getElementById("buttonGroup");
+        const correctBtn = document.getElementById("correctBtn");
+        const wrongBtn = document.getElementById("wrongBtn");
+        const gameScreen = document.getElementById("gameScreen");
+        const finishScreen = document.getElementById("finishScreen");
+        const restartBtn = document.getElementById("restartBtn");
+
+        // Initialiser sprogvelger
+        function initLanguageSelect() {
+            languageSelect.innerHTML = "";
+            LANGUAGES.forEach(lang => {
+                const option = document.createElement("option");
+                option.value = lang.code;
+                option.textContent = lang.name;
+                languageSelect.appendChild(option);
+            });
+            languageSelect.value = selectedLanguage;
+        }
+
+        // Start / Nulstil spillet
+        function initGame() {
+            currentDeck = [...WORDS];
+            // Bland bunken for variation
+            currentDeck.sort(() => Math.random() - 0.5);
+            currentCardIndex = 0;
+            isFlipped = false;
+            isTransitioning = false;
+
+            gameScreen.classList.remove("hidden");
+            finishScreen.classList.add("hidden");
+
+            updateCardContent();
+            updateUIState();
+        }
+
+        // Opdater teksten på kortet baseret på den nuværende tilstand
+        function updateCardContent() {
+            if (currentDeck.length === 0) return;
+            const currentWord = currentDeck[currentCardIndex];
+            cardFrontText.textContent = currentWord.da;
+            cardBackText.textContent = currentWord.translations[selectedLanguage] || "Ingen oversættelse";
+            
+            const currentLangName = LANGUAGES.find(l => l.code === selectedLanguage)?.name || "Målsprog";
+            targetLangLabel.textContent = `Oversættelse (${currentLangName})`;
+        }
+
+        // Opdater visualisering og knapper
+        function updateUIState() {
+            cardsCountEl.textContent = `Kort tilbage: ${currentDeck.length}`;
+
+            if (isFlipped) {
+                cardInner.classList.add("rotate-y-180");
+                buttonGroup.classList.remove("opacity-0", "pointer-events-none");
+            } else {
+                cardInner.classList.remove("rotate-y-180");
+                buttonGroup.classList.add("opacity-0", "pointer-events-none");
+            }
+        }
+
+        // Flip kortet ved klik
+        function flipCard() {
+            if (isTransitioning || currentDeck.length === 0) return;
+            isFlipped = !isFlipped;
+            updateUIState();
+        }
+
+        // Håndter svar ("Rigtigt" eller "Forkert") med isTransitioning timing
+        function handleAnswer(isCorrect) {
+            if (isTransitioning || !isFlipped) return;
+
+            isTransitioning = true;
+            
+            // 1. Vender kortet tilbage til forsiden (Dansk)
+            isFlipped = false;
+            updateUIState();
+
+            // 2. Venter ca. 400ms før opdatering af teksten for ikke at afsløre svaret for tidligt
+            setTimeout(() => {
+                if (isCorrect) {
+                    // Fjern ordet fra bunken
+                    currentDeck.splice(currentCardIndex, 1);
+                    if (currentCardIndex >= currentDeck.length) {
+                        currentCardIndex = 0;
+                    }
+                } else {
+                    // Bliver i bunken og flyttes om bag i runden
+                    const failedWord = currentDeck.splice(currentCardIndex, 1)[0];
+                    currentDeck.push(failedWord);
+                }
+
+                // Tjek om alle kort er lært
+                if (currentDeck.length === 0) {
+                    gameScreen.classList.add("hidden");
+                    finishScreen.classList.remove("hidden");
+                    cardsCountEl.textContent = "Kort tilbage: 0";
+                } else {
+                    updateCardContent();
+                    updateUIState();
+                }
+
+                isTransitioning = false;
+            }, 400);
+        }
+
+        // Event Listeners
+        cardContainer.addEventListener("click", flipCard);
+        
+        correctBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            handleAnswer(true);
+        });
+
+        wrongBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            handleAnswer(false);
+        });
+
+        languageSelect.addEventListener("change", (e) => {
+            selectedLanguage = e.target.value;
+            updateCardContent();
+        });
+
+        restartBtn.addEventListener("click", () => {
+            initGame();
+        });
+
+        // Start applikationen ved indlæsning
+        window.addEventListener("DOMContentLoaded", () => {
+            initLanguageSelect();
+            initGame();
+        });
+    </script>
+</body>
+</html>
